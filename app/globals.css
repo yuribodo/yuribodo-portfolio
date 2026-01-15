@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Terminal Colors */
+  --color-terminal-green: #4ade80;
+  --color-terminal-amber: #fbbf24;
+  --color-terminal-red: #ef4444;
+
+  /* Animation */
+  --animate-blink: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Selection */
+::selection {
+  background: rgba(74, 222, 128, 0.3);
+  color: inherit;
+}
