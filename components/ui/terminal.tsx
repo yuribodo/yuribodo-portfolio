@@ -41,7 +41,7 @@ export function Terminal({ lines, title = "terminal", className }: TerminalProps
         for (let charIndex = 0; charIndex <= text.length; charIndex++) {
           setCurrentText(text.slice(0, charIndex));
           await new Promise(resolve =>
-            setTimeout(resolve, line.type === "command" ? 50 : 20)
+            setTimeout(resolve, line.type === "command" ? 50 : 35)
           );
         }
 
