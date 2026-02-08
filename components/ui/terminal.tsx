@@ -16,9 +16,11 @@ interface TerminalProps {
   lines: TerminalLine[];
   title?: string;
   className?: string;
+  onComplete?: () => void;
+  children?: React.ReactNode;
 }
 
-export function Terminal({ lines, title = "terminal", className }: TerminalProps) {
+export function Terminal({ lines, title = "terminal", className, onComplete, children }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const linesRef = useRef<HTMLDivElement>(null);
   const [visibleLines, setVisibleLines] = useState<number>(0);
@@ -49,6 +51,8 @@ export function Terminal({ lines, title = "terminal", className }: TerminalProps
         setVisibleLines(prev => prev + 1);
         setCurrentText("");
       }
+
+      onComplete?.();
     };
 
     typeText();
@@ -111,10 +115,14 @@ export function Terminal({ lines, title = "terminal", className }: TerminalProps
         )}
 
         {visibleLines === lines.length && (
-          <div className="flex items-start gap-2 mt-2">
-            <span className="text-green-400">$</span>
-            <Cursor visible={true} />
-          </div>
+          children ? (
+            <div className="mt-2">{children}</div>
+          ) : (
+            <div className="flex items-start gap-2 mt-2">
+              <span className="text-green-400">$</span>
+              <Cursor visible={true} />
+            </div>
+          )
         )}
       </div>
     </motion.div>
