@@ -40,3 +40,9 @@ body {
   background: rgba(74, 222, 128, 0.3);
   color: inherit;
 }
+
+/* Canvas pixel rendering */
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
