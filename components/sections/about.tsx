@@ -8,10 +8,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const PARAGRAPHS = [
-  "I started programming on Replit before I knew what a terminal was. No setup, no configuration — just open and write. That accessibility is what made the whole thing feel possible.",
-  "Since then I've built B2B compliance infrastructure that handles 25+ transactions per second for 20M+ users, an autonomous coding agent that opens pull requests without human intervention, a Solana subscription billing protocol in Rust, and an open-source React component library that other developers actually use.",
-  "My stack centers on TypeScript, React, Node.js, Go, and Python — with Web3 experience across Ethereum, Solana, and NEAR. I use Claude Code and Cursor daily, not as autocomplete, but as a core part of how I reason about architecture and ship faster.",
-  "I'm currently based in São Paulo and open to international opportunities — remote or relocation. If you're building something interesting in AI infrastructure, developer tools, fintech, or Web3, I'd like to hear about it.",
+  "Started on Replit before I knew what a terminal was. Since then — B2B compliance infra handling 25+ TPS for 20M+ users, autonomous agents that open PRs, a Solana billing protocol in Rust, and an open-source component library devs actually use.",
+  "Placed in hackathons across Solana, NEAR, AI Agents, Cypherpunk, and Replit. Top 1% in Brazil's Programming Olympiad — twice.",
+  "Based in São Paulo. Open to international opportunities in AI infrastructure, developer tools, fintech, or Web3.",
 ];
 
 const STACK = [
@@ -101,8 +100,8 @@ export function About() {
           ref={headlineRef}
           className="mb-12 font-sans text-3xl font-black leading-tight tracking-tight text-foreground-bright md:text-4xl"
         >
-          I build production systems, AI tools, and Web3 infrastructure —{" "}
-          <span className="text-accent">and I compete</span>.
+          I ship code that{" "}
+          <span className="text-accent">competes and scales</span>.
         </h2>
 
         <div className="flex flex-col gap-8">

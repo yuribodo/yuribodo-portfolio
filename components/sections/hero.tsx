@@ -28,7 +28,7 @@ export function Hero() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLDivElement>(null);
-  const achievementsRef = useRef<HTMLDivElement>(null);
+
   const linksRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const animFrameRef = useRef<number>(0);
@@ -41,11 +41,12 @@ export function Hero() {
 
     const tl = gsap.timeline({ delay: 0.3 });
 
-    // Name reveal
-    tl.from(nameRef.current, {
-      y: 80,
+    // Name reveal — character by character
+    tl.from("[data-hero-char]", {
+      y: "100%",
       opacity: 0,
-      duration: 1.2,
+      duration: 0.8,
+      stagger: 0.04,
       ease: "power3.out",
     });
 
@@ -58,12 +59,6 @@ export function Hero() {
         ease: "power2.out",
       },
       "-=0.5"
-    );
-
-    tl.from(
-      achievementsRef.current,
-      { y: 15, opacity: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.3"
     );
 
     tl.from(
@@ -106,7 +101,7 @@ export function Hero() {
       const w = window.innerWidth;
       const h = window.innerHeight;
       // Render at lower resolution for performance + aesthetic
-      const scale = 0.25; // 25% resolution = chunky pixels
+      const scale = 0.5;
       canvas.width = Math.floor(w * scale);
       canvas.height = Math.floor(h * scale);
       canvas.style.width = w + "px";
@@ -227,18 +222,7 @@ export function Hero() {
           <p className="mt-2 font-mono text-[10px] text-subtle md:text-xs">
             TypeScript · React · Node.js · Go · Python · Web3
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-              Top 1% OBP ×2
-            </span>
-            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-              10+ hackathons
-            </span>
-            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-              2nd Replit + Resend
-            </span>
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="mt-8 flex items-center justify-center gap-6">
             <a
               href="https://github.com/yuribodo"
               target="_blank"
@@ -255,9 +239,6 @@ export function Hero() {
             >
               LinkedIn ↗
             </a>
-            <span className="rounded border border-accent px-3 py-1 font-mono text-xs text-accent">
-              Open to opportunities
-            </span>
           </div>
         </div>
       </section>
@@ -287,9 +268,21 @@ export function Hero() {
           ref={nameRef}
           className="font-sans text-7xl font-black tracking-[-4px] text-foreground-bright mix-blend-difference md:text-[120px] lg:text-[160px]"
         >
-          YURI
+          <span className="inline-block overflow-hidden">
+            {"YURI".split("").map((char, i) => (
+              <span key={`y-${i}`} data-hero-char className="inline-block">
+                {char}
+              </span>
+            ))}
+          </span>
           <br />
-          <span className="text-accent">BODO</span>
+          <span className="inline-block overflow-hidden">
+            {"BODO".split("").map((char, i) => (
+              <span key={`b-${i}`} data-hero-char className="inline-block text-accent">
+                {char}
+              </span>
+            ))}
+          </span>
         </h1>
 
         <div
@@ -304,21 +297,8 @@ export function Hero() {
           </p>
         </div>
 
-        {/* Achievements */}
-        <div ref={achievementsRef} className="mt-8 flex flex-wrap justify-center gap-3">
-          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-            Top 1% OBP ×2
-          </span>
-          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-            10+ hackathons
-          </span>
-          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
-            2nd Replit + Resend
-          </span>
-        </div>
-
         {/* Links */}
-        <div ref={linksRef} className="mt-6 flex items-center gap-4">
+        <div ref={linksRef} className="mt-8 flex items-center gap-6">
           <a
             href="https://github.com/yuribodo"
             target="_blank"
@@ -335,9 +315,6 @@ export function Hero() {
           >
             LinkedIn ↗
           </a>
-          <span className="rounded border border-accent px-3 py-1 font-mono text-xs text-accent transition-premium hover:bg-accent hover:text-background">
-            Open to opportunities
-          </span>
         </div>
       </div>
 
