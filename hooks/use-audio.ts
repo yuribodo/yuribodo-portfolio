@@ -8,11 +8,7 @@ import {
 } from "@/lib/audio-manager";
 
 export function useAudio() {
-  const [isMuted, setIsMuted] = useState(true);
-
-  useEffect(() => {
-    setIsMuted(getIsMuted());
-  }, []);
+  const [isMuted, setIsMuted] = useState(() => getIsMuted());
 
   useEffect(() => {
     function handleInteraction() {
