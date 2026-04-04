@@ -28,6 +28,8 @@ export function Hero() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLDivElement>(null);
+  const achievementsRef = useRef<HTMLDivElement>(null);
+  const linksRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const animFrameRef = useRef<number>(0);
   const ditherRef = useRef({ strength: 1.0 });
@@ -56,6 +58,18 @@ export function Hero() {
         ease: "power2.out",
       },
       "-=0.5"
+    );
+
+    tl.from(
+      achievementsRef.current,
+      { y: 15, opacity: 0, duration: 0.6, ease: "power2.out" },
+      "-=0.3"
+    );
+
+    tl.from(
+      linksRef.current,
+      { y: 15, opacity: 0, duration: 0.6, ease: "power2.out" },
+      "-=0.3"
     );
 
     tl.from(
@@ -205,11 +219,46 @@ export function Hero() {
       <section className="flex h-screen w-full items-center justify-center">
         <div className="text-center">
           <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-8xl">
-            YURI<br />BODO
+            YURI<br /><span className="text-accent">BODO</span>
           </h1>
           <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-muted">
-            Creative Frontend Developer
+            Full Stack Engineer
           </p>
+          <p className="mt-2 font-mono text-[10px] text-subtle md:text-xs">
+            TypeScript · React · Node.js · Go · Python · Web3
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+              Top 1% OBP ×2
+            </span>
+            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+              10+ hackathons
+            </span>
+            <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+              2nd Replit + Resend
+            </span>
+          </div>
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <a
+              href="https://github.com/yuribodo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+            >
+              GitHub ↗
+            </a>
+            <a
+              href="https://linkedin.com/in/yuribodo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+            >
+              LinkedIn ↗
+            </a>
+            <span className="rounded border border-accent px-3 py-1 font-mono text-xs text-accent">
+              Open to opportunities
+            </span>
+          </div>
         </div>
       </section>
     );
@@ -232,7 +281,7 @@ export function Hero() {
       {/* Content overlay */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 flex flex-col items-center justify-center"
+        className="absolute inset-0 flex flex-col items-center justify-center px-6"
       >
         <h1
           ref={nameRef}
@@ -245,9 +294,50 @@ export function Hero() {
 
         <div
           ref={subtitleRef}
-          className="mt-6 font-sans text-xs font-semibold uppercase tracking-[4px] text-muted md:text-sm"
+          className="mt-6 text-center"
         >
-          Creative Frontend Developer
+          <p className="font-sans text-xs font-semibold uppercase tracking-[4px] text-muted md:text-sm">
+            Full Stack Engineer
+          </p>
+          <p className="mt-2 font-mono text-[10px] text-subtle md:text-xs">
+            TypeScript · React · Node.js · Go · Python · Web3
+          </p>
+        </div>
+
+        {/* Achievements */}
+        <div ref={achievementsRef} className="mt-8 flex flex-wrap justify-center gap-3">
+          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+            Top 1% OBP ×2
+          </span>
+          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+            10+ hackathons
+          </span>
+          <span className="rounded border border-border px-3 py-1 font-mono text-[10px] text-muted">
+            2nd Replit + Resend
+          </span>
+        </div>
+
+        {/* Links */}
+        <div ref={linksRef} className="mt-6 flex items-center gap-4">
+          <a
+            href="https://github.com/yuribodo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+          >
+            GitHub ↗
+          </a>
+          <a
+            href="https://linkedin.com/in/yuribodo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+          >
+            LinkedIn ↗
+          </a>
+          <span className="rounded border border-accent px-3 py-1 font-mono text-xs text-accent transition-premium hover:bg-accent hover:text-background">
+            Open to opportunities
+          </span>
         </div>
       </div>
 

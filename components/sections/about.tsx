@@ -8,22 +8,16 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const PARAGRAPHS = [
-  "Sou Yuri Bodo, desenvolvedor frontend criativo do Brasil. Meu trabalho vive na interseção entre código e arte — onde animações têm propósito e interações contam histórias.",
-  "Cresci jogando Pokémon, duelando Yu-Gi-Oh e estudando xadrez. Esses jogos me ensinaram paciência, estratégia e a importância de cada detalhe. Aplico isso em tudo que construo.",
-  "Minha stack favorita envolve React, TypeScript, GSAP e qualquer coisa que me permita empurrar os limites do que a web pode fazer.",
-  "Next.js, Three.js, Framer Motion, Tailwind — as ferramentas mudam, mas a obsessão por craft permanece.",
+  "I started programming on Replit before I knew what a terminal was. No setup, no configuration — just open and write. That accessibility is what made the whole thing feel possible.",
+  "Since then I've built B2B compliance infrastructure that handles 25+ transactions per second for 20M+ users, an autonomous coding agent that opens pull requests without human intervention, a Solana subscription billing protocol in Rust, and an open-source React component library that other developers actually use.",
+  "My stack centers on TypeScript, React, Node.js, Go, and Python — with Web3 experience across Ethereum, Solana, and NEAR. I use Claude Code and Cursor daily, not as autocomplete, but as a core part of how I reason about architecture and ship faster.",
+  "I'm currently based in São Paulo and open to international opportunities — remote or relocation. If you're building something interesting in AI infrastructure, developer tools, fintech, or Web3, I'd like to hear about it.",
 ];
 
-const SKILLS = [
-  "React",
-  "TypeScript",
-  "Next.js",
-  "GSAP",
-  "Three.js",
-  "Tailwind",
-  "Framer Motion",
-  "Canvas",
-  "WebGL",
+const STACK = [
+  "TypeScript", "React", "Node.js", "Go", "Python",
+  "Next.js", "Solana", "Ethereum", "NEAR", "Rust",
+  "GSAP", "Tailwind",
 ];
 
 export function About() {
@@ -107,8 +101,8 @@ export function About() {
           ref={headlineRef}
           className="mb-12 font-sans text-3xl font-black leading-tight tracking-tight text-foreground-bright md:text-4xl"
         >
-          Cada interface que eu construo é uma{" "}
-          <span className="text-accent">jogada calculada</span>.
+          I build production systems, AI tools, and Web3 infrastructure —{" "}
+          <span className="text-accent">and I compete</span>.
         </h2>
 
         <div className="flex flex-col gap-8">
@@ -123,14 +117,14 @@ export function About() {
           ))}
         </div>
 
-        {/* Skills inline */}
+        {/* Stack */}
         <div className="mt-12 flex flex-wrap gap-2">
-          {SKILLS.map((skill) => (
+          {STACK.map((tech) => (
             <span
-              key={skill}
+              key={tech}
               className="rounded border border-border px-3 py-1 font-mono text-xs text-subtle transition-premium hover:border-accent hover:text-accent"
             >
-              {skill}
+              {tech}
             </span>
           ))}
         </div>
