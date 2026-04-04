@@ -32,7 +32,7 @@ export function Hero() {
   const linksRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const animFrameRef = useRef<number>(0);
-  const ditherRef = useRef({ strength: 0.6 });
+  const ditherRef = useRef({ strength: 0.4 });
   const reducedMotion = useReducedMotion();
 
   // Entrance animations
@@ -101,7 +101,7 @@ export function Hero() {
       const w = window.innerWidth;
       const h = window.innerHeight;
       // Render at lower resolution for performance + aesthetic
-      const scale = 0.75;
+      const scale = 1.0;
       canvas.width = Math.floor(w * scale);
       canvas.height = Math.floor(h * scale);
       canvas.style.width = w + "px";
@@ -203,7 +203,7 @@ export function Hero() {
 
   function handleMouseLeave() {
     gsap.to(ditherRef.current, {
-      strength: 0.6,
+      strength: 0.4,
       duration: 0.8,
       ease: "power2.in",
     });
@@ -216,10 +216,10 @@ export function Hero() {
           <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-[100px] lg:text-[140px]">
             YURI <span className="text-accent">BODO</span>
           </h1>
-          <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-muted">
+          <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-foreground">
             Full Stack Engineer
           </p>
-          <p className="mt-2 font-mono text-[10px] text-subtle md:text-xs">
+          <p className="mt-2 font-mono text-[10px] text-muted md:text-xs">
             TypeScript · React · Node.js · Go · Python · Web3
           </p>
           <div className="mt-8 flex items-center justify-center gap-6">
@@ -227,7 +227,7 @@ export function Hero() {
               href="https://github.com/yuribodo"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+              className="font-mono text-xs text-muted transition-premium hover:text-accent"
             >
               GitHub ↗
             </a>
@@ -235,7 +235,7 @@ export function Hero() {
               href="https://linkedin.com/in/yuribodo"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+              className="font-mono text-xs text-muted transition-premium hover:text-accent"
             >
               LinkedIn ↗
             </a>
@@ -256,7 +256,7 @@ export function Hero() {
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
-        style={{ imageRendering: "pixelated" }}
+        style={{ imageRendering: "auto" }}
       />
 
       {/* Content overlay */}
@@ -289,10 +289,10 @@ export function Hero() {
           ref={subtitleRef}
           className="mt-6 text-center"
         >
-          <p className="font-sans text-xs font-semibold uppercase tracking-[4px] text-muted md:text-sm">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[4px] text-foreground md:text-sm">
             Full Stack Engineer
           </p>
-          <p className="mt-2 font-mono text-[10px] text-subtle md:text-xs">
+          <p className="mt-2 font-mono text-[10px] text-muted md:text-xs">
             TypeScript · React · Node.js · Go · Python · Web3
           </p>
         </div>
@@ -303,7 +303,7 @@ export function Hero() {
             href="https://github.com/yuribodo"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+            className="font-mono text-xs text-muted transition-premium hover:text-accent"
           >
             GitHub ↗
           </a>
@@ -311,7 +311,7 @@ export function Hero() {
             href="https://linkedin.com/in/yuribodo"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-subtle transition-premium hover:text-accent"
+            className="font-mono text-xs text-muted transition-premium hover:text-accent"
           >
             LinkedIn ↗
           </a>
