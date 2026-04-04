@@ -11,29 +11,69 @@ export interface Project {
 }
 
 export const projects: Project[] = [
-  // Placeholder projects — Yuri will replace with real data
   {
-    slug: "project-one",
-    title: "Project One",
+    slug: "launchlist",
+    title: "LaunchList",
     description:
-      "A description of the first project showcasing creative frontend work.",
-    tech: ["React", "GSAP", "TypeScript"],
+      "Hackathon-born product for managing waitlists and early access campaigns. Built during competition, now a real product.",
+    tech: ["TypeScript", "React", "Node.js"],
     featured: true,
+    links: {
+      github: "https://github.com/yuribodo/launchlist",
+    },
   },
   {
-    slug: "project-two",
-    title: "Project Two",
+    slug: "bugless",
+    title: "BugLess",
     description:
-      "Another project demonstrating animation and interaction craft.",
-    tech: ["Next.js", "Three.js"],
-    featured: false,
+      "AI-powered tools for automated bug detection and code quality analysis.",
+    tech: ["TypeScript", "AI", "Node.js"],
+    featured: true,
+    links: {
+      github: "https://github.com/yuribodo/bugless",
+    },
   },
   {
-    slug: "project-three",
-    title: "Project Three",
+    slug: "mario-charts",
+    title: "Mario Charts",
     description:
-      "A third project exploring the boundaries of web interaction.",
-    tech: ["Canvas", "Pretext"],
+      "Open-source React component library for data visualization. Used by other developers in production.",
+    tech: ["React", "TypeScript", "Open Source"],
+    featured: true,
+    links: {
+      github: "https://github.com/yuribodo/mario-charts",
+    },
+  },
+  {
+    slug: "auto-issue",
+    title: "Auto-Issue",
+    description:
+      "Autonomous coding agent built in Go that opens pull requests without human intervention.",
+    tech: ["Go", "AI Agents", "GitHub API"],
+    featured: true,
+    links: {
+      github: "https://github.com/yuribodo/auto-issue",
+    },
+  },
+  {
+    slug: "givememoney",
+    title: "GiveMeMoney",
+    description: "Web3 payment infrastructure on Solana blockchain.",
+    tech: ["Solana", "Rust", "TypeScript"],
     featured: false,
+    links: {
+      github: "https://github.com/yuribodo/givememoney",
+    },
+  },
+  {
+    slug: "pattpay",
+    title: "PattPay",
+    description:
+      "Solana subscription billing protocol. Handles recurring payments on-chain.",
+    tech: ["Solana", "Rust", "Web3"],
+    featured: false,
+    links: {
+      github: "https://github.com/yuribodo/pattpay",
+    },
   },
 ];
