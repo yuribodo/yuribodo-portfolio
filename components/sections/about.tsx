@@ -11,6 +11,19 @@ const PARAGRAPHS = [
   "Sou Yuri Bodo, desenvolvedor frontend criativo do Brasil. Meu trabalho vive na interseção entre código e arte — onde animações têm propósito e interações contam histórias.",
   "Cresci jogando Pokémon, duelando Yu-Gi-Oh e estudando xadrez. Esses jogos me ensinaram paciência, estratégia e a importância de cada detalhe. Aplico isso em tudo que construo.",
   "Minha stack favorita envolve React, TypeScript, GSAP e qualquer coisa que me permita empurrar os limites do que a web pode fazer.",
+  "Next.js, Three.js, Framer Motion, Tailwind — as ferramentas mudam, mas a obsessão por craft permanece.",
+];
+
+const SKILLS = [
+  "React",
+  "TypeScript",
+  "Next.js",
+  "GSAP",
+  "Three.js",
+  "Tailwind",
+  "Framer Motion",
+  "Canvas",
+  "WebGL",
 ];
 
 export function About() {
@@ -107,6 +120,18 @@ export function About() {
             >
               {text}
             </p>
+          ))}
+        </div>
+
+        {/* Skills inline */}
+        <div className="mt-12 flex flex-wrap gap-2">
+          {SKILLS.map((skill) => (
+            <span
+              key={skill}
+              className="rounded border border-border px-3 py-1 font-mono text-xs text-subtle transition-premium hover:border-accent hover:text-accent"
+            >
+              {skill}
+            </span>
           ))}
         </div>
       </div>

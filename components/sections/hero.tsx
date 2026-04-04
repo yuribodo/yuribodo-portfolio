@@ -1,36 +1,261 @@
 "use client";
 
-import { useRef } from "react";
-import { TextParticles } from "@/components/canvas/text-particles";
-import { HeroScene } from "@/components/canvas/hero-scene";
+import { useEffect, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { startSoundtrack } from "@/lib/audio-manager";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// 4x4 Bayer dithering matrix
+const BAYER_4X4 = [
+  [0, 8, 2, 10],
+  [12, 4, 14, 6],
+  [3, 11, 1, 9],
+  [15, 7, 13, 5],
+];
+
+// Normalize Bayer matrix to 0-1 range
+const BAYER_NORMALIZED = BAYER_4X4.map((row) =>
+  row.map((v) => v / 16)
+);
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number>(0);
+  const ditherRef = useRef({ strength: 1.0 });
+  const reducedMotion = useReducedMotion();
 
-  function handleBootComplete() {
-    startSoundtrack("/audio/soundtrack.mp3");
+  // Entrance animations
+  useGSAP(() => {
+    if (reducedMotion) return;
+
+    const tl = gsap.timeline({ delay: 0.3 });
+
+    // Name reveal
+    tl.from(nameRef.current, {
+      y: 80,
+      opacity: 0,
+      duration: 1.2,
+      ease: "power3.out",
+    });
+
+    tl.from(
+      subtitleRef.current,
+      {
+        y: 20,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+      },
+      "-=0.5"
+    );
+
+    tl.from(
+      scrollRef.current,
+      {
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      },
+      "-=0.3"
+    );
+
+    // Start soundtrack after entrance
+    tl.call(() => {
+      startSoundtrack("/audio/soundtrack.mp3");
+    });
+  }, [reducedMotion]);
+
+  // Dithering canvas render loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || reducedMotion) return;
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    // Placeholder: animated gradient (replace with video later)
+    const offscreen = document.createElement("canvas");
+    const offCtx = offscreen.getContext("2d");
+    if (!offCtx) return;
+
+    function resize() {
+      if (!canvas) return;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // Render at lower resolution for performance + aesthetic
+      const scale = 0.25; // 25% resolution = chunky pixels
+      canvas.width = Math.floor(w * scale);
+      canvas.height = Math.floor(h * scale);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      offscreen.width = canvas.width;
+      offscreen.height = canvas.height;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    function drawGradient(time: number) {
+      if (!offCtx) return;
+      const w = offscreen.width;
+      const h = offscreen.height;
+
+      // Animated warm gradient (placeholder for video)
+      const t = time * 0.0003;
+      const grad = offCtx.createLinearGradient(
+        w * (0.3 + Math.sin(t) * 0.2),
+        0,
+        w * (0.7 + Math.cos(t * 0.7) * 0.2),
+        h
+      );
+      grad.addColorStop(0, "#1a1a1a");
+      grad.addColorStop(0.3, "#45272f");
+      grad.addColorStop(0.5, "#2e2024");
+      grad.addColorStop(0.7, "#9f5454");
+      grad.addColorStop(1, "#1a1a1a");
+      offCtx.fillStyle = grad;
+      offCtx.fillRect(0, 0, w, h);
+
+      // Add some noise/variation
+      const grad2 = offCtx.createRadialGradient(
+        w * (0.5 + Math.sin(t * 1.3) * 0.3),
+        h * (0.5 + Math.cos(t * 0.9) * 0.3),
+        0,
+        w * 0.5,
+        h * 0.5,
+        w * 0.6
+      );
+      grad2.addColorStop(0, "rgba(250, 75, 18, 0.15)");
+      grad2.addColorStop(1, "transparent");
+      offCtx.fillStyle = grad2;
+      offCtx.fillRect(0, 0, w, h);
+    }
+
+    function applyDithering(strength: number) {
+      if (!ctx || !canvas) return;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Draw source (gradient placeholder or video frame)
+      ctx.drawImage(offscreen, 0, 0);
+
+      if (strength <= 0.01) return; // Skip dithering when fully revealed
+
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const data = imageData.data;
+      const colorLevels = Math.max(2, Math.round(2 + (1 - strength) * 14)); // 2 colors at max dither, 16 at no dither
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4;
+          const threshold = BAYER_NORMALIZED[y % 4][x % 4];
+
+          for (let c = 0; c < 3; c++) {
+            const value = data[idx + c] / 255;
+            const quantized =
+              Math.floor(value * (colorLevels - 1) + threshold * strength) /
+              (colorLevels - 1);
+            data[idx + c] = Math.min(255, Math.max(0, quantized * 255));
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function loop(now: number) {
+      drawGradient(now);
+      applyDithering(ditherRef.current.strength);
+      animFrameRef.current = requestAnimationFrame(loop);
+    }
+    animFrameRef.current = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, [reducedMotion]);
+
+  function handleMouseEnter() {
+    gsap.to(ditherRef.current, {
+      strength: 0,
+      duration: 1.2,
+      ease: "power2.out",
+    });
+  }
+
+  function handleMouseLeave() {
+    gsap.to(ditherRef.current, {
+      strength: 1,
+      duration: 0.8,
+      ease: "power2.in",
+    });
+  }
+
+  if (reducedMotion) {
+    return (
+      <section className="flex h-screen w-full items-center justify-center">
+        <div className="text-center">
+          <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-8xl">
+            YURI<br />BODO
+          </h1>
+          <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-muted">
+            Creative Frontend Developer
+          </p>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section ref={sectionRef} className="relative h-screen w-full overflow-hidden">
-      <TextParticles
-        text="YURI BODO"
-        fontSize={72}
-        color="#ede4df"
-        onBootComplete={handleBootComplete}
+    <section
+      ref={sectionRef}
+      className="relative h-screen w-full overflow-hidden"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Dithered canvas background */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0"
+        style={{ imageRendering: "pixelated" }}
       />
-      <HeroScene />
 
-      {/* Subtitle — appears after boot */}
-      <div className="pointer-events-none absolute bottom-[20%] left-1/2 -translate-x-1/2 text-center">
-        <p className="font-sans text-sm font-semibold uppercase tracking-[4px] text-muted">
+      {/* Content overlay */}
+      <div
+        ref={overlayRef}
+        className="absolute inset-0 flex flex-col items-center justify-center"
+      >
+        <h1
+          ref={nameRef}
+          className="font-sans text-7xl font-black tracking-[-4px] text-foreground-bright mix-blend-difference md:text-[120px] lg:text-[160px]"
+        >
+          YURI
+          <br />
+          <span className="text-accent">BODO</span>
+        </h1>
+
+        <div
+          ref={subtitleRef}
+          className="mt-6 font-sans text-xs font-semibold uppercase tracking-[4px] text-muted md:text-sm"
+        >
           Creative Frontend Developer
-        </p>
+        </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-subtle">
+      <div
+        ref={scrollRef}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-subtle"
+      >
         SCROLL ▼
       </div>
     </section>
