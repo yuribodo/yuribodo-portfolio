@@ -4,13 +4,14 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PretextHeadline } from "@/components/canvas/pretext-headline";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const STATS = [
-  { value: "Top 1%", label: "Brazil's Programming Olympiad — twice" },
-  { value: "10+", label: "Hackathons across Solana, NEAR, AI, Replit" },
-  { value: "20M+", label: "Users on infrastructure I've built" },
+  { value: "Top 1%", label: "OBP \u2014 twice" },
+  { value: "10+", label: "Hackathons" },
+  { value: "20M+", label: "Users served" },
 ];
 
 const STACK = [
@@ -23,7 +24,6 @@ export function About() {
 
   useGSAP(
     () => {
-      // Animate all revealable elements
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         gsap.from(el, {
           opacity: 0,
@@ -43,48 +43,58 @@ export function About() {
   );
 
   return (
-    <section ref={sectionRef} className="relative px-6 py-32">
+    <section
+      ref={sectionRef}
+      className="relative px-6 py-32"
+      style={{
+        background: "linear-gradient(180deg, #1a1a1a 0%, #1e1a18 50%, #1a1a1a 100%)",
+      }}
+    >
       <div className="mx-auto max-w-3xl">
 
-        {/* Stats row */}
-        <div data-reveal className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-3">
+        {/* Interactive Pretext headline */}
+        <div data-reveal>
+          <PretextHeadline
+            text="I build things that compete."
+            className="mb-16"
+          />
+        </div>
+
+        {/* Stats */}
+        <div data-reveal className="mb-16 grid grid-cols-3 gap-6">
           {STATS.map((stat) => (
-            <div key={stat.value} className="text-center md:text-left">
-              <div className="font-sans text-4xl font-black text-accent md:text-5xl">
+            <div key={stat.value}>
+              <div className="font-sans text-3xl font-black text-accent md:text-4xl">
                 {stat.value}
               </div>
-              <div className="mt-2 font-sans text-sm text-muted">
+              <div className="mt-1 font-sans text-xs text-muted">
                 {stat.label}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Bio */}
-        <div className="space-y-6">
-          <p data-reveal className="font-sans text-lg leading-relaxed text-foreground md:text-xl">
-            I started programming on Replit before I knew what a terminal was. No setup, no configuration — just open and write. That accessibility is what made the whole thing feel possible.
-          </p>
-
-          <p data-reveal className="font-sans text-base leading-relaxed text-muted">
-            Since then I&apos;ve built B2B compliance infrastructure that handles 25+ transactions per second for 20M+ users, an autonomous coding agent that opens pull requests without human intervention, a Solana subscription billing protocol in Rust, and an open-source React component library that other developers actually use.
-          </p>
-
-          <p data-reveal className="font-sans text-base leading-relaxed text-muted">
-            My stack centers on TypeScript, React, Node.js, Go, and Python — with Web3 experience across Ethereum, Solana, and NEAR. I use Claude Code and Cursor daily, not as autocomplete, but as a core part of how I reason about architecture and ship faster.
+        {/* Bio — short, direct, mostly bright */}
+        <div className="space-y-5">
+          <p data-reveal className="font-sans text-lg leading-relaxed text-foreground-bright">
+            Full stack engineer from S&atilde;o Paulo. I ship production systems, AI agents, and Web3 protocols &mdash; then I go compete in hackathons with them.
           </p>
 
           <p data-reveal className="font-sans text-base leading-relaxed text-foreground">
-            Based in São Paulo. Open to international opportunities — remote or relocation. If you&apos;re building something interesting in AI infrastructure, developer tools, fintech, or Web3, I&apos;d like to hear about it.
+            I&apos;ve built compliance infra handling 25+ TPS for 20M+ users, an autonomous agent that opens PRs without humans, a Solana billing protocol in Rust, and an open-source component library other devs actually use.
+          </p>
+
+          <p data-reveal className="font-sans text-base leading-relaxed text-foreground-bright">
+            Open to international opportunities. If you&apos;re building in AI, dev tools, fintech, or Web3 &mdash; let&apos;s talk.
           </p>
         </div>
 
         {/* Stack */}
-        <div data-reveal className="mt-16 flex flex-wrap gap-2">
+        <div data-reveal className="mt-12 flex flex-wrap gap-2">
           {STACK.map((tech) => (
             <span
               key={tech}
-              className="rounded border border-border px-3 py-1.5 font-mono text-xs text-foreground transition-premium hover:border-accent hover:text-accent"
+              className="rounded border border-border px-3 py-1.5 font-mono text-xs text-foreground-bright transition-premium hover:border-accent hover:text-accent"
             >
               {tech}
             </span>
