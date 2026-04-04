@@ -32,7 +32,7 @@ export function Hero() {
   const linksRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const animFrameRef = useRef<number>(0);
-  const ditherRef = useRef({ strength: 1.0 });
+  const ditherRef = useRef({ strength: 0.6 });
   const reducedMotion = useReducedMotion();
 
   // Entrance animations
@@ -101,7 +101,7 @@ export function Hero() {
       const w = window.innerWidth;
       const h = window.innerHeight;
       // Render at lower resolution for performance + aesthetic
-      const scale = 0.5;
+      const scale = 0.75;
       canvas.width = Math.floor(w * scale);
       canvas.height = Math.floor(h * scale);
       canvas.style.width = w + "px";
@@ -203,7 +203,7 @@ export function Hero() {
 
   function handleMouseLeave() {
     gsap.to(ditherRef.current, {
-      strength: 1,
+      strength: 0.6,
       duration: 0.8,
       ease: "power2.in",
     });
@@ -213,8 +213,8 @@ export function Hero() {
     return (
       <section className="flex h-screen w-full items-center justify-center">
         <div className="text-center">
-          <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-8xl">
-            YURI<br /><span className="text-accent">BODO</span>
+          <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-[100px] lg:text-[140px]">
+            YURI <span className="text-accent">BODO</span>
           </h1>
           <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-muted">
             Full Stack Engineer
@@ -266,7 +266,7 @@ export function Hero() {
       >
         <h1
           ref={nameRef}
-          className="font-sans text-7xl font-black tracking-[-4px] text-foreground-bright mix-blend-difference md:text-[120px] lg:text-[160px]"
+          className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright mix-blend-difference md:text-[100px] lg:text-[140px]"
         >
           <span className="inline-block overflow-hidden">
             {"YURI".split("").map((char, i) => (
@@ -275,7 +275,7 @@ export function Hero() {
               </span>
             ))}
           </span>
-          <br />
+          <span className="inline-block w-[0.2em]" />
           <span className="inline-block overflow-hidden">
             {"BODO".split("").map((char, i) => (
               <span key={`b-${i}`} data-hero-char className="inline-block text-accent">

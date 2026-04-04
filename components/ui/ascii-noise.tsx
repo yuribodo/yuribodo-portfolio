@@ -28,7 +28,7 @@ export function AsciiNoise() {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = `${charSize}px JetBrains Mono, monospace`;
-      ctx.fillStyle = "rgba(46, 32, 36, 0.06)";
+      ctx.fillStyle = "rgba(69, 39, 47, 0.15)";
 
       const cols = Math.ceil(canvas.width / charSize);
       const rows = Math.ceil(canvas.height / charSize);
