@@ -31,7 +31,7 @@ export function ProjectCard({ project, isActive }: ProjectCardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-[280px] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-surface transition-all duration-300 md:w-[320px] ${
+      className={`relative w-[280px] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-surface transition-all transition-premium md:w-[320px] ${
         project.featured
           ? "border-accent shadow-[0_0_30px_rgba(250,75,18,0.08)]"
           : "border-border"

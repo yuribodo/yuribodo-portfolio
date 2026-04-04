@@ -23,7 +23,12 @@ export function Projects() {
         scale: 0.95,
         duration: 0.4,
         ease: "power2.out",
-        scrollTrigger: { trigger: labelRef.current, start: "top 85%" },
+        scrollTrigger: {
+          trigger: labelRef.current,
+          start: "top 90%",
+          end: "top 60%",
+          scrub: 1,
+        },
       });
 
       // Cards stagger entrance
@@ -35,7 +40,12 @@ export function Projects() {
           rotation: 5 + i * 2,
           duration: 0.6,
           ease: "power3.out",
-          scrollTrigger: { trigger: deckRef.current, start: "top 80%" },
+          scrollTrigger: {
+            trigger: deckRef.current,
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 1,
+          },
           delay: i * 0.1,
         });
       });
@@ -83,7 +93,7 @@ export function Projects() {
         {projects.map((_, i) => (
           <div
             key={i}
-            className={`h-[3px] rounded-full transition-all duration-300 ${
+            className={`h-[3px] rounded-full transition-all transition-premium ${
               i === activeIndex
                 ? "w-5 bg-accent"
                 : "w-2 bg-border"

@@ -1,0 +1,191 @@
+<h2>Design — SKILLS: Constellation / Skill Tree</h2>
+<p class="subtitle">Suas tecnologias como estrelas conectadas. Qual nível de interatividade?</p>
+
+<div class="cards">
+  <div class="card" data-choice="constellation-svg" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative; overflow: hidden;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 16px;">004 — SKILLS</div>
+
+      <!-- Constellation map -->
+      <svg viewBox="0 0 400 220" style="width: 100%; height: auto;">
+        <!-- Connection lines -->
+        <line x1="200" y1="60" x2="120" y2="110" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="200" y1="60" x2="280" y2="100" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="200" y1="60" x2="200" y2="140" stroke="#1a3a1a" stroke-width="1"/>
+        <line x1="120" y1="110" x2="60" y2="160" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="120" y1="110" x2="160" y2="170" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="280" y1="100" x2="340" y2="150" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="280" y1="100" x2="260" y2="170" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="200" y1="140" x2="160" y2="170" stroke="#1a1a2a" stroke-width="1"/>
+        <line x1="200" y1="140" x2="260" y2="170" stroke="#1a1a2a" stroke-width="1"/>
+
+        <!-- Core node — React -->
+        <circle cx="200" cy="60" r="16" fill="#0a0a12" stroke="#4ade80" stroke-width="2"/>
+        <text x="200" y="64" text-anchor="middle" fill="#4ade80" font-size="8" font-family="monospace">React</text>
+
+        <!-- Connected nodes -->
+        <circle cx="120" cy="110" r="12" fill="#0a0a12" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="120" y="114" text-anchor="middle" fill="#3b82f6" font-size="7" font-family="monospace">TS</text>
+
+        <circle cx="280" cy="100" r="12" fill="#0a0a12" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="280" y="104" text-anchor="middle" fill="#fbbf24" font-size="7" font-family="monospace">GSAP</text>
+
+        <circle cx="200" cy="140" r="13" fill="#0a0a12" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="200" y="144" text-anchor="middle" fill="#8b5cf6" font-size="7" font-family="monospace">Next</text>
+
+        <!-- Leaf nodes -->
+        <circle cx="60" cy="160" r="8" fill="#0a0a12" stroke="#555" stroke-width="1"/>
+        <text x="60" y="163" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">CSS</text>
+
+        <circle cx="160" cy="170" r="9" fill="#0a0a12" stroke="#555" stroke-width="1"/>
+        <text x="160" y="173" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">Tailwind</text>
+
+        <circle cx="260" cy="170" r="9" fill="#0a0a12" stroke="#555" stroke-width="1"/>
+        <text x="260" y="173" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">Three.js</text>
+
+        <circle cx="340" cy="150" r="8" fill="#0a0a12" stroke="#555" stroke-width="1"/>
+        <text x="340" y="153" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">Motion</text>
+
+        <!-- Glow on core -->
+        <circle cx="200" cy="60" r="24" fill="none" stroke="rgba(74,222,128,0.1)" stroke-width="8"/>
+      </svg>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; margin-top: 8px; text-align: center; line-height: 1.8;">
+        → ScrollTrigger: estrelas aparecem uma a uma como céu noturno.<br>
+        → Linhas se desenham conectando nodes relacionados.<br>
+        → Hover em node: glow + tooltip com descrição e nível de experiência.<br>
+        → Hover ilumina conexões (linhas ficam brilhantes).<br>
+        → Tamanho do node = nível de proficiência.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Constellation SVG Interativa (Recomendada)</h3>
+      <p>SVG puro + GSAP. Estrelas são skills, tamanho = proficiência, linhas = relação entre techs. ScrollTrigger revela estrela por estrela. Hover ilumina conexões. Simples, elegante, performático. Parece um mapa estelar — referência gaming sutil (skill tree) sem ser literal.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="orbit-system" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative; overflow: hidden;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 16px;">004 — SKILLS</div>
+
+      <!-- Solar system / orbit layout -->
+      <div style="position: relative; width: 100%; height: 220px; display: flex; align-items: center; justify-content: center;">
+
+        <!-- Orbits -->
+        <div style="position: absolute; width: 200px; height: 200px; border: 1px solid #111; border-radius: 50%;"></div>
+        <div style="position: absolute; width: 140px; height: 140px; border: 1px solid #151515; border-radius: 50%;"></div>
+        <div style="position: absolute; width: 80px; height: 80px; border: 1px solid #1a1a1a; border-radius: 50%;"></div>
+
+        <!-- Core -->
+        <div style="position: absolute; width: 36px; height: 36px; background: #0a0a12; border: 2px solid #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3;">
+          <span style="color: #4ade80; font-size: 7px; font-weight: bold;">CORE</span>
+        </div>
+
+        <!-- Inner orbit skills -->
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(30px, -55px); z-index: 2;">
+          <div style="width: 28px; height: 28px; background: #0a0a12; border: 1.5px solid #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #3b82f6; font-size: 6px;">React</span>
+          </div>
+        </div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-55px, 20px); z-index: 2;">
+          <div style="width: 28px; height: 28px; background: #0a0a12; border: 1.5px solid #fbbf24; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #fbbf24; font-size: 6px;">TS</span>
+          </div>
+        </div>
+
+        <!-- Outer orbit skills -->
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(80px, 30px); z-index: 2;">
+          <div style="width: 22px; height: 22px; background: #0a0a12; border: 1px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #555; font-size: 5px;">GSAP</span>
+          </div>
+        </div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-90px, -40px); z-index: 2;">
+          <div style="width: 22px; height: 22px; background: #0a0a12; border: 1px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #555; font-size: 5px;">Next</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; margin-top: 8px; text-align: center; line-height: 1.8;">
+        → Skills orbitam ao redor de um núcleo (você / sua especialidade).<br>
+        → Órbita interna = core skills, externa = tools e libs.<br>
+        → Nodes orbitam lentamente (CSS animation ou GSAP).<br>
+        → Click pausa órbita e expande detalhes do skill.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Sistema Solar / Órbitas</h3>
+      <p>Você é o centro. Skills orbitam ao redor — core skills perto, ferramentas mais longe. Nodes se movem lentamente em órbita. Click congela e expande. Visual de sistema planetário — conecta com sua ideia original de "planeta para projetos" mas aplicado a skills.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="grid-rpg" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 16px;">004 — SKILLS</div>
+
+      <!-- RPG skill grid -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 360px; margin: 0 auto;">
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #4ade80; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: relative;">
+          <div style="font-size: 16px;">⚛</div>
+          <div style="color: #4ade80; font-size: 7px;">React</div>
+          <div style="position: absolute; bottom: 3px; display: flex; gap: 1px;">
+            <div style="width: 4px; height: 4px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 4px; height: 4px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 4px; height: 4px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 4px; height: 4px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 4px; height: 4px; background: #222; border-radius: 1px;"></div>
+          </div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #3b82f6; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">📘</div>
+          <div style="color: #3b82f6; font-size: 7px;">TypeScript</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #fbbf24; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">✨</div>
+          <div style="color: #fbbf24; font-size: 7px;">GSAP</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #8b5cf6; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">▲</div>
+          <div style="color: #8b5cf6; font-size: 7px;">Next.js</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">🎨</div>
+          <div style="color: #666; font-size: 7px;">Tailwind</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">🧊</div>
+          <div style="color: #666; font-size: 7px;">Three.js</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px;">🔄</div>
+          <div style="color: #666; font-size: 7px;">Motion</div>
+        </div>
+
+        <div style="aspect-ratio: 1; background: #0a0a12; border: 1px dashed #222; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+          <div style="font-size: 16px; opacity: 0.3;">🔒</div>
+          <div style="color: #333; font-size: 7px;">???</div>
+        </div>
+      </div>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; margin-top: 12px; text-align: center; line-height: 1.8;">
+        → Grid de ícones tipo inventário de RPG.<br>
+        → Hover expande com descrição e XP bar.<br>
+        → Último slot "locked" como easter egg — referência gaming direta.<br>
+        → ScrollTrigger: slots aparecem um a um com stagger.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Grid de Inventário RPG</h3>
+      <p>Grid quadrada tipo inventário de jogo. Cada célula é uma skill com ícone e nome. Hover expande com detalhes. Último slot "locked" (???). Referência gaming mais direta mas ainda clean. Simples de implementar, visualmente marcante.</p>
+    </div>
+  </div>
+</div>

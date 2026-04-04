@@ -55,7 +55,12 @@ export function Skills() {
         scale: 0.95,
         duration: 0.4,
         ease: "power2.out",
-        scrollTrigger: { trigger: labelRef.current, start: "top 85%" },
+        scrollTrigger: {
+          trigger: labelRef.current,
+          start: "top 90%",
+          end: "top 60%",
+          scrub: 1,
+        },
       });
 
       gsap.from(orbitRef.current, {
@@ -63,7 +68,12 @@ export function Skills() {
         scale: 0.8,
         duration: 1,
         ease: "power3.out",
-        scrollTrigger: { trigger: orbitRef.current, start: "top 80%" },
+        scrollTrigger: {
+          trigger: orbitRef.current,
+          start: "top 90%",
+          end: "top 60%",
+          scrub: 1,
+        },
       });
 
       return () => ctx.revert();

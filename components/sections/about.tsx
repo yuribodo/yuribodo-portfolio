@@ -28,7 +28,9 @@ export function About() {
         ease: "power2.out",
         scrollTrigger: {
           trigger: labelRef.current,
-          start: "top 85%",
+          start: "top 90%",
+          end: "top 60%",
+          scrub: 1,
         },
       });
 
@@ -41,24 +43,38 @@ export function About() {
           ease: "power3.out",
           scrollTrigger: {
             trigger: headlineRef.current,
-            start: "top 80%",
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 1,
           },
         });
       }
 
       // Paragraphs
-      gsap.utils.toArray<HTMLElement>("[data-about-paragraph]").forEach((el, i) => {
+      gsap.utils.toArray<HTMLElement>("[data-about-paragraph]").forEach((el) => {
         gsap.from(el, {
           opacity: 0,
-          y: 20,
+          y: 40,
           duration: 0.8,
           ease: "power2.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 85%",
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 1,
           },
-          delay: i * 0.1,
         });
+      });
+
+      // Parallax depth on headline
+      gsap.to(headlineRef.current, {
+        y: -30,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
       });
     },
     { scope: sectionRef }

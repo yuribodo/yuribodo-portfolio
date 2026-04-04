@@ -1,0 +1,78 @@
+<h2>3 Abordagens — Mesmo conceito, execuções diferentes</h2>
+<p class="subtitle">Todas seguem o Game World Hybrid Journey. A diferença é no nível de ambição e como cada tech é usada. Clique na sua preferida.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>🎯 Precision Strike (Recomendada)</h3>
+      <p><strong>Filosofia:</strong> Cada pixel conta. Foco em polish extremo sobre quantidade de features.</p>
+      <br>
+      <p><strong>Hero:</strong> Intro cinematográfica com Pretext — texto cinético em Canvas renderizando seu nome com efeitos de glitch/scramble. Um objeto 3D central (poliedro low-poly que reage ao mouse) via Three.js. Transição tipo "battle start" com flash branco pra revelar o conteúdo.</p>
+      <br>
+      <p><strong>About (Pokédex):</strong> Card estilizado como entrada de Pokédex. Stats animados com GSAP (barras preenchendo). Tipo, habilidades, "evolução" (timeline de carreira). ScrollTrigger revela cada stat.</p>
+      <br>
+      <p><strong>Projects (Yu-Gi-Oh):</strong> Grid de cards com efeito holográfico CSS (gradiente que segue o mouse). Hover faz o card "flutuar" com sombra dinâmica. Click abre página dedicada com FLIP animation (card expande pra tela cheia). Pretext nos títulos dos projetos.</p>
+      <br>
+      <p><strong>Skills (Constellation):</strong> SVG + GSAP constellation map. Nodes são techs, linhas conectam relacionadas. Hover em um node ilumina conexões. Scroll-driven: nodes aparecem um a um como estrelas surgindo.</p>
+      <br>
+      <p><strong>Contact (Save Point):</strong> Estilo save point de RPG. "Save your progress" = enviar mensagem. Animação de save game ao enviar.</p>
+      <br>
+      <p><strong>Tech: Next.js + GSAP + Pretext + Three.js (só hero) + SVG</strong></p>
+      <p><strong>Tempo estimado: Médio | Resultado: Alto impacto</strong></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>🚀 Full Send</h3>
+      <p><strong>Filosofia:</strong> Go big or go home. Máximo de interatividade e imersão possível.</p>
+      <br>
+      <p><strong>Tudo do A, mais:</strong></p>
+      <br>
+      <p><strong>Hero:</strong> Cena 3D completa (não só um objeto). Ambiente tipo dungeon/arena com partículas. Câmera se move com scroll. Pretext renderiza texto diretamente no Canvas 3D.</p>
+      <br>
+      <p><strong>Projects:</strong> Cards Yu-Gi-Oh com modelo 3D do card (rotação real em 3D). Efeito de "invocar" o card com partículas e flash. Página do projeto tem parallax 3D.</p>
+      <br>
+      <p><strong>Skills:</strong> Constellation em 3D real (Three.js). Navega com mouse pelo espaço. Cada "estrela" é interativa com tooltip e linhas de conexão em 3D.</p>
+      <br>
+      <p><strong>Easter eggs:</strong> Pong + mini chess + Konami code + achievements system completo.</p>
+      <br>
+      <p><strong>Áudio:</strong> Soundtrack que muda por seção. SFX em todas interações.</p>
+      <br>
+      <p><strong>Tech: Next.js + GSAP + Pretext + Three.js (pesado) + R3F + Shaders</strong></p>
+      <p><strong>Tempo estimado: Alto | Resultado: Máximo impacto (se bem executado)</strong></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>⚡ Smart & Iterative</h3>
+      <p><strong>Filosofia:</strong> Lançar rápido algo incrível, depois iterar. V1 já impressiona, V2 surpreende.</p>
+      <br>
+      <p><strong>V1 (lançar primeiro):</strong></p>
+      <p>Hero com Pretext + GSAP (sem 3D no V1). Battle encounter com tipografia cinética pura. About como Pokédex com stats animados. Projects como cards com holografia CSS. Skills como constellation SVG. Contact como Save Point. Pong easter egg mantido.</p>
+      <br>
+      <p><strong>V2 (iterar depois):</strong></p>
+      <p>Adicionar elemento 3D no hero. Upgrade cards pra Yu-Gi-Oh com mais efeitos. Constellation em canvas/WebGL. Mais easter eggs. Achievements. Soundtrack por seção.</p>
+      <br>
+      <p><strong>Tech V1: Next.js + GSAP + Pretext + SVG + CSS avançado</strong></p>
+      <p><strong>Tech V2: + Three.js + WebGL + Web Audio API</strong></p>
+      <p><strong>Tempo V1: Curto-Médio | Resultado: Alto impacto imediato</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>Referências roubadas (aplicadas em todas):</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: #aaa;">
+    <div>🎨 <strong>Bruno Simon</strong> → Interatividade com personalidade</div>
+    <div>✨ <strong>Samsy.ninja</strong> → Atmosfera imersiva e neon glow</div>
+    <div>📝 <strong>Pretext demos</strong> → Tipografia cinética em Canvas</div>
+    <div>🃏 <strong>Pokémon/YGO</strong> → Card system com stats e holografia</div>
+    <div>🎮 <strong>Retro portfolios</strong> → CRT scanlines, pixel accents</div>
+    <div>♟ <strong>Skill constellations</strong> → Conexões visuais entre techs</div>
+  </div>
+</div>

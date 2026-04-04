@@ -38,7 +38,7 @@ export function SkillNode({
 
   return (
     <div
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300"
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all transition-premium"
       style={{
         transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
       }}
@@ -46,7 +46,7 @@ export function SkillNode({
       onMouseLeave={handleMouseLeave}
     >
       <div
-        className={`flex items-center justify-center rounded-full border bg-surface font-mono text-[10px] transition-all duration-300 ${
+        className={`flex items-center justify-center rounded-full border bg-surface font-mono text-[10px] transition-all transition-premium ${
           isHighlighted
             ? "border-accent text-accent shadow-[0_0_16px_rgba(250,75,18,0.2)]"
             : "border-muted/30 text-muted"

@@ -52,7 +52,7 @@ export function Header() {
             href={link.href}
             target={link.href.startsWith("http") ? "_blank" : undefined}
             rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="font-mono text-xs text-subtle transition-colors duration-300 hover:text-accent"
+            className="font-mono text-xs text-subtle transition-colors transition-premium hover:text-accent"
             aria-label={link.label}
           >
             {link.icon}

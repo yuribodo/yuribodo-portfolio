@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { archivo, jetbrainsMono } from "@/lib/fonts";
+import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
       <body
         className={`${archivo.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );
