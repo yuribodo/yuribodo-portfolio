@@ -101,7 +101,7 @@ export function Hero() {
       const w = window.innerWidth;
       const h = window.innerHeight;
       // Render at lower resolution for performance + aesthetic
-      const scale = 1.0;
+      const scale = 0.5;
       canvas.width = Math.floor(w * scale);
       canvas.height = Math.floor(h * scale);
       canvas.style.width = w + "px";
