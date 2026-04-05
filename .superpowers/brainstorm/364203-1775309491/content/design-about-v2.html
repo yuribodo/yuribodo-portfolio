@@ -1,0 +1,164 @@
+<h2>Design — ABOUT V2: Você primeiro, gaming como tempero</h2>
+<p class="subtitle">O foco é quem você é. Referências gaming aparecem em detalhes sutis, não no layout inteiro.</p>
+
+<div class="cards">
+  <div class="card" data-choice="character-sheet" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative;">
+
+      <!-- Clean, modern layout with gaming accents -->
+      <div style="max-width: 440px;">
+
+        <!-- Section label -->
+        <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 20px;">002 — ABOUT</div>
+
+        <!-- Name + title, clean typography -->
+        <div style="font-size: 28px; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 4px;">
+          Sobre mim
+        </div>
+        <div style="color: #666; font-size: 11px; margin-bottom: 20px;">Creative Frontend Developer · Brasil</div>
+
+        <!-- Bio text - clean, personal -->
+        <div style="color: #999; font-size: 11px; line-height: 1.9; margin-bottom: 24px;">
+          Sou desenvolvedor frontend com obsessão por animações e interações que surpreendem. Acredito que a web pode ser tão envolvente quanto um jogo bem feito. Fora do código, você me encontra em partidas de xadrez, colecionando cartas ou tentando ser o melhor treinador.
+        </div>
+
+        <!-- Stats as minimal bars - gaming accent, not theme -->
+        <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #666; font-size: 9px;">Frontend</span>
+              <span style="color: #4ade80; font-size: 9px;">◆◆◆◆◇</span>
+            </div>
+            <div style="height: 2px; background: #111; border-radius: 1px;">
+              <div style="width: 88%; height: 100%; background: #4ade80; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #666; font-size: 9px;">Animation</span>
+              <span style="color: #fbbf24; font-size: 9px;">◆◆◆◆◆</span>
+            </div>
+            <div style="height: 2px; background: #111; border-radius: 1px;">
+              <div style="width: 95%; height: 100%; background: #fbbf24; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #666; font-size: 9px;">Creative</span>
+              <span style="color: #8b5cf6; font-size: 9px;">◆◆◆◆◇</span>
+            </div>
+            <div style="height: 2px; background: #111; border-radius: 1px;">
+              <div style="width: 90%; height: 100%; background: #8b5cf6; border-radius: 1px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtle gaming references as tags/interests -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="border: 1px solid #222; padding: 4px 10px; font-size: 9px; color: #555; border-radius: 3px;">♟ xadrez</span>
+          <span style="border: 1px solid #222; padding: 4px 10px; font-size: 9px; color: #555; border-radius: 3px;">⚡ pokémon</span>
+          <span style="border: 1px solid #222; padding: 4px 10px; font-size: 9px; color: #555; border-radius: 3px;">🃏 yu-gi-oh</span>
+          <span style="border: 1px solid #222; padding: 4px 10px; font-size: 9px; color: #555; border-radius: 3px;">🎮 games</span>
+        </div>
+      </div>
+
+      <!-- Subtle corner detail -->
+      <div style="position: absolute; top: 16px; right: 16px; color: #1a1a1a; font-size: 60px; font-weight: 900;">♟</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Clean com accents (Recomendada)</h3>
+      <p>Layout moderno e limpo. Tipografia forte, bio pessoal, stats minimalistas como barras finas (referência gaming sutil). Hobbies como tags discretas. Um ícone grande e fantasma no fundo como textura. O gaming tá lá mas não grita — sussurra.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="split-narrative" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative;">
+
+      <div style="display: flex; gap: 24px;">
+        <!-- Left: personal text -->
+        <div style="flex: 1;">
+          <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 20px;">ABOUT</div>
+
+          <div style="color: #fff; font-size: 22px; font-weight: 900; line-height: 1.3; margin-bottom: 16px;">
+            Eu construo experiências<br>
+            <span style="color: #4ade80;">que as pessoas lembram.</span>
+          </div>
+
+          <div style="color: #777; font-size: 10px; line-height: 1.9;">
+            Frontend dev que trata cada pixel como uma jogada de xadrez — com estratégia e intenção. Transformo interfaces em experiências que prendem como um bom jogo.
+          </div>
+        </div>
+
+        <!-- Right: interactive card that reveals info -->
+        <div style="width: 160px; flex-shrink: 0;">
+          <div style="background: #0a0a12; border: 1px solid #1a1a2a; border-radius: 8px; padding: 16px; text-align: center; height: 100%;">
+            <div style="color: #333; font-size: 8px; letter-spacing: 2px; margin-bottom: 12px;">HOVER TO REVEAL</div>
+
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #111; border: 1px solid #222; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 28px; opacity: 0.4;">👤</span>
+            </div>
+
+            <div style="color: #fff; font-size: 11px; font-weight: bold;">Yuri Bodo</div>
+            <div style="color: #4ade80; font-size: 9px; margin-top: 2px;">LVL 27 · Brasil</div>
+
+            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px;">
+                <span style="color: #555;">ATK</span>
+                <span style="color: #ef4444;">████░</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 8px;">
+                <span style="color: #555;">DEF</span>
+                <span style="color: #3b82f6;">███░░</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 8px;">
+                <span style="color: #555;">CRT</span>
+                <span style="color: #fbbf24;">█████</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-body">
+      <h3>B — Split com card interativo</h3>
+      <p>Lado esquerdo: texto pessoal forte, tipografia impactante, sua filosofia como dev. Lado direito: um mini-card interativo que funciona como easter egg — hover revela stats estilo RPG. A referência gaming está contida num elemento, não espalhada pela seção inteira.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="scroll-reveal" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 300px; font-family: monospace; position: relative;">
+
+      <div style="max-width: 400px; margin: 0 auto; text-align: center;">
+        <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 24px;">ABOUT</div>
+
+        <!-- Big statement -->
+        <div style="color: #fff; font-size: 24px; font-weight: 900; line-height: 1.4; margin-bottom: 24px;">
+          Cada interface que eu construo é uma <span style="color: #4ade80;">jogada calculada</span>.
+        </div>
+
+        <!-- Paragraphs that scroll-reveal one by one -->
+        <div style="text-align: left; color: #777; font-size: 10px; line-height: 1.9; display: flex; flex-direction: column; gap: 16px;">
+          <div style="padding-left: 16px; border-left: 2px solid #222;">
+            Sou Yuri Bodo, desenvolvedor frontend criativo do Brasil. Meu trabalho vive na interseção entre código e arte — onde animações têm propósito e interações contam histórias.
+          </div>
+          <div style="padding-left: 16px; border-left: 2px solid #222; opacity: 0.6;">
+            Cresci jogando Pokémon, duelando Yu-Gi-Oh e estudando xadrez. Esses jogos me ensinaram paciência, estratégia e a importância de cada detalhe. Aplico isso em tudo que construo.
+          </div>
+          <div style="padding-left: 16px; border-left: 2px solid #222; opacity: 0.3;">
+            Minha stack favorita envolve React, TypeScript, GSAP e qualquer coisa que me permita empurrar os limites do que a web pode fazer.
+          </div>
+        </div>
+      </div>
+
+      <div style="position: absolute; bottom: 12px; left: 24px; right: 24px; color: #333; font-size: 9px; text-align: center;">
+        → Parágrafos revelam com scroll. Pretext anima cada bloco de texto.<br>
+        → Gaming aparece no conteúdo, não no design. Autêntico.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Scroll Reveal Narrativo</h3>
+      <p>Abordagem editorial. Grande statement no topo, parágrafos revelam com scroll. Gaming aparece naturalmente no texto (como parte da sua história), não forçado no visual. O design é limpo e premium — a personalidade vem das palavras e das animações GSAP/Pretext, não de frames de Pokédex.</p>
+    </div>
+  </div>
+</div>

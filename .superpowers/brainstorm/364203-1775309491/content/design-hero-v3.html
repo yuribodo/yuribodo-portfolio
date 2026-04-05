@@ -1,0 +1,95 @@
+<h2>Hero V3 — Boot + Text Physics (conceito final)</h2>
+<p class="subtitle">O site liga como um console. O texto É o espetáculo — vivo, físico, interativo.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Hero — Sequência completa</div>
+  <div class="mockup-body" style="background: #050508; min-height: 420px; position: relative; overflow: hidden; font-family: monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;">
+
+    <!-- Phase visualization -->
+    <div style="width: 100%; max-width: 520px;">
+
+      <!-- PHASE 1: Boot -->
+      <div style="border-left: 2px solid #4ade80; padding-left: 16px; margin-bottom: 24px;">
+        <div style="color: #4ade80; font-size: 10px; letter-spacing: 3px; margin-bottom: 8px;">FASE 1 — BOOT (0s → 2s)</div>
+        <div style="color: #333; font-size: 11px; line-height: 2;">
+          <div><span style="color: #555;">GAME_WORLD OS v2.0</span></div>
+          <div><span style="color: #555;">Initializing render engine...</span> <span style="color: #4ade80;">OK</span></div>
+          <div><span style="color: #555;">Loading protagonist...</span> <span style="color: #4ade80;">OK</span></div>
+          <div><span style="color: #555;">Preparing canvas...</span> <span style="color: #4ade80;">OK</span></div>
+        </div>
+        <div style="color: #444; font-size: 9px; margin-top: 6px; font-style: italic;">
+          → Pretext renderiza cada linha com timing. Texto aparece com micro-animações cinéticas.
+          <br>→ Soundtrack lo-fi/chiptune começa baixinho e vai subindo.
+        </div>
+      </div>
+
+      <!-- PHASE 2: Name explosion -->
+      <div style="border-left: 2px solid #fbbf24; padding-left: 16px; margin-bottom: 24px;">
+        <div style="color: #fbbf24; font-size: 10px; letter-spacing: 3px; margin-bottom: 8px;">FASE 2 — SPAWN (2s → 3.5s)</div>
+        <div style="position: relative; height: 80px; display: flex; align-items: center; justify-content: center;">
+          <!-- Scattered letters forming -->
+          <span style="color: #fff; font-size: 36px; font-weight: 900; letter-spacing: 4px; position: relative;">
+            <span style="display: inline-block; transform: rotate(-2deg) translateY(-3px);">Y</span><span style="display: inline-block; transform: rotate(1deg) translateY(2px);">U</span><span style="display: inline-block; transform: rotate(-1deg);">R</span><span style="display: inline-block; transform: translateY(-2px);">I</span><span style="display: inline-block; width: 16px;"></span><span style="color: #4ade80; display: inline-block; transform: rotate(2deg) translateY(1px);">B</span><span style="color: #4ade80; display: inline-block; transform: rotate(-1deg) translateY(-2px);">O</span><span style="color: #4ade80; display: inline-block; transform: rotate(1deg);">D</span><span style="color: #4ade80; display: inline-block; transform: translateY(2px);">O</span>
+          </span>
+          <!-- Glow -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(74,222,128,0.08) 0%, transparent 70%);"></div>
+        </div>
+        <div style="color: #444; font-size: 9px; margin-top: 6px; font-style: italic;">
+          → Boot text se dissolve. Partículas explodem do centro e se assentam formando "YURI BODO".
+          <br>→ Cada letra é uma partícula independente com spring physics via Pretext + Canvas.
+          <br>→ As letras "respiram" — micro-movimento constante, nunca totalmente paradas.
+          <br>→ SFX: som de "power up" / "spawn" sutil.
+        </div>
+      </div>
+
+      <!-- PHASE 3: Interactive -->
+      <div style="border-left: 2px solid #8b5cf6; padding-left: 16px; margin-bottom: 24px;">
+        <div style="color: #8b5cf6; font-size: 10px; letter-spacing: 3px; margin-bottom: 8px;">FASE 3 — PLAYGROUND (3.5s → ∞)</div>
+        <div style="background: #0a0a12; border: 1px solid #1a1a2a; border-radius: 6px; padding: 16px; text-align: center;">
+          <div style="color: #fff; font-size: 14px; font-weight: bold; margin-bottom: 8px;">ESTADO INTERATIVO</div>
+          <div style="display: flex; justify-content: center; gap: 20px; color: #666; font-size: 10px; margin-bottom: 12px;">
+            <div>🖱 cursor repele letras</div>
+            <div>📱 toque empurra</div>
+            <div>🌊 gravidade puxa de volta</div>
+          </div>
+          <div style="color: #888; font-size: 11px; line-height: 1.8;">
+            <div><span style="color: #fbbf24;">CLASS:</span> Creative Frontend Developer</div>
+            <div style="display: flex; gap: 6px; justify-content: center; margin-top: 4px;">
+              <span style="border: 1px solid #333; padding: 2px 8px; font-size: 9px; color: #4ade80;">React</span>
+              <span style="border: 1px solid #333; padding: 2px 8px; font-size: 9px; color: #3b82f6;">TypeScript</span>
+              <span style="border: 1px solid #333; padding: 2px 8px; font-size: 9px; color: #fbbf24;">GSAP</span>
+            </div>
+          </div>
+        </div>
+        <div style="color: #444; font-size: 9px; margin-top: 6px; font-style: italic;">
+          → Cursor vira um campo de força. Letras fogem como cardume quando o cursor chega perto.
+          <br>→ Spring physics: letras voltam suavemente quando cursor sai. Nunca param totalmente.
+          <br>→ Subtítulo e tags aparecem abaixo — Pretext faz o texto fluir ao redor das partículas.
+          <br>→ Scroll down → letras se compactam no topo como header sticky e viram navegação.
+        </div>
+      </div>
+
+      <!-- PHASE 4: Transition -->
+      <div style="border-left: 2px solid #ef4444; padding-left: 16px;">
+        <div style="color: #ef4444; font-size: 10px; letter-spacing: 3px; margin-bottom: 8px;">FASE 4 — SCROLL TRANSITION</div>
+        <div style="color: #444; font-size: 9px; font-style: italic; line-height: 1.8;">
+          → Ao scrollar, as letras do nome se comprimem e migram pro topo.
+          <br>→ Viram o header/nav do site — seu nome no canto, sempre presente.
+          <br>→ O canvas de partículas diminui e vira background sutil das seções.
+          <br>→ Transição contínua — sem corte. ScrollTrigger orquestra tudo.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>O que torna isso único:</h3>
+  <div style="font-size: 13px; color: #aaa; line-height: 2;">
+    <div>✦ <strong>Ninguém tem um nome que foge do cursor.</strong> É visceral, divertido, memorável.</div>
+    <div>✦ <strong>O boot sequence dá contexto narrativo</strong> — não é decoração, é worldbuilding.</div>
+    <div>✦ <strong>Pretext como engine de texto</strong> — tipografia cinética real, não CSS fake.</div>
+    <div>✦ <strong>A transição hero → nav é orgânica</strong> — o nome não "some e aparece no header". Ele migra.</div>
+    <div>✦ <strong>Funciona no mobile</strong> — toque substitui cursor, mesma interatividade.</div>
+  </div>
+</div>

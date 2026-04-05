@@ -1,0 +1,100 @@
+<h2>Design — HERO: Intro Cinematográfica</h2>
+<p class="subtitle">A primeira coisa que o visitante vê. Precisa ser inesquecível.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Hero — Desktop (1440px)</div>
+  <div class="mockup-body" style="background: #0a0a0a; min-height: 400px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: monospace;">
+
+    <!-- Scanlines overlay -->
+    <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px); pointer-events: none; z-index: 10;"></div>
+
+    <!-- 3D object placeholder -->
+    <div style="position: absolute; right: 15%; top: 50%; transform: translateY(-50%); width: 200px; height: 200px; display: flex; align-items: center; justify-content: center;">
+      <div style="width: 120px; height: 120px; border: 2px solid rgba(74, 222, 128, 0.3); transform: rotate(45deg); position: relative; animation: float 3s ease-in-out infinite;">
+        <div style="position: absolute; inset: 15px; border: 1px solid rgba(74, 222, 128, 0.15); transform: rotate(15deg);"></div>
+        <div style="position: absolute; inset: 30px; border: 1px solid rgba(74, 222, 128, 0.08); transform: rotate(30deg);"></div>
+      </div>
+      <div style="position: absolute; font-size: 9px; color: #333; bottom: -20px;">[ Three.js — low-poly icosahedron ]</div>
+    </div>
+
+    <!-- Main content — left aligned -->
+    <div style="position: absolute; left: 10%; top: 50%; transform: translateY(-50%); max-width: 500px;">
+
+      <!-- Phase 1: Terminal typing -->
+      <div style="color: #4ade80; font-size: 11px; margin-bottom: 4px; opacity: 0.6;">$ encounter --init</div>
+      <div style="color: #fbbf24; font-size: 10px; margin-bottom: 20px; opacity: 0.5;">> loading protagonist...</div>
+
+      <!-- Phase 2: Name reveal with Pretext kinetic typography -->
+      <div style="font-size: 48px; font-weight: 900; color: #fff; letter-spacing: -2px; line-height: 1;">
+        YURI<br>BODO
+      </div>
+      <div style="position: absolute; left: 0; top: 70px; font-size: 48px; font-weight: 900; color: rgba(74, 222, 128, 0.06); letter-spacing: -2px; line-height: 1; filter: blur(8px);">
+        YURI<br>BODO
+      </div>
+
+      <!-- Phase 3: Title scramble -->
+      <div style="margin-top: 12px; color: #888; font-size: 13px; letter-spacing: 3px;">
+        CREATIVE FRONTEND DEVELOPER
+      </div>
+
+      <!-- Phase 4: CTA -->
+      <div style="margin-top: 24px; display: flex; gap: 16px; align-items: center;">
+        <div style="border: 1px solid #4ade80; color: #4ade80; padding: 8px 20px; font-size: 11px; letter-spacing: 2px; cursor: pointer;">
+          EXPLORE ↓
+        </div>
+        <div style="color: #555; font-size: 10px;">or scroll to begin your journey</div>
+      </div>
+    </div>
+
+    <!-- Corner HUD elements -->
+    <div style="position: absolute; top: 16px; left: 16px; color: #333; font-size: 9px;">
+      <div>SYS.ONLINE</div>
+      <div style="color: #4ade80; margin-top: 2px;">● CONNECTED</div>
+    </div>
+
+    <div style="position: absolute; top: 16px; right: 16px; color: #333; font-size: 9px; text-align: right;">
+      <div>v2.0.0</div>
+      <div style="margin-top: 2px;">2026.04</div>
+    </div>
+
+    <div style="position: absolute; bottom: 16px; left: 16px; color: #333; font-size: 9px;">
+      <div>[ SOUND: ON 🔊 ]</div>
+    </div>
+
+    <div style="position: absolute; bottom: 16px; right: 16px; color: #333; font-size: 9px;">
+      <div>SCROLL TO CONTINUE ▼</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Sequência de animação (timeline):</h3>
+  <div style="font-size: 13px; color: #aaa; line-height: 2;">
+    <div><strong style="color: #4ade80;">0.0s</strong> — Tela escura. Scanlines visíveis.</div>
+    <div><strong style="color: #4ade80;">0.3s</strong> — Terminal text digita: <code style="color: #4ade80;">$ encounter --init</code></div>
+    <div><strong style="color: #fbbf24;">0.8s</strong> — Output: <code style="color: #fbbf24;">> loading protagonist...</code></div>
+    <div><strong style="color: #fff;">1.5s</strong> — Flash branco sutil. Objeto 3D aparece com bloom.</div>
+    <div><strong style="color: #fff;">1.8s</strong> — <strong>YURI BODO</strong> — Pretext renderiza nome com efeito cinético (caracteres surgem com physics, se assentam na posição final). Glow verde sutil atrás.</div>
+    <div><strong style="color: #888;">2.5s</strong> — Título scramble: letras aleatórias → "CREATIVE FRONTEND DEVELOPER"</div>
+    <div><strong style="color: #4ade80;">3.2s</strong> — CTA "EXPLORE" fade in. HUD corners aparecem.</div>
+    <div><strong style="color: #555;">3.5s+</strong> — Objeto 3D começa a reagir ao mouse. Idle state.</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 16px;">
+  <h3>Tech por camada:</h3>
+  <div style="font-size: 13px; color: #aaa; line-height: 1.8;">
+    <div>🎬 <strong>Pretext</strong> — Tipografia cinética do nome (Canvas, per-character physics)</div>
+    <div>✨ <strong>GSAP Timeline</strong> — Orquestração da sequência inteira + ScrollTrigger pro scroll</div>
+    <div>🧊 <strong>Three.js</strong> — Icosahedron low-poly com wireframe + bloom post-processing</div>
+    <div>🔤 <strong>GSAP ScrambleText</strong> — Efeito scramble no título</div>
+    <div>🎵 <strong>Web Audio</strong> — SFX sutil no flash e na entrada do nome</div>
+  </div>
+</div>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(-50%) rotate(45deg); }
+    50% { transform: translateY(calc(-50% - 10px)) rotate(45deg); }
+  }
+</style>

@@ -1,0 +1,172 @@
+<h2>Design — PROJECTS: Cards de Projeto</h2>
+<p class="subtitle">Cada projeto é uma carta. Mas até onde vai a referência Yu-Gi-Oh? Mesma lógica — gaming como tempero.</p>
+
+<div class="cards">
+  <div class="card" data-choice="holographic-cards" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 320px; font-family: monospace; position: relative;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 20px;">003 — PROJECTS</div>
+
+      <!-- Cards grid -->
+      <div style="display: flex; gap: 14px; justify-content: center;">
+
+        <!-- Card 1 -->
+        <div style="width: 130px; background: #0a0a12; border: 1px solid #1a1a2a; border-radius: 8px; overflow: hidden; position: relative;">
+          <!-- Holographic shimmer hint -->
+          <div style="position: absolute; inset: 0; background: linear-gradient(135deg, transparent 30%, rgba(74,222,128,0.05) 50%, transparent 70%); pointer-events: none;"></div>
+
+          <div style="height: 80px; background: linear-gradient(135deg, #111, #1a1a2a); display: flex; align-items: center; justify-content: center;">
+            <span style="color: #333; font-size: 24px;">🖼</span>
+          </div>
+          <div style="padding: 10px;">
+            <div style="color: #fff; font-size: 10px; font-weight: bold; margin-bottom: 4px;">Project Name</div>
+            <div style="color: #555; font-size: 8px; line-height: 1.5; margin-bottom: 8px;">Short description of what this does</div>
+            <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+              <span style="font-size: 7px; color: #4ade80; border: 1px solid #1a3a1a; padding: 1px 5px; border-radius: 2px;">React</span>
+              <span style="font-size: 7px; color: #3b82f6; border: 1px solid #1a2a3a; padding: 1px 5px; border-radius: 2px;">GSAP</span>
+            </div>
+          </div>
+          <!-- Subtle star rating like card rarity -->
+          <div style="padding: 0 10px 8px; color: #fbbf24; font-size: 8px; letter-spacing: 2px;">★★★</div>
+        </div>
+
+        <!-- Card 2 -->
+        <div style="width: 130px; background: #0a0a12; border: 1px solid #fbbf24; border-radius: 8px; overflow: hidden; position: relative;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(135deg, transparent 20%, rgba(251,191,36,0.06) 45%, transparent 65%); pointer-events: none;"></div>
+
+          <div style="height: 80px; background: linear-gradient(135deg, #1a1508, #1a1a0a); display: flex; align-items: center; justify-content: center;">
+            <span style="color: #333; font-size: 24px;">🖼</span>
+          </div>
+          <div style="padding: 10px;">
+            <div style="color: #fff; font-size: 10px; font-weight: bold; margin-bottom: 4px;">Featured Project</div>
+            <div style="color: #555; font-size: 8px; line-height: 1.5; margin-bottom: 8px;">This one is special — gold border</div>
+            <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+              <span style="font-size: 7px; color: #fbbf24; border: 1px solid #3a3a1a; padding: 1px 5px; border-radius: 2px;">Next.js</span>
+              <span style="font-size: 7px; color: #8b5cf6; border: 1px solid #2a1a3a; padding: 1px 5px; border-radius: 2px;">Three.js</span>
+            </div>
+          </div>
+          <div style="padding: 0 10px 8px; color: #fbbf24; font-size: 8px; letter-spacing: 2px;">★★★★★</div>
+        </div>
+
+        <!-- Card 3 -->
+        <div style="width: 130px; background: #0a0a12; border: 1px solid #1a1a2a; border-radius: 8px; overflow: hidden; position: relative;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(135deg, transparent 30%, rgba(139,92,246,0.05) 50%, transparent 70%); pointer-events: none;"></div>
+
+          <div style="height: 80px; background: linear-gradient(135deg, #111, #1a1a2a); display: flex; align-items: center; justify-content: center;">
+            <span style="color: #333; font-size: 24px;">🖼</span>
+          </div>
+          <div style="padding: 10px;">
+            <div style="color: #fff; font-size: 10px; font-weight: bold; margin-bottom: 4px;">Another Project</div>
+            <div style="color: #555; font-size: 8px; line-height: 1.5; margin-bottom: 8px;">Something cool described here</div>
+            <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+              <span style="font-size: 7px; color: #ef4444; border: 1px solid #3a1a1a; padding: 1px 5px; border-radius: 2px;">Rust</span>
+            </div>
+          </div>
+          <div style="padding: 0 10px 8px; color: #fbbf24; font-size: 8px; letter-spacing: 2px;">★★★★</div>
+        </div>
+      </div>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; margin-top: 16px; text-align: center; line-height: 1.8;">
+        → Hover: gradiente holográfico segue o mouse (CSS perspective + JS).<br>
+        → Cards "flutuam" com sombra dinâmica no hover.<br>
+        → Raridade (estrelas) define borda: normal = cinza, raro = dourado, lendário = roxo.<br>
+        → Click → FLIP animation → página dedicada do projeto.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Cards com Holografia Sutil</h3>
+      <p>Cards limpos e modernos com <em>toque</em> de card game: gradiente holográfico no hover que segue o mouse, sistema de raridade via cor da borda e estrelas. A referência Yu-Gi-Oh tá na mecânica (holografia, raridade), não na estética (sem frame de carta literal). Click faz FLIP pro projeto.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-scroll" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 320px; font-family: monospace; position: relative;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 20px;">003 — PROJECTS</div>
+
+      <!-- Stacked deck that fans out -->
+      <div style="position: relative; height: 200px; display: flex; align-items: center; justify-content: center;">
+
+        <!-- Stack of cards fanning -->
+        <div style="position: relative; width: 300px; height: 180px;">
+          <!-- Card back (deck) -->
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg); width: 110px; height: 150px; background: linear-gradient(135deg, #111, #1a1a2a); border: 1px solid #222; border-radius: 6px; z-index: 1;"></div>
+
+          <!-- Card fanning out -->
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(-60%, -55%) rotate(-3deg); width: 110px; height: 150px; background: #0a0a12; border: 1px solid #333; border-radius: 6px; z-index: 2; padding: 8px;">
+            <div style="height: 50px; background: #111; border-radius: 3px; margin-bottom: 6px;"></div>
+            <div style="color: #666; font-size: 8px;">Project 1</div>
+          </div>
+
+          <!-- Featured card (pulled out) -->
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(-30%, -50%) rotate(2deg); width: 110px; height: 150px; background: #0a0a12; border: 1px solid #4ade80; border-radius: 6px; z-index: 3; padding: 8px; box-shadow: 0 0 20px rgba(74,222,128,0.1);">
+            <div style="height: 50px; background: linear-gradient(135deg, #0a1a0a, #111); border-radius: 3px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center;">
+              <span style="color: #4ade80; font-size: 12px;">★</span>
+            </div>
+            <div style="color: #fff; font-size: 8px; font-weight: bold;">Featured</div>
+            <div style="color: #555; font-size: 7px;">Active card</div>
+          </div>
+
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(0%, -45%) rotate(7deg); width: 110px; height: 150px; background: #0a0a12; border: 1px solid #222; border-radius: 6px; z-index: 2; padding: 8px;">
+            <div style="height: 50px; background: #111; border-radius: 3px; margin-bottom: 6px;"></div>
+            <div style="color: #666; font-size: 8px;">Project 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; margin-top: 8px; text-align: center; line-height: 1.8;">
+        → Scroll horizontal "abre" o deck como um leque de cartas.<br>
+        → Scroll ou drag pra navegar entre projetos.<br>
+        → Card ativo fica em destaque (escala maior, glow, info expandida).<br>
+        → Drag pra "puxar" um card do deck → abre página do projeto.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Deck que se abre com scroll</h3>
+      <p>Projetos começam empilhados como um deck de cartas. Scroll horizontal (ou drag) abre o leque — cada card se revela. O card ativo fica em destaque com mais info. Puxar um card do deck abre a página dedicada. A metáfora é "seu deck de projetos" sem ser literalmente Yu-Gi-Oh.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="showcase-minimal" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #050508; padding: 24px; min-height: 320px; font-family: monospace; position: relative;">
+
+      <div style="color: #333; font-size: 9px; letter-spacing: 4px; margin-bottom: 20px;">003 — PROJECTS</div>
+
+      <!-- Full-width project showcase -->
+      <div style="border: 1px solid #1a1a2a; border-radius: 8px; overflow: hidden; margin-bottom: 12px;">
+        <div style="height: 120px; background: linear-gradient(135deg, #0a0a12, #12121a); display: flex; align-items: center; justify-content: center;">
+          <span style="color: #222; font-size: 12px;">[ screenshot / video preview ]</span>
+        </div>
+        <div style="padding: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="color: #fff; font-size: 14px; font-weight: bold; margin-bottom: 4px;">Project Name</div>
+            <div style="color: #666; font-size: 10px; max-width: 260px;">Uma linha sobre o que esse projeto faz e por que é especial.</div>
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <span style="font-size: 8px; color: #4ade80; border: 1px solid #1a3a1a; padding: 2px 6px; border-radius: 2px;">React</span>
+            <span style="font-size: 8px; color: #3b82f6; border: 1px solid #1a2a3a; padding: 2px 6px; border-radius: 2px;">GSAP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation dots -->
+      <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 12px;">
+        <div style="width: 20px; height: 3px; background: #4ade80; border-radius: 2px;"></div>
+        <div style="width: 8px; height: 3px; background: #222; border-radius: 2px;"></div>
+        <div style="width: 8px; height: 3px; background: #222; border-radius: 2px;"></div>
+        <div style="width: 8px; height: 3px; background: #222; border-radius: 2px;"></div>
+      </div>
+
+      <div style="color: #444; font-size: 9px; font-style: italic; text-align: center; line-height: 1.8;">
+        → Um projeto por vez, full-width. Scroll ou swipe navega.<br>
+        → Screenshot/video preview com hover play.<br>
+        → Transição entre projetos com GSAP FLIP.<br>
+        → Sem referência gaming explícita — o polish É a mensagem.
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Showcase Full-Width</h3>
+      <p>Sem cards. Um projeto de cada vez, tela inteira. Screenshot grande, título, descrição, stack. Scroll/swipe navega entre projetos com transições cinematográficas (GSAP FLIP). Sem referência gaming — o craft do frontend dev fala por si. Limpo, confiante, premium.</p>
+    </div>
+  </div>
+</div>
