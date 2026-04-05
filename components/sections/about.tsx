@@ -115,8 +115,17 @@ export function About() {
         },
       });
 
-      // No exit animation — sticky reveal handles the transition
-      // Main scrolls up naturally, revealing Contact behind
+      // EXIT: cinematic scale-down as scrolling away (no opacity — stays opaque)
+      gsap.to(sectionRef.current, {
+        scale: 0.92,
+        borderRadius: "24px",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "bottom bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
     },
     { scope: sectionRef }
   );
