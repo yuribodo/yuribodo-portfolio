@@ -112,14 +112,12 @@ export function CustomCursor() {
   const svgRef = useRef<SVGSVGElement>(null);
   const groupRef = useRef<SVGGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const [isDesktop, setIsDesktop] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(pointer: fine)").matches;
-  });
+  const [isDesktop, setIsDesktop] = useState(false);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const query = window.matchMedia("(pointer: fine)");
+    setIsDesktop(query.matches);
     function handleChange(e: MediaQueryListEvent) {
       setIsDesktop(e.matches);
     }

@@ -42,7 +42,7 @@ export function Header() {
       className="fixed top-0 left-0 z-40 flex w-full items-center justify-between border-b border-border bg-background/80 px-6 py-3 opacity-0 backdrop-blur-md"
     >
       <span className="font-sans text-sm font-black tracking-tight text-foreground-bright">
-        YURI BODO
+        YURI <span className="text-accent">BODO</span>
       </span>
 
       <nav className="flex items-center gap-4">
