@@ -42,6 +42,19 @@ export function About() {
 
   useGSAP(
     () => {
+      // Section fade-in — smooth transition from hero
+      gsap.from(sectionRef.current, {
+        opacity: 0,
+        duration: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 95%",
+          end: "top 70%",
+          scrub: 1,
+        },
+      });
+
       // Headline: enters fast with zoom settle
       gsap.from("[data-about-headline]", {
         y: 100,
@@ -126,9 +139,7 @@ export function About() {
           className="font-sans text-4xl font-black leading-[1.15] tracking-tight text-foreground-bright md:text-5xl lg:text-6xl"
         >
           Engineer who ships fast.{" "}
-          <span className="text-accent">
-            Crypto payments, AI agents, and MVPs that win hackathons.
-          </span>
+          <span className="text-accent">AI, crypto, and hackathon-winning MVPs.</span>
         </h2>
 
         {/* Bio — what a recruiter needs */}
