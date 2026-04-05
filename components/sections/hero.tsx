@@ -42,7 +42,7 @@ export function Hero() {
     // Start fully dithered
     ditherRef.current.strength = 0.8;
 
-    const tl = gsap.timeline({ delay: 0.2 });
+    const tl = gsap.timeline({ delay: 2.0 });
 
     // Phase 1: Dissolve dither
     tl.to(ditherRef.current, {
@@ -104,6 +104,21 @@ export function Hero() {
     // Start soundtrack after entrance
     tl.call(() => {
       startSoundtrack("/audio/soundtrack.mp3");
+    });
+
+    // Hero scales down as user scrolls past
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "80% top",
+      end: "bottom top",
+      scrub: 1,
+      onUpdate: (self) => {
+        if (!sectionRef.current) return;
+        const p = self.progress;
+        sectionRef.current.style.transform = `scale(${1 - p * 0.1})`;
+        sectionRef.current.style.opacity = `${1 - p * 0.7}`;
+        sectionRef.current.style.borderRadius = `${p * 24}px`;
+      },
     });
   }, [reducedMotion]);
 
@@ -272,7 +287,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-full overflow-hidden"
+      className="sticky top-0 h-screen w-full overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

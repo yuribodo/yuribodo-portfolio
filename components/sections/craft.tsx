@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function Craft() {
   const containerRef = useRef<HTMLElement>(null);
@@ -48,7 +53,7 @@ export function Craft() {
     container.addEventListener("mousemove", handleMouse);
 
     // Particle system
-    const PARTICLE_COUNT = 120;
+    const PARTICLE_COUNT = 200;
     const particles: Array<{
       x: number;
       y: number;
@@ -67,7 +72,7 @@ export function Craft() {
         y,
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
+        radius: Math.random() * 1.5 + 0.5,
         baseX: x,
         baseY: y,
       });
@@ -130,8 +135,8 @@ export function Craft() {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx.globalAlpha = 1 - dist / 100;
+          if (dist < 120) {
+            ctx.globalAlpha = 1 - dist / 120;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -159,6 +164,26 @@ export function Craft() {
     };
   }, [reducedMotion]);
 
+  // Clip-path circle reveal on scroll
+  useGSAP(() => {
+    if (!containerRef.current || reducedMotion) return;
+
+    gsap.fromTo(
+      containerRef.current,
+      { clipPath: "circle(5% at 50% 50%)" },
+      {
+        clipPath: "circle(75% at 50% 50%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 80%",
+          end: "top 20%",
+          scrub: 1,
+        },
+      }
+    );
+  }, [reducedMotion]);
+
   if (reducedMotion) {
     return <section className="h-[50vh]" />;
   }
@@ -173,12 +198,6 @@ export function Craft() {
         className="absolute inset-0"
         style={{ imageRendering: "auto" }}
       />
-      {/* Subtle center text */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <span className="font-mono text-[10px] tracking-[6px] text-subtle/30">
-          MOVE YOUR CURSOR
-        </span>
-      </div>
     </section>
   );
 }
