@@ -115,23 +115,14 @@ export function About() {
         },
       });
 
-      // EXIT: scale down + fade as scrolling away
-      gsap.to(sectionRef.current, {
-        scale: 0.95,
-        opacity: 0.3,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "bottom bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
+      // No exit animation — sticky reveal handles the transition
+      // Main scrolls up naturally, revealing Contact behind
     },
     { scope: sectionRef }
   );
 
   return (
-    <section ref={sectionRef} className="relative px-6 py-40">
+    <section ref={sectionRef} className="relative bg-background px-6 py-40">
       <div className="mx-auto max-w-4xl">
         {/* Statement */}
         <h2
@@ -148,6 +139,13 @@ export function About() {
           className="mt-10 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
         >
           4+ years building production systems in TypeScript, React, Node.js, Go, and Python. Currently shipping features end-to-end at a B2B platform serving 20M+ users. Hands-on crypto payments experience across Ethereum, Solana, and NEAR. I use Claude Code, Cursor, and custom MCP integrations daily — not as autocomplete, but as core engineering infrastructure.
+        </p>
+
+        <p
+          data-about-bio
+          className="mt-6 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
+        >
+          I obsess over the details that make software feel alive — the animation that guides your eye, the interaction that makes you lean in, the micro-feedback that turns a click into a conversation. I don&apos;t just build features, I craft experiences that people remember.
         </p>
 
         {/* Tech badges */}
