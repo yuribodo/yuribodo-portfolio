@@ -16,12 +16,12 @@ export function Projects() {
       gsap.utils.toArray<HTMLElement>("[data-project]").forEach((el) => {
         gsap.from(el, {
           opacity: 0,
-          y: 30,
-          duration: 0.8,
+          y: 50,
+          duration: 1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 90%",
+            start: "top 92%",
             end: "top 65%",
             scrub: 1,
           },
@@ -32,22 +32,16 @@ export function Projects() {
   );
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative px-6 py-32"
-      style={{
-        background: "linear-gradient(180deg, #1a1a1a 0%, #191517 50%, #1a1a1a 100%)",
-      }}
-    >
-      <div className="mx-auto max-w-3xl">
-        <h2
+    <section ref={sectionRef} className="relative px-6 py-40">
+      <div className="mx-auto max-w-4xl">
+        <div
           data-project
-          className="mb-12 font-sans text-3xl font-black tracking-tight text-foreground-bright md:text-4xl"
+          className="mb-12 font-mono text-[10px] tracking-[2px] text-subtle"
         >
-          Selected work
-        </h2>
+          SELECTED WORK
+        </div>
 
-        <div className="space-y-1">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {projects.map((project) => (
             <a
               key={project.slug}
@@ -55,37 +49,54 @@ export function Projects() {
               href={project.links?.github ?? `/projects/${project.slug}`}
               target={project.links?.github ? "_blank" : undefined}
               rel={project.links?.github ? "noopener noreferrer" : undefined}
-              className="group block border-b border-border py-5 transition-premium hover:border-accent"
+              className="group overflow-hidden rounded-lg border border-border bg-surface transition-premium hover:border-accent hover:shadow-[0_8px_30px_rgba(250,75,18,0.06)]"
             >
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-baseline gap-3">
-                  <h3 className="font-sans text-lg font-bold text-foreground-bright transition-premium group-hover:text-accent md:text-xl">
+              {/* Preview area */}
+              <div className="relative h-36 overflow-hidden bg-surface-hover md:h-44">
+                {/* Gradient placeholder — replace with screenshots later */}
+                <div
+                  className="absolute inset-0 opacity-40 transition-premium group-hover:opacity-60"
+                  style={{
+                    background: project.featured
+                      ? "linear-gradient(135deg, #2e2024 0%, #45272f 50%, #1a1a1a 100%)"
+                      : "linear-gradient(135deg, #222 0%, #2a2a2a 50%, #1a1a1a 100%)",
+                  }}
+                />
+                {/* Project initial */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-sans text-4xl font-black text-foreground-bright/10 transition-premium group-hover:text-foreground-bright/20 md:text-5xl">
+                    {project.title.charAt(0)}
+                  </span>
+                </div>
+                {/* Arrow */}
+                <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-surface/80 font-mono text-xs text-subtle opacity-0 backdrop-blur-sm transition-premium group-hover:opacity-100 group-hover:text-accent group-hover:border-accent">
+                  ↗
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <div className="flex items-baseline gap-2">
+                  <h3 className="font-sans text-base font-bold text-foreground-bright transition-premium group-hover:text-accent">
                     {project.title}
                   </h3>
                   {project.featured && (
-                    <span className="font-mono text-[10px] text-accent">&star;</span>
+                    <span className="font-mono text-[10px] text-accent">★</span>
                   )}
                 </div>
-                <span className="font-mono text-xs text-muted transition-premium group-hover:text-accent">
-                  &nearr;
-                </span>
-              </div>
-
-              <div className="mt-1 flex items-baseline justify-between">
-                <p className="font-sans text-sm text-muted">
+                <p className="mt-1.5 font-sans text-sm leading-relaxed text-muted">
                   {project.description}
                 </p>
-              </div>
-
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {project.tech.map((tech) => (
-                  <span
-                    key={tech}
-                    className="font-mono text-[10px] text-subtle"
-                  >
-                    {tech}
-                  </span>
-                ))}
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {project.tech.map((tech) => (
+                    <span
+                      key={tech}
+                      className="font-mono text-[10px] text-subtle"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </a>
           ))}
