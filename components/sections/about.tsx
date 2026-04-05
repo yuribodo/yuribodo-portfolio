@@ -42,33 +42,76 @@ export function About() {
 
   useGSAP(
     () => {
-      // Section entrance — slides up as a whole
-      gsap.from(sectionRef.current, {
-        y: 80,
-        opacity: 0.3,
+      // Headline: enters fast with zoom settle
+      gsap.from("[data-about-headline]", {
+        y: 100,
+        scale: 1.1,
+        opacity: 0,
         duration: 1,
-        ease: "power2.out",
+        ease: "power3.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 95%",
-          end: "top 60%",
+          start: "top 85%",
+          end: "top 40%",
           scrub: 1,
         },
       });
 
-      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+      // Bio paragraphs: enter slower (depth layer)
+      gsap.utils.toArray<HTMLElement>("[data-about-bio]").forEach((el) => {
         gsap.from(el, {
+          y: 60,
           opacity: 0,
-          y: 40,
           duration: 1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 90%",
+            start: "top 92%",
             end: "top 60%",
             scrub: 1,
           },
         });
+      });
+
+      // Tech badges: stagger from scale
+      gsap.from("[data-about-badge]", {
+        scale: 0.8,
+        opacity: 0,
+        stagger: 0.05,
+        duration: 0.6,
+        ease: "back.out(1.4)",
+        scrollTrigger: {
+          trigger: "[data-about-badges]",
+          start: "top 90%",
+          end: "top 65%",
+          scrub: 1,
+        },
+      });
+
+      // Info grid: enters slowest (deepest layer)
+      gsap.from("[data-about-info]", {
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: "[data-about-info]",
+          start: "top 92%",
+          end: "top 65%",
+          scrub: 1,
+        },
+      });
+
+      // EXIT: scale down + fade as scrolling away
+      gsap.to(sectionRef.current, {
+        scale: 0.95,
+        opacity: 0.3,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "bottom bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
       });
     },
     { scope: sectionRef }
@@ -79,7 +122,7 @@ export function About() {
       <div className="mx-auto max-w-4xl">
         {/* Statement */}
         <h2
-          data-reveal
+          data-about-headline
           className="font-sans text-4xl font-black leading-[1.15] tracking-tight text-foreground-bright md:text-5xl lg:text-6xl"
         >
           Engineer who ships fast.{" "}
@@ -90,17 +133,18 @@ export function About() {
 
         {/* Bio — what a recruiter needs */}
         <p
-          data-reveal
+          data-about-bio
           className="mt-10 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
         >
           4+ years building production systems in TypeScript, React, Node.js, Go, and Python. Currently shipping features end-to-end at a B2B platform serving 20M+ users. Hands-on crypto payments experience across Ethereum, Solana, and NEAR. I use Claude Code, Cursor, and custom MCP integrations daily — not as autocomplete, but as core engineering infrastructure.
         </p>
 
         {/* Tech badges */}
-        <div data-reveal className="mt-12 flex flex-wrap gap-2">
+        <div data-about-badges className="mt-12 flex flex-wrap gap-2">
           {TECH_BADGES.map((tech) => (
             <div
               key={tech.name}
+              data-about-badge
               className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 transition-premium hover:border-accent hover:bg-surface-hover"
             >
               <span className="font-mono text-xs font-bold text-accent">
@@ -114,7 +158,7 @@ export function About() {
         </div>
 
         {/* Projects */}
-        <div data-reveal className="mt-16">
+        <div className="mt-16">
           <div className="mb-4 font-mono text-[10px] tracking-[2px] text-subtle">
             SELECTED PROJECTS
           </div>
@@ -145,7 +189,7 @@ export function About() {
 
         {/* Info grid */}
         <div
-          data-reveal
+          data-about-info
           className="mt-16 grid grid-cols-1 gap-8 border-t border-border pt-8 md:grid-cols-3"
         >
           {INFO.map((col) => (
