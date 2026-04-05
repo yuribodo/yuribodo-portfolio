@@ -121,19 +121,20 @@ export function About() {
       });
 
       // Tech badges: stagger from scale
-      gsap.from("[data-about-badge]", {
-        scale: 0.8,
-        opacity: 0,
-        stagger: 0.05,
-        duration: 0.6,
-        ease: "back.out(1.4)",
-        scrollTrigger: {
-          trigger: "[data-about-badges]",
-          start: "top 90%",
-          end: "top 65%",
-          scrub: 1,
-        },
-      });
+      // TEMP: disabled to debug visibility issue
+      // gsap.from("[data-about-badge]", {
+      //   scale: 0.8,
+      //   opacity: 0,
+      //   stagger: 0.05,
+      //   duration: 0.6,
+      //   ease: "back.out(1.4)",
+      //   scrollTrigger: {
+      //     trigger: "[data-about-badges]",
+      //     start: "top 90%",
+      //     end: "top 65%",
+      //     scrub: 1,
+      //   },
+      // });
 
       // Info grid: enters slowest (deepest layer)
       gsap.from("[data-about-info]", {

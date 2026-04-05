@@ -106,28 +106,32 @@ export function Hero() {
       startSoundtrack("/audio/soundtrack.mp3");
     });
 
-    // Cinematic exit: pin hero, scale down, blur, re-dither
+    // Exit: gentle fade-out on scroll
     const exitTl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=150%",
+        end: "+=100%",
         pin: true,
-        scrub: 1,
+        scrub: 0.8,
       },
     });
 
-    exitTl.to(overlayRef.current, {
-      scale: 0.75,
-      opacity: 0,
-      filter: "blur(8px)",
-      duration: 1,
-    }, 0);
+    // First 30% of scroll: nothing happens (dead zone)
+    exitTl.to({}, { duration: 0.3 });
 
-    exitTl.to(ditherRef.current, {
-      strength: 0.9,
-      duration: 1,
-    }, 0);
+    // Remaining 70%: gentle exit — explicit fromTo for clean reversal
+    exitTl.fromTo(overlayRef.current, {
+      scale: 1,
+      opacity: 1,
+      filter: "blur(0px)",
+    }, {
+      scale: 0.9,
+      opacity: 0,
+      filter: "blur(4px)",
+      duration: 0.7,
+      ease: "power1.in",
+    }, 0.3);
   }, [reducedMotion]);
 
   // Dithering canvas render loop
@@ -240,21 +244,6 @@ export function Hero() {
     };
   }, [reducedMotion]);
 
-  function handleMouseEnter() {
-    gsap.to(ditherRef.current, {
-      strength: 0,
-      duration: 1.2,
-      ease: "power2.out",
-    });
-  }
-
-  function handleMouseLeave() {
-    gsap.to(ditherRef.current, {
-      strength: 0.4,
-      duration: 0.8,
-      ease: "power2.in",
-    });
-  }
 
   if (reducedMotion) {
     return (
@@ -266,7 +255,7 @@ export function Hero() {
           <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-foreground">
             Full Stack Engineer
           </p>
-          <p className="mt-2 font-mono text-[10px] text-muted md:text-xs">
+          <p className="mt-2 font-mono text-[10px] text-foreground/60 md:text-xs">
             TypeScript · React · Node.js · Go · Python · Web3
           </p>
           <div className="mt-8 flex items-center justify-center gap-6">
@@ -274,7 +263,7 @@ export function Hero() {
               href="https://github.com/yuribodo"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-muted transition-premium hover:text-accent"
+              className="font-mono text-xs text-foreground/60 transition-premium hover:text-accent"
             >
               GitHub ↗
             </a>
@@ -282,7 +271,7 @@ export function Hero() {
               href="https://www.linkedin.com/in/mario-lara-1a801b272/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-muted transition-premium hover:text-accent"
+              className="font-mono text-xs text-foreground/60 transition-premium hover:text-accent"
             >
               LinkedIn ↗
             </a>
@@ -296,14 +285,11 @@ export function Hero() {
     <section
       ref={sectionRef}
       className="relative h-screen w-full overflow-hidden bg-background"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {/* Dithered canvas background */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0"
-        style={{ imageRendering: "auto" }}
+        className="absolute inset-0 canvas-pixelated"
       />
 
       {/* Content overlay */}
@@ -339,7 +325,7 @@ export function Hero() {
           <p className="font-sans text-xs font-semibold uppercase tracking-[4px] text-foreground md:text-sm">
             Full Stack Engineer
           </p>
-          <p className="mt-2 font-mono text-[10px] text-muted md:text-xs">
+          <p className="mt-2 font-mono text-[10px] text-foreground/60 md:text-xs">
             TypeScript · React · Node.js · Go · Python · Web3
           </p>
         </div>
@@ -350,7 +336,7 @@ export function Hero() {
             href="https://github.com/yuribodo"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-muted transition-premium hover:text-accent"
+            className="font-mono text-xs text-foreground/60 transition-premium hover:text-accent"
           >
             GitHub ↗
           </a>
@@ -358,7 +344,7 @@ export function Hero() {
             href="https://www.linkedin.com/in/mario-lara-1a801b272/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-muted transition-premium hover:text-accent"
+            className="font-mono text-xs text-foreground/60 transition-premium hover:text-accent"
           >
             LinkedIn ↗
           </a>
@@ -368,7 +354,7 @@ export function Hero() {
       {/* Scroll indicator */}
       <div
         ref={scrollRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-subtle"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-foreground/40"
       >
         SCROLL ▼
       </div>
