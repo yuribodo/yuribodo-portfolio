@@ -287,7 +287,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="sticky top-0 h-screen w-full overflow-hidden"
+      className="relative h-screen w-full overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
