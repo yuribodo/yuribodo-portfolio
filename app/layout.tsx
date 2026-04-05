@@ -7,6 +7,19 @@ export const metadata: Metadata = {
   title: "Yuri Bodo | Creative Frontend Developer",
   description:
     "Creative frontend developer crafting immersive web experiences with obsessive attention to animation and interaction.",
+  metadataBase: new URL("https://www.yuribodo.com"),
+  openGraph: {
+    title: "Yuri Bodo | Creative Frontend Developer",
+    description:
+      "Creative frontend developer crafting immersive web experiences with obsessive attention to animation and interaction.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Yuri Bodo | Creative Frontend Developer",
+    description:
+      "Creative frontend developer crafting immersive web experiences with obsessive attention to animation and interaction.",
+  },
 };
 
 export default function RootLayout({
