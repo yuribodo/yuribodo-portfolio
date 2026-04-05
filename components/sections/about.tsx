@@ -60,6 +60,18 @@ export function About() {
           <span className="text-accent">Then I compete with them.</span>
         </h2>
 
+        {/* Bio */}
+        <p
+          data-reveal
+          className="mt-10 max-w-2xl font-sans text-base leading-relaxed text-foreground"
+        >
+          I started on Replit before I knew what a terminal was. Since then
+          I&apos;ve built compliance infra for 20M+ users, autonomous agents
+          that ship code, and Web3 protocols in Rust. I placed in hackathons
+          across Solana, NEAR, AI, and Replit — including 2nd at the Replit +
+          Resend Hackathon.
+        </p>
+
         {/* Info grid */}
         <div
           data-reveal

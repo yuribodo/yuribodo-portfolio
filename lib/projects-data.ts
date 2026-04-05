@@ -4,6 +4,7 @@ export interface Project {
   description: string;
   tech: string[];
   featured: boolean;
+  image?: string;
   links?: {
     live?: string;
     github?: string;
@@ -18,6 +19,7 @@ export const projects: Project[] = [
       "Hackathon-born product for managing waitlists and early access campaigns. Built during competition, now a real product.",
     tech: ["TypeScript", "React", "Node.js"],
     featured: true,
+    image: "/projects/launchlist.jpg",
     links: {
       github: "https://github.com/yuribodo/launchlist",
     },
@@ -40,6 +42,7 @@ export const projects: Project[] = [
       "Open-source React component library for data visualization. Used by other developers in production.",
     tech: ["React", "TypeScript", "Open Source"],
     featured: true,
+    image: "/projects/mariocharts.svg",
     links: {
       github: "https://github.com/yuribodo/mario-charts",
     },
@@ -51,6 +54,7 @@ export const projects: Project[] = [
       "Autonomous coding agent built in Go that opens pull requests without human intervention.",
     tech: ["Go", "AI Agents", "GitHub API"],
     featured: true,
+    image: "/projects/auto-issue.png",
     links: {
       github: "https://github.com/yuribodo/auto-issue",
     },

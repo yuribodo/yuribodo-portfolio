@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 import { projects } from "@/lib/projects-data";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -53,21 +54,30 @@ export function Projects() {
             >
               {/* Preview area */}
               <div className="relative h-36 overflow-hidden bg-surface-hover md:h-44">
-                {/* Gradient placeholder — replace with screenshots later */}
-                <div
-                  className="absolute inset-0 opacity-40 transition-premium group-hover:opacity-60"
-                  style={{
-                    background: project.featured
-                      ? "linear-gradient(135deg, #2e2024 0%, #45272f 50%, #1a1a1a 100%)"
-                      : "linear-gradient(135deg, #222 0%, #2a2a2a 50%, #1a1a1a 100%)",
-                  }}
-                />
-                {/* Project initial */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-sans text-4xl font-black text-foreground-bright/10 transition-premium group-hover:text-foreground-bright/20 md:text-5xl">
-                    {project.title.charAt(0)}
-                  </span>
-                </div>
+                {project.image ? (
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover opacity-70 transition-premium group-hover:opacity-90 group-hover:scale-105"
+                  />
+                ) : (
+                  <>
+                    <div
+                      className="absolute inset-0 opacity-40 transition-premium group-hover:opacity-60"
+                      style={{
+                        background: project.featured
+                          ? "linear-gradient(135deg, #2e2024 0%, #45272f 50%, #1a1a1a 100%)"
+                          : "linear-gradient(135deg, #222 0%, #2a2a2a 50%, #1a1a1a 100%)",
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="font-sans text-4xl font-black text-foreground-bright/10 transition-premium group-hover:text-foreground-bright/20 md:text-5xl">
+                        {project.title.charAt(0)}
+                      </span>
+                    </div>
+                  </>
+                )}
                 {/* Arrow */}
                 <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-surface/80 font-mono text-xs text-subtle opacity-0 backdrop-blur-sm transition-premium group-hover:opacity-100 group-hover:text-accent group-hover:border-accent">
                   ↗
