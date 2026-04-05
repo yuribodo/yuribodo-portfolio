@@ -18,14 +18,23 @@ const TECH_BADGES = [
   { name: "Solana", icon: "◎" },
   { name: "Ethereum", icon: "Ξ" },
   { name: "NEAR", icon: "⬡" },
-  { name: "AI/ML", icon: "◈" },
-  { name: "Tailwind", icon: "tw" },
+  { name: "AI Agents", icon: "◈" },
+  { name: "Docker", icon: "🐳" },
+];
+
+const PROJECTS = [
+  { name: "LaunchList", desc: "Waitlist SaaS — shipped in 8h, 2nd place hackathon", href: "https://github.com/yuribodo/launchlist" },
+  { name: "Auto-Issue", desc: "Autonomous coding agent in Go — opens PRs without humans", href: "https://github.com/yuribodo/auto-issue" },
+  { name: "Mario Charts", desc: "Open-source React component library", href: "https://github.com/yuribodo/mario-charts" },
+  { name: "GiveMeMoney", desc: "Multi-chain crypto payments — Ethereum + Solana", href: "https://github.com/yuribodo/givememoney" },
+  { name: "BugLess", desc: "Production AI pipeline for bug detection", href: "https://github.com/yuribodo/bugless" },
+  { name: "PattPay", desc: "Solana subscription billing protocol in Rust", href: "https://github.com/yuribodo/pattpay" },
 ];
 
 const INFO = [
-  { label: "LOCATION", value: "São Paulo, BR", note: "Open to relocation" },
-  { label: "STATUS", value: "Open to opportunities", note: "Remote or on-site" },
-  { label: "FOCUS", value: "AI · Dev Tools · Web3", note: "Fintech welcome" },
+  { label: "EXPERIENCE", value: "4+ years", note: "Full stack, frontend-leaning" },
+  { label: "LOCATION", value: "Brazil (GMT-3)", note: "Remote · Open to visa sponsorship" },
+  { label: "ACHIEVEMENTS", value: "Top 1% OBP ×2", note: "15,000+ participants · 10+ hackathons" },
 ];
 
 export function About() {
@@ -59,24 +68,18 @@ export function About() {
           data-reveal
           className="font-sans text-4xl font-black leading-[1.15] tracking-tight text-foreground-bright md:text-5xl lg:text-6xl"
         >
-          Full stack engineer, frontend-leaning.{" "}
-          <span className="text-accent">I build with AI, ship to Web3, and compete.</span>
+          Engineer who ships fast.{" "}
+          <span className="text-accent">
+            Crypto payments, AI agents, and MVPs that win hackathons.
+          </span>
         </h2>
 
-        {/* Bio — recruiter-friendly, mentions projects by name */}
+        {/* Bio — what a recruiter needs */}
         <p
           data-reveal
-          className="mt-10 max-w-3xl font-sans text-lg leading-relaxed text-foreground md:text-xl"
+          className="mt-10 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
         >
-          I&apos;ve built{" "}
-          <a href="https://github.com/yuribodo/launchlist" target="_blank" rel="noopener noreferrer" className="text-accent transition-premium hover:opacity-70">LaunchList</a>
-          {" "}(waitlist platform),{" "}
-          <a href="https://github.com/yuribodo/auto-issue" target="_blank" rel="noopener noreferrer" className="text-accent transition-premium hover:opacity-70">Auto-Issue</a>
-          {" "}(autonomous agent that opens PRs in Go),{" "}
-          <a href="https://github.com/yuribodo/mario-charts" target="_blank" rel="noopener noreferrer" className="text-accent transition-premium hover:opacity-70">Mario Charts</a>
-          {" "}(open-source React component library), and{" "}
-          <a href="https://github.com/yuribodo/pattpay" target="_blank" rel="noopener noreferrer" className="text-accent transition-premium hover:opacity-70">PattPay</a>
-          {" "}(Solana billing protocol in Rust). Top 1% in Brazil&apos;s Programming Olympiad — twice. 10+ hackathons, 2nd at Replit + Resend.
+          4+ years building production systems in TypeScript, React, Node.js, Go, and Python. Currently shipping features end-to-end at a B2B platform serving 20M+ users. Hands-on crypto payments experience across Ethereum, Solana, and NEAR. I use Claude Code, Cursor, and custom MCP integrations daily — not as autocomplete, but as core engineering infrastructure.
         </p>
 
         {/* Tech badges */}
@@ -94,6 +97,36 @@ export function About() {
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Projects */}
+        <div data-reveal className="mt-16">
+          <div className="mb-4 font-mono text-[10px] tracking-[2px] text-subtle">
+            SELECTED PROJECTS
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {PROJECTS.map((project) => (
+              <a
+                key={project.name}
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-baseline justify-between rounded-md border border-border bg-surface px-4 py-3 transition-premium hover:border-accent hover:bg-surface-hover"
+              >
+                <div>
+                  <span className="font-sans text-sm font-bold text-accent transition-premium group-hover:text-foreground-bright">
+                    {project.name}
+                  </span>
+                  <span className="ml-2 font-sans text-xs text-muted">
+                    {project.desc}
+                  </span>
+                </div>
+                <span className="ml-2 font-mono text-xs text-subtle transition-premium group-hover:text-accent">
+                  ↗
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* Info grid */}
