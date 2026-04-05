@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { LiquidSection } from "./contact-liquid-text";
+import { LiquidBackground } from "./contact-liquid-bg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,12 +27,11 @@ export function Contact() {
   const contentRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
-  // Fade in content during reveal
   useGSAP(
     () => {
       if (reducedMotion || !contentRef.current) return;
 
-      gsap.set(contentRef.current, { opacity: 0, y: 40 });
+      gsap.set(contentRef.current, { opacity: 0, y: 30 });
 
       const spacer = document.querySelector("[data-reveal-spacer]");
       if (spacer) {
@@ -44,7 +43,7 @@ export function Contact() {
           onUpdate: (self) => {
             gsap.set(contentRef.current, {
               opacity: self.progress,
-              y: 40 * (1 - self.progress),
+              y: 30 * (1 - self.progress),
             });
           },
         });
@@ -57,55 +56,38 @@ export function Contact() {
     <section
       ref={sectionRef}
       aria-label="Contact"
-      className="fixed inset-x-0 bottom-0 z-[1] flex h-screen flex-col items-center justify-center bg-background"
+      className="fixed inset-x-0 bottom-0 z-[1] h-screen overflow-hidden bg-background"
     >
-      <LiquidSection reducedMotion={reducedMotion}>
-        <div
-          ref={contentRef}
-          className="flex h-screen w-full flex-col items-center justify-center"
-        >
-          {/* CTA Text */}
-          <h2
-            data-liquid-render
-            className="text-center font-sans text-[clamp(3rem,12vw,8rem)] font-black leading-none tracking-tighter text-foreground-bright"
-          >
-            LET&apos;S TALK
-          </h2>
+      {/* Liquid reactive background */}
+      <LiquidBackground reducedMotion={reducedMotion} />
 
-          {/* Quote */}
-          <blockquote className="mt-8 flex flex-col items-center gap-1">
-            <span
-              data-liquid-render
-              className="font-mono text-xs tracking-[3px] uppercase text-subtle"
-            >
-              &mdash;
-            </span>
-            <p
-              data-liquid-render
-              className="text-center font-sans text-lg italic tracking-wide text-foreground/60 sm:text-xl"
-            >
-              &ldquo;1 year as a tiger or 20 as a turtle?&rdquo;
-            </p>
-          </blockquote>
+      {/* Content — normal HTML, fully interactive */}
+      <div
+        ref={contentRef}
+        className="relative z-10 flex h-full w-full flex-col items-center justify-center"
+      >
+        <h2 className="text-center font-sans text-[clamp(3rem,12vw,8rem)] font-black leading-none tracking-tighter text-foreground-bright">
+          LET&apos;S TALK
+        </h2>
 
-          {/* Contact Links */}
-          <nav className="mt-[clamp(2.5rem,5vw,4rem)] flex flex-col items-center gap-5 sm:flex-row sm:gap-8">
-            {CONTACT_LINKS.map((link) => (
-              <ContactLink key={link.href} {...link} reducedMotion={reducedMotion} />
-            ))}
-          </nav>
+        <blockquote className="mt-8 flex flex-col items-center gap-1">
+          <p className="text-center font-sans text-lg italic tracking-wide text-foreground/50 sm:text-xl">
+            &ldquo;1 year as a tiger or 20 as a turtle?&rdquo;
+          </p>
+        </blockquote>
 
-          {/* Footer Info */}
-          <div
-            data-liquid-render
-            className="absolute inset-x-0 bottom-6 flex justify-between px-8 font-mono text-[11px] text-foreground/25"
-          >
-            <span>&copy; 2026 Yuri Bodo</span>
-            <span>Built with obsession</span>
-            <span>São Paulo, BR</span>
-          </div>
+        <nav className="mt-[clamp(2.5rem,5vw,4rem)] flex flex-col items-center gap-5 sm:flex-row sm:gap-8">
+          {CONTACT_LINKS.map((link) => (
+            <ContactLink key={link.href} {...link} reducedMotion={reducedMotion} />
+          ))}
+        </nav>
+
+        <div className="absolute inset-x-0 bottom-6 flex justify-between px-8 font-mono text-[11px] text-foreground/25">
+          <span>&copy; 2026 Yuri Bodo</span>
+          <span>Built with obsession</span>
+          <span>São Paulo, BR</span>
         </div>
-      </LiquidSection>
+      </div>
     </section>
   );
 }
@@ -150,18 +132,14 @@ const ContactLink = forwardRef<HTMLAnchorElement, ContactLinkProps>(
         target="_blank"
         rel="noopener noreferrer"
         className="group flex items-center gap-3 rounded-full border border-accent/30 px-6 py-3 transition-colors hover:border-accent/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        style={{ willChange: reducedMotion ? "auto" : "transform" }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <span
-          data-liquid-render
-          className="font-mono text-xs font-bold uppercase tracking-wider text-accent"
-        >
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-accent">
           {label}
         </span>
         <div ref={innerRef} className="relative overflow-hidden">
-          <div data-text="original" data-liquid-render className="text-sm leading-tight text-foreground">
+          <div data-text="original" className="text-sm leading-tight text-foreground">
             {handle}
           </div>
           <div
