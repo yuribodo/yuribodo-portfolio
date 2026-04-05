@@ -15,6 +15,46 @@ const SPRING_DAMPING = 0.15;
 const IDLE_THRESHOLD_MS = 200;
 const IDLE_AMPLITUDE = 1.5;
 
+type CursorState = "default" | "link" | "project" | "cta" | "text" | "none";
+
+const STATE_RADIUS: Record<CursorState, number> = {
+  default: 16,
+  link: 24,
+  project: 32,
+  cta: 24,
+  text: 16,
+  none: 0,
+};
+
+const STATE_SCALE_X: Record<CursorState, number> = {
+  default: 1,
+  link: 1.4,
+  project: 1,
+  cta: 1,
+  text: 0.15,
+  none: 0.5,
+};
+
+const STATE_SCALE_Y: Record<CursorState, number> = {
+  default: 1,
+  link: 0.85,
+  project: 1,
+  cta: 1,
+  text: 1.2,
+  none: 0.5,
+};
+
+const STATE_OPACITY: Record<CursorState, number> = {
+  default: 1,
+  link: 1,
+  project: 1,
+  cta: 1,
+  text: 0.8,
+  none: 0,
+};
+
+const AUTO_CURSOR_SELECTOR = "a, button, [role='button']";
+
 function generateCirclePath(radius: number): string {
   const points: [number, number][] = [];
   for (let i = 0; i < NUM_POINTS; i++) {
@@ -103,6 +143,67 @@ export function CustomCursor() {
       ease: "power3.out",
     });
 
+    let currentState: CursorState = "default";
+    let targetRadius = BASE_RADIUS;
+    let currentRadius = BASE_RADIUS;
+    let ctaPulseTween: gsap.core.Tween | null = null;
+
+    const scaleXTo = gsap.quickTo(groupRef.current, "scaleX", {
+      duration: 0.3,
+      ease: "power3.out",
+    });
+    const scaleYTo = gsap.quickTo(groupRef.current, "scaleY", {
+      duration: 0.3,
+      ease: "power3.out",
+    });
+
+    function detectCursorState(target: EventTarget | null): CursorState {
+      if (!(target instanceof Element)) return "default";
+      const explicit = target.closest("[data-cursor]");
+      if (explicit) {
+        return (explicit.getAttribute("data-cursor") as CursorState) || "default";
+      }
+      if (target.closest(AUTO_CURSOR_SELECTOR)) return "link";
+      return "default";
+    }
+
+    function setState(state: CursorState) {
+      if (state === currentState) return;
+      currentState = state;
+      targetRadius = STATE_RADIUS[state];
+      scaleXTo(STATE_SCALE_X[state]);
+      scaleYTo(STATE_SCALE_Y[state]);
+
+      gsap.to(pathRef.current, {
+        opacity: STATE_OPACITY[state],
+        duration: 0.3,
+        ease: "power3.out",
+      });
+
+      if (ctaPulseTween) {
+        ctaPulseTween.kill();
+        ctaPulseTween = null;
+      }
+
+      if (state === "cta") {
+        ctaPulseTween = gsap.to(groupRef.current, {
+          scale: 1.15,
+          duration: 0.4,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+      }
+    }
+
+    function handleMouseOver(e: MouseEvent) {
+      setState(detectCursorState(e.target));
+    }
+
+    function handleMouseOut(e: MouseEvent) {
+      setState(detectCursorState(e.relatedTarget));
+    }
+
     function handleMouseMove(e: MouseEvent) {
       xTo(e.clientX);
       yTo(e.clientY);
@@ -113,6 +214,8 @@ export function CustomCursor() {
 
     function onTick() {
       if (reducedMotion) return;
+
+      currentRadius += (targetRadius - currentRadius) * SPRING_DAMPING;
 
       const now = Date.now();
       const isIdle = now - lastMoveTime > IDLE_THRESHOLD_MS;
@@ -159,20 +262,26 @@ export function CustomCursor() {
         p.offsetY += (targetOY - p.offsetY) * SPRING_DAMPING;
       }
 
+      const radiusScale = currentRadius / BASE_RADIUS;
       const deformedPoints: [number, number][] = points.map((p) => [
-        p.baseX + p.offsetX,
-        p.baseY + p.offsetY,
+        p.baseX * radiusScale + p.offsetX,
+        p.baseY * radiusScale + p.offsetY,
       ]);
 
       pathRef.current.setAttribute("d", pointsToSmoothPath(deformedPoints));
     }
 
     document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseout", handleMouseOut);
     gsap.ticker.add(onTick);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
       gsap.ticker.remove(onTick);
+      if (ctaPulseTween) ctaPulseTween.kill();
     };
   }, { scope: svgRef, dependencies: [isDesktop, reducedMotion] });
 
