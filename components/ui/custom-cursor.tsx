@@ -72,12 +72,14 @@ export function CustomCursor() {
   const svgRef = useRef<SVGSVGElement>(null);
   const groupRef = useRef<SVGGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(pointer: fine)").matches;
+  });
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const query = window.matchMedia("(pointer: fine)");
-    setIsDesktop(query.matches);
     function handleChange(e: MediaQueryListEvent) {
       setIsDesktop(e.matches);
     }
@@ -89,7 +91,7 @@ export function CustomCursor() {
     if (!isDesktop || !groupRef.current || !pathRef.current) return;
 
     const points = createControlPoints();
-    const prevMouse = { x: 0, y: 0 };
+    const mouseTarget = { x: 0, y: 0 };
     let lastMoveTime = 0;
 
     const xTo = gsap.quickTo(groupRef.current, "x", {
@@ -104,8 +106,8 @@ export function CustomCursor() {
     function handleMouseMove(e: MouseEvent) {
       xTo(e.clientX);
       yTo(e.clientY);
-      prevMouse.x = e.clientX;
-      prevMouse.y = e.clientY;
+      mouseTarget.x = e.clientX;
+      mouseTarget.y = e.clientY;
       lastMoveTime = Date.now();
     }
 
@@ -116,10 +118,12 @@ export function CustomCursor() {
       const isIdle = now - lastMoveTime > IDLE_THRESHOLD_MS;
       const time = now * 0.001;
 
-      const gX = gsap.getProperty(groupRef.current!, "x") as number;
-      const gY = gsap.getProperty(groupRef.current!, "y") as number;
-      const vx = prevMouse.x - gX;
-      const vy = prevMouse.y - gY;
+      if (!groupRef.current || !pathRef.current) return;
+
+      const gX = gsap.getProperty(groupRef.current, "x") as number;
+      const gY = gsap.getProperty(groupRef.current, "y") as number;
+      const vx = mouseTarget.x - gX;
+      const vy = mouseTarget.y - gY;
       const speed = Math.sqrt(vx * vx + vy * vy);
 
       let dx = 0;
@@ -160,7 +164,7 @@ export function CustomCursor() {
         p.baseY + p.offsetY,
       ]);
 
-      pathRef.current!.setAttribute("d", pointsToSmoothPath(deformedPoints));
+      pathRef.current.setAttribute("d", pointsToSmoothPath(deformedPoints));
     }
 
     document.addEventListener("mousemove", handleMouseMove);
