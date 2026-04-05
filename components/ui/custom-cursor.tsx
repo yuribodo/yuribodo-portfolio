@@ -76,7 +76,7 @@ export function CustomCursor() {
 
     document.addEventListener("mousemove", handleMouseMove);
     return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, { dependencies: [isDesktop, reducedMotion] });
+  }, { scope: svgRef, dependencies: [isDesktop, reducedMotion] });
 
   if (!isDesktop) return null;
 
