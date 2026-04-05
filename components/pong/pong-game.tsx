@@ -128,6 +128,7 @@ export function PongGame({ onRestart }: { onRestart?: () => void }) {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full cursor-none"
+        data-cursor="none"
         style={{ touchAction: "none" }}
       />
 

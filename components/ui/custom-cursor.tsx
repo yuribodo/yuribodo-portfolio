@@ -133,6 +133,12 @@ export function CustomCursor() {
     const points = createControlPoints();
     const mouseTarget = { x: 0, y: 0 };
     let lastMoveTime = 0;
+    let willChangeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function setWillChange(active: boolean) {
+      if (!groupRef.current) return;
+      groupRef.current.style.willChange = active ? "transform" : "auto";
+    }
 
     const xTo = gsap.quickTo(groupRef.current, "x", {
       duration: reducedMotion ? 0 : 0.3,
@@ -210,6 +216,10 @@ export function CustomCursor() {
       mouseTarget.x = e.clientX;
       mouseTarget.y = e.clientY;
       lastMoveTime = Date.now();
+
+      setWillChange(true);
+      if (willChangeTimer) clearTimeout(willChangeTimer);
+      willChangeTimer = setTimeout(() => setWillChange(false), 500);
     }
 
     function onTick() {
@@ -282,6 +292,7 @@ export function CustomCursor() {
       document.removeEventListener("mouseout", handleMouseOut);
       gsap.ticker.remove(onTick);
       if (ctaPulseTween) ctaPulseTween.kill();
+      if (willChangeTimer) clearTimeout(willChangeTimer);
     };
   }, { scope: svgRef, dependencies: [isDesktop, reducedMotion] });
 
