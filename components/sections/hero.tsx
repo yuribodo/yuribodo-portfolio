@@ -279,7 +279,7 @@ export function Hero() {
               GitHub ↗
             </a>
             <a
-              href="https://linkedin.com/in/yuribodo"
+              href="https://www.linkedin.com/in/mario-lara-1a801b272/"
               target="_blank"
               rel="noopener noreferrer"
               className="font-mono text-xs text-muted transition-premium hover:text-accent"
@@ -295,7 +295,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-full overflow-hidden"
+      className="relative h-screen w-full overflow-hidden bg-background"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -355,7 +355,7 @@ export function Hero() {
             GitHub ↗
           </a>
           <a
-            href="https://linkedin.com/in/yuribodo"
+            href="https://www.linkedin.com/in/mario-lara-1a801b272/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs text-muted transition-premium hover:text-accent"

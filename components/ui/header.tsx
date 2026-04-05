@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const SOCIAL_LINKS = [
   { label: "GitHub", href: "https://github.com/yuribodo", icon: "GH" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/yuribodo", icon: "LI" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/mario-lara-1a801b272/", icon: "LI" },
   { label: "Email", href: "mailto:contact@yuribodo.dev", icon: "EM" },
 ] as const;
 
