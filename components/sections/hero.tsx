@@ -42,7 +42,7 @@ export function Hero() {
     // Start fully dithered
     ditherRef.current.strength = 0.8;
 
-    const tl = gsap.timeline({ delay: 2.0 });
+    const tl = gsap.timeline({ delay: 2.2 });
 
     // Phase 1: Dissolve dither
     tl.to(ditherRef.current, {
@@ -106,21 +106,28 @@ export function Hero() {
       startSoundtrack("/audio/soundtrack.mp3");
     });
 
-    // Hero scales down as user scrolls into next section
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "bottom bottom",
-      end: "bottom -50%",
-      scrub: 1,
-      onUpdate: (self) => {
-        if (!sectionRef.current) return;
-        const p = self.progress;
-        sectionRef.current.style.transform = `scale(${1 - p * 0.08}) translateY(${p * -30}px)`;
-        sectionRef.current.style.opacity = `${1 - p * 0.6}`;
-        sectionRef.current.style.borderRadius = `${p * 20}px`;
-        sectionRef.current.style.overflow = "hidden";
+    // Cinematic exit: pin hero, scale down, blur, re-dither
+    const exitTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "+=150%",
+        pin: true,
+        scrub: 1,
       },
     });
+
+    exitTl.to(overlayRef.current, {
+      scale: 0.75,
+      opacity: 0,
+      filter: "blur(8px)",
+      duration: 1,
+    }, 0);
+
+    exitTl.to(ditherRef.current, {
+      strength: 0.9,
+      duration: 1,
+    }, 0);
   }, [reducedMotion]);
 
   // Dithering canvas render loop
