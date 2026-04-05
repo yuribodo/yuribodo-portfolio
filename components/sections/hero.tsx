@@ -39,17 +39,34 @@ export function Hero() {
   useGSAP(() => {
     if (reducedMotion) return;
 
-    const tl = gsap.timeline({ delay: 0.3 });
+    // Start fully dithered
+    ditherRef.current.strength = 0.8;
 
-    // Name reveal — character by character
-    tl.from("[data-hero-char]", {
-      y: "100%",
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.04,
-      ease: "power3.out",
+    const tl = gsap.timeline({ delay: 0.2 });
+
+    // Phase 1: Dissolve dither
+    tl.to(ditherRef.current, {
+      strength: 0.4,
+      duration: 1.5,
+      ease: "power2.out",
     });
 
+    // Phase 2: Characters drop in with overshoot bounce
+    tl.from(
+      "[data-hero-char]",
+      {
+        y: -120,
+        opacity: 0,
+        scale: 1.3,
+        rotation: () => gsap.utils.random(-15, 15),
+        duration: 1,
+        stagger: 0.06,
+        ease: "back.out(1.7)",
+      },
+      "-=1.2"
+    );
+
+    // Phase 3: Subtitle
     tl.from(
       subtitleRef.current,
       {
@@ -58,15 +75,22 @@ export function Hero() {
         duration: 0.8,
         ease: "power2.out",
       },
-      "-=0.5"
+      "-=0.4"
     );
 
+    // Links
     tl.from(
       linksRef.current,
-      { y: 15, opacity: 0, duration: 0.6, ease: "power2.out" },
+      {
+        y: 15,
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      },
       "-=0.3"
     );
 
+    // Scroll indicator
     tl.from(
       scrollRef.current,
       {
@@ -74,7 +98,7 @@ export function Hero() {
         duration: 0.6,
         ease: "power2.out",
       },
-      "-=0.3"
+      "-=0.2"
     );
 
     // Start soundtrack after entrance
