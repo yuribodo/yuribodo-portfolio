@@ -8,11 +8,57 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface Dot {
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  originX: number;
+  originY: number;
+  vx: number;
+  vy: number;
+  radius: number;
+}
+
 export function Craft() {
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const morphRef = useRef({ progress: 0 });
   const reducedMotion = useReducedMotion();
+
+  // ScrollTrigger drives the morph progress
+  useGSAP(() => {
+    if (!containerRef.current || reducedMotion) return;
+
+    // Circle clip-path reveal
+    gsap.fromTo(
+      containerRef.current,
+      { clipPath: "circle(5% at 50% 50%)" },
+      {
+        clipPath: "circle(80% at 50% 50%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 85%",
+          end: "top 30%",
+          scrub: 1,
+        },
+      }
+    );
+
+    // Morph particles from random to text shape
+    gsap.to(morphRef.current, {
+      progress: 1,
+      ease: "none",
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top 60%",
+        end: "top -20%",
+        scrub: 1,
+      },
+    });
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -25,133 +71,162 @@ export function Craft() {
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    let width = 0;
-    let height = 0;
+    let w = 0;
+    let h = 0;
+    let dots: Dot[] = [];
     let animFrame = 0;
 
-    function resize() {
-      if (!canvas || !container) return;
-      const rect = container.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
-      ctx!.scale(dpr, dpr);
+    function getTextPositions(text: string, fontSize: number): Array<{ x: number; y: number }> {
+      if (!ctx) return [];
+      // Render text to a temp canvas, sample pixel positions
+      const tempCanvas = document.createElement("canvas");
+      const tempCtx = tempCanvas.getContext("2d");
+      if (!tempCtx) return [];
+
+      tempCanvas.width = w;
+      tempCanvas.height = h;
+      tempCtx.font = `900 ${fontSize}px Archivo, system-ui, sans-serif`;
+      tempCtx.fillStyle = "#fff";
+      tempCtx.textAlign = "center";
+      tempCtx.textBaseline = "middle";
+      tempCtx.fillText(text, w / 2, h / 2);
+
+      const imageData = tempCtx.getImageData(0, 0, w, h);
+      const positions: Array<{ x: number; y: number }> = [];
+      const gap = 4; // Sample every 4 pixels
+
+      for (let y = 0; y < h; y += gap) {
+        for (let x = 0; x < w; x += gap) {
+          const idx = (y * w + x) * 4;
+          if (imageData.data[idx + 3] > 128) {
+            positions.push({ x, y });
+          }
+        }
+      }
+      return positions;
     }
-    resize();
-    window.addEventListener("resize", resize);
+
+    function setup() {
+      const rect = container!.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas!.width = w * dpr;
+      canvas!.height = h * dpr;
+      canvas!.style.width = w + "px";
+      canvas!.style.height = h + "px";
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Get text target positions
+      const fontSize = Math.min(w * 0.15, 120);
+      const textPositions = getTextPositions("CRAFT", fontSize);
+
+      // Create dots — enough to fill text + extras floating
+      const totalDots = Math.max(textPositions.length, 300);
+      dots = [];
+
+      for (let i = 0; i < totalDots; i++) {
+        const hasTarget = i < textPositions.length;
+        const originX = Math.random() * w;
+        const originY = Math.random() * h;
+
+        dots.push({
+          x: originX,
+          y: originY,
+          targetX: hasTarget ? textPositions[i].x : Math.random() * w,
+          targetY: hasTarget ? textPositions[i].y : Math.random() * h,
+          originX,
+          originY,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          radius: hasTarget ? 1.5 : Math.random() * 1 + 0.3,
+        });
+      }
+    }
+
+    setup();
+    window.addEventListener("resize", setup);
 
     function handleMouse(e: MouseEvent) {
       const rect = container!.getBoundingClientRect();
       mouseRef.current = {
-        x: (e.clientX - rect.left) / rect.width,
-        y: (e.clientY - rect.top) / rect.height,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       };
     }
-    container.addEventListener("mousemove", handleMouse);
-
-    // Particle system
-    const PARTICLE_COUNT = 200;
-    const particles: Array<{
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
-      baseX: number;
-      baseY: number;
-    }> = [];
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      particles.push({
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 1.5 + 0.5,
-        baseX: x,
-        baseY: y,
-      });
+    function handleMouseLeave() {
+      mouseRef.current = { x: -1000, y: -1000 };
     }
+    container.addEventListener("mousemove", handleMouse);
+    container.addEventListener("mouseleave", handleMouseLeave);
 
     function render(time: number) {
       if (!ctx) return;
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, w, h);
 
-      const mx = mouseRef.current.x * width;
-      const my = mouseRef.current.y * height;
-      const cursorRadius = 150;
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+      const cursorRadius = 100;
+      const morph = morphRef.current.progress;
 
-      // Update and draw particles
-      for (const p of particles) {
-        // Drift
-        p.x += p.vx;
-        p.y += p.vy;
+      for (const d of dots) {
+        // Lerp between origin (random) and target (text) based on morph progress
+        const goalX = d.originX + (d.targetX - d.originX) * morph;
+        const goalY = d.originY + (d.targetY - d.originY) * morph;
+
+        // Spring to goal
+        d.vx += (goalX - d.x) * 0.04;
+        d.vy += (goalY - d.y) * 0.04;
 
         // Cursor repulsion
-        const dx = p.x - mx;
-        const dy = p.y - my;
+        const dx = d.x - mx;
+        const dy = d.y - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < cursorRadius && dist > 0) {
-          const force = (1 - dist / cursorRadius) * 3;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
+          const force = (1 - dist / cursorRadius) * 4;
+          d.vx += (dx / dist) * force;
+          d.vy += (dy / dist) * force;
         }
 
-        // Gentle pull back to base position
-        p.vx += (p.baseX - p.x) * 0.003;
-        p.vy += (p.baseY - p.y) * 0.003;
-
-        // Breathing motion
-        p.vx += Math.sin(time * 0.001 + p.baseX * 0.01) * 0.02;
-        p.vy += Math.cos(time * 0.0013 + p.baseY * 0.01) * 0.02;
+        // Breathing when scattered
+        if (morph < 0.5) {
+          d.vx += Math.sin(time * 0.001 + d.originX * 0.01) * 0.01;
+          d.vy += Math.cos(time * 0.0013 + d.originY * 0.01) * 0.01;
+        }
 
         // Damping
-        p.vx *= 0.96;
-        p.vy *= 0.96;
+        d.vx *= 0.9;
+        d.vy *= 0.9;
 
-        // Wrap edges
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
+        d.x += d.vx;
+        d.y += d.vy;
 
-        // Draw particle
+        // Draw
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(250, 75, 18, 0.6)";
+        ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+        // Color: accent when formed, muted when scattered
+        const alpha = 0.3 + morph * 0.5;
+        ctx.fillStyle = `rgba(250, 75, 18, ${alpha})`;
         ctx.fill();
       }
 
-      // Draw connections between nearby particles
-      ctx.strokeStyle = "rgba(250, 75, 18, 0.08)";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
-            ctx.globalAlpha = 1 - dist / 120;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+      // Connections when scattered (fade out as they form text)
+      if (morph < 0.7) {
+        ctx.strokeStyle = `rgba(250, 75, 18, ${0.06 * (1 - morph)})`;
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < dots.length; i += 3) {
+          for (let j = i + 3; j < dots.length; j += 3) {
+            const ddx = dots[i].x - dots[j].x;
+            const ddy = dots[i].y - dots[j].y;
+            const dd = ddx * ddx + ddy * ddy;
+            if (dd < 8000) {
+              ctx.beginPath();
+              ctx.moveTo(dots[i].x, dots[i].y);
+              ctx.lineTo(dots[j].x, dots[j].y);
+              ctx.stroke();
+            }
           }
         }
       }
-      ctx.globalAlpha = 1;
-
-      // Central glow near cursor
-      const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, 200);
-      gradient.addColorStop(0, "rgba(250, 75, 18, 0.04)");
-      gradient.addColorStop(1, "transparent");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
 
       animFrame = requestAnimationFrame(render);
     }
@@ -159,33 +234,18 @@ export function Craft() {
 
     return () => {
       cancelAnimationFrame(animFrame);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", setup);
       container.removeEventListener("mousemove", handleMouse);
+      container.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [reducedMotion]);
 
-  // Clip-path circle reveal on scroll
-  useGSAP(() => {
-    if (!containerRef.current || reducedMotion) return;
-
-    gsap.fromTo(
-      containerRef.current,
-      { clipPath: "circle(5% at 50% 50%)" },
-      {
-        clipPath: "circle(75% at 50% 50%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-          end: "top 20%",
-          scrub: 1,
-        },
-      }
-    );
-  }, [reducedMotion]);
-
   if (reducedMotion) {
-    return <section className="h-[50vh]" />;
+    return (
+      <section className="flex h-screen items-center justify-center">
+        <span className="font-sans text-6xl font-black text-accent/20">CRAFT</span>
+      </section>
+    );
   }
 
   return (

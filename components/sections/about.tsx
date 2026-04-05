@@ -42,6 +42,20 @@ export function About() {
 
   useGSAP(
     () => {
+      // Section entrance — slides up as a whole
+      gsap.from(sectionRef.current, {
+        y: 80,
+        opacity: 0.3,
+        duration: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 95%",
+          end: "top 60%",
+          scrub: 1,
+        },
+      });
+
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         gsap.from(el, {
           opacity: 0,

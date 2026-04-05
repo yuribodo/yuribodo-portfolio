@@ -106,18 +106,19 @@ export function Hero() {
       startSoundtrack("/audio/soundtrack.mp3");
     });
 
-    // Hero scales down as user scrolls past
+    // Hero scales down as user scrolls into next section
     ScrollTrigger.create({
       trigger: sectionRef.current,
-      start: "80% top",
-      end: "bottom top",
+      start: "bottom bottom",
+      end: "bottom -50%",
       scrub: 1,
       onUpdate: (self) => {
         if (!sectionRef.current) return;
         const p = self.progress;
-        sectionRef.current.style.transform = `scale(${1 - p * 0.1})`;
-        sectionRef.current.style.opacity = `${1 - p * 0.7}`;
-        sectionRef.current.style.borderRadius = `${p * 24}px`;
+        sectionRef.current.style.transform = `scale(${1 - p * 0.08}) translateY(${p * -30}px)`;
+        sectionRef.current.style.opacity = `${1 - p * 0.6}`;
+        sectionRef.current.style.borderRadius = `${p * 20}px`;
+        sectionRef.current.style.overflow = "hidden";
       },
     });
   }, [reducedMotion]);
