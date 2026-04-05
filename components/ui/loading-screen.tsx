@@ -6,6 +6,14 @@ export function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
+  // Lock scroll during loading
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   useEffect(() => {
     // Simulate loading progress
     const start = performance.now();
@@ -20,7 +28,10 @@ export function LoadingScreen() {
         requestAnimationFrame(tick);
       } else {
         // Small delay before fade out
-        setTimeout(() => setIsLoading(false), 200);
+        setTimeout(() => {
+          document.body.style.overflow = "";
+          setIsLoading(false);
+        }, 200);
       }
     }
     requestAnimationFrame(tick);

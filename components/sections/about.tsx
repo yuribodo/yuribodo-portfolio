@@ -1,44 +1,78 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  SiTypescript,
+  SiReact,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiGo,
+  SiPython,
+  SiRust,
+  SiPostgresql,
+  SiRedis,
+  SiDocker,
+  SiSolana,
+  SiEthereum,
+  SiNear,
+  SiClaude,
+  SiElectron,
+} from "react-icons/si";
+import type { IconType } from "react-icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TECH_BADGES = [
-  { name: "TypeScript", icon: "TS" },
-  { name: "React", icon: "⚛" },
-  { name: "Next.js", icon: "▲" },
-  { name: "Node.js", icon: "◆" },
-  { name: "Go", icon: "Go" },
-  { name: "Python", icon: "Py" },
-  { name: "Rust", icon: "Rs" },
-  { name: "Solana", icon: "◎" },
-  { name: "Ethereum", icon: "Ξ" },
-  { name: "NEAR", icon: "⬡" },
-  { name: "AI Agents", icon: "◈" },
-  { name: "Docker", icon: "🐳" },
+const TECH_BADGES: { name: string; Icon: IconType }[] = [
+  { name: "TypeScript", Icon: SiTypescript },
+  { name: "React", Icon: SiReact },
+  { name: "Next.js", Icon: SiNextdotjs },
+  { name: "Node.js", Icon: SiNodedotjs },
+  { name: "Go", Icon: SiGo },
+  { name: "Python", Icon: SiPython },
+  { name: "Rust", Icon: SiRust },
+  { name: "PostgreSQL", Icon: SiPostgresql },
+  { name: "Redis", Icon: SiRedis },
+  { name: "React Native", Icon: SiReact },
+  { name: "Electron", Icon: SiElectron },
+  { name: "Docker", Icon: SiDocker },
+  { name: "Solana", Icon: SiSolana },
+  { name: "Ethereum", Icon: SiEthereum },
+  { name: "NEAR", Icon: SiNear },
+  { name: "Claude Code", Icon: SiClaude },
 ];
 
 const PROJECTS = [
-  { name: "LaunchList", desc: "Waitlist SaaS — shipped in 8h, 2nd place hackathon", href: "https://github.com/yuribodo/launchlist" },
+  { name: "Mario Charts", desc: "Open-source React component library — CLI-driven (npx mario-charts)", href: "https://github.com/yuribodo/mario-charts" },
+  { name: "CodeLord", desc: "Codebase architecture visualizer — Obsidian graph view for devs", href: "https://github.com/yuribodo/codelord" },
+  { name: "BugLess", desc: "AI dev tool — real-time LLM streaming, Redis queues, React/Ink CLI", href: "https://github.com/yuribodo/bugless" },
   { name: "Auto-Issue", desc: "Autonomous coding agent in Go — opens PRs without humans", href: "https://github.com/yuribodo/auto-issue" },
-  { name: "Mario Charts", desc: "Open-source React component library", href: "https://github.com/yuribodo/mario-charts" },
-  { name: "GiveMeMoney", desc: "Multi-chain crypto payments — Ethereum + Solana", href: "https://github.com/yuribodo/givememoney" },
-  { name: "BugLess", desc: "Production AI pipeline for bug detection", href: "https://github.com/yuribodo/bugless" },
+  { name: "GiveMeMoney", desc: "Multi-chain crypto payments — Ethereum + Solana + NEAR", href: "https://github.com/yuribodo/givememoney" },
   { name: "PattPay", desc: "Solana subscription billing protocol in Rust", href: "https://github.com/yuribodo/pattpay" },
 ];
 
 const INFO = [
-  { label: "EXPERIENCE", value: "4+ years", note: "Full stack, frontend-leaning" },
-  { label: "LOCATION", value: "Brazil (GMT-3)", note: "Remote · Open to visa sponsorship" },
-  { label: "ACHIEVEMENTS", value: "Top 1% OBP ×2", note: "15,000+ participants · 10+ hackathons" },
+  { label: "EXPERIENCE", value: "Full stack engineer", note: "TypeScript, React, Node.js, Go, Rust" },
+  { label: "WEB3", value: "3 chains shipped", note: "Ethereum · Solana · NEAR — payments & billing infra" },
+  { label: "COMPETITION", value: "Top 1% × 2", note: "Brazilian Programming Olympiad · 15,000+ participants" },
+  { label: "HACKATHONS", value: "10+ entered, multiple wins", note: "2nd at ContCode (120+ teams) · 2nd at Replit + Resend" },
+  { label: "OPEN SOURCE", value: "Library author", note: "Mario Charts — CLI-driven React components (npx)" },
+  { label: "AVAILABILITY", value: "Brazil (GMT-3)", note: "Remote · Open to visa sponsorship" },
 ];
 
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Slow down video to 0.3x speed
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.playbackRate = 0.3;
+    }
+  }, []);
 
   useGSAP(
     () => {
@@ -115,6 +149,21 @@ export function About() {
         },
       });
 
+      // Silhouette: gentle fade in
+      gsap.from("[data-about-silhouette]", {
+        x: 40,
+        scale: 0.95,
+        opacity: 0,
+        duration: 2,
+        ease: "power1.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 90%",
+          end: "top 40%",
+          scrub: 1.5,
+        },
+      });
+
       // EXIT: cinematic scale-down as scrolling away (no opacity — stays opaque)
       gsap.to(sectionRef.current, {
         scale: 0.92,
@@ -131,15 +180,35 @@ export function About() {
   );
 
   return (
-    <section ref={sectionRef} className="relative bg-background px-6 py-40">
+    <section ref={sectionRef} className="relative overflow-hidden bg-background px-6 py-40">
+      {/* Mario silhouette */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        ref={videoRef}
+        data-about-silhouette
+        src="/mario.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+        className="pointer-events-none absolute right-0 top-1/2 h-[400px] w-[400px] -translate-y-1/2 select-none object-contain mix-blend-screen md:right-[5%] md:h-[550px] md:w-[550px] lg:right-[8%] lg:h-[650px] lg:w-[650px]"
+        style={{
+          opacity: 0.08,
+          filter: "blur(1px) saturate(0.3)",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+        }}
+      />
+
       <div className="mx-auto max-w-4xl">
         {/* Statement */}
         <h2
           data-about-headline
           className="font-sans text-4xl font-black leading-[1.15] tracking-tight text-foreground-bright md:text-5xl lg:text-6xl"
         >
-          Engineer who ships fast.{" "}
-          <span className="text-accent">AI, crypto, and hackathon-winning MVPs.</span>
+          Ships fast. Owns the stack.{" "}
+          <span className="text-accent">Builds tools other devs actually use.</span>
         </h2>
 
         {/* Bio — what a recruiter needs */}
@@ -147,14 +216,21 @@ export function About() {
           data-about-bio
           className="mt-10 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
         >
-          4+ years building production systems in TypeScript, React, Node.js, Go, and Python. Currently shipping features end-to-end at a B2B platform serving 20M+ users. Hands-on crypto payments experience across Ethereum, Solana, and NEAR. I use Claude Code, Cursor, and custom MCP integrations daily — not as autocomplete, but as core engineering infrastructure.
+          Full-stack engineer building production systems in TypeScript, React, Node.js, Go, and Rust. Built a marketplace from zero and introduced engineering standards that cut production bugs by 60%. Deep in web3 — shipped multi-chain payment systems across Ethereum, Solana, and NEAR, and wrote a subscription billing protocol in Rust on Solana. I don&apos;t just use blockchains, I build infrastructure on them.
         </p>
 
         <p
           data-about-bio
           className="mt-6 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
         >
-          I obsess over the details that make software feel alive — the animation that guides your eye, the interaction that makes you lean in, the micro-feedback that turns a click into a conversation. I don&apos;t just build features, I craft experiences that people remember.
+          Ranked Top 1% twice in Brazil&apos;s Programming Olympiad (15,000+ participants). Won prizes at hackathons by shipping complete products in hours, not days. Author of Mario Charts, an open-source React library with CLI-driven integration that external developers can actually use.
+        </p>
+
+        <p
+          data-about-bio
+          className="mt-6 max-w-3xl font-sans text-lg leading-relaxed text-foreground-bright md:text-xl"
+        >
+          I use Claude Code, Cursor, and custom MCP integrations as core engineering infrastructure — AI-native workflow, not autocomplete. Ambassador at Borderless Coding, where I mentor developers for international careers and organize hackathons. I ship clean, composable code that other engineers can read, extend, and build on.
         </p>
 
         {/* Tech badges */}
@@ -165,9 +241,7 @@ export function About() {
               data-about-badge
               className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 transition-premium hover:border-accent hover:bg-surface-hover"
             >
-              <span className="font-mono text-xs font-bold text-accent">
-                {tech.icon}
-              </span>
+              <tech.Icon className="h-3.5 w-3.5 text-accent" />
               <span className="font-sans text-sm text-foreground-bright">
                 {tech.name}
               </span>
@@ -208,7 +282,7 @@ export function About() {
         {/* Info grid */}
         <div
           data-about-info
-          className="mt-16 grid grid-cols-1 gap-8 border-t border-border pt-8 md:grid-cols-3"
+          className="mt-16 grid grid-cols-1 gap-8 border-t border-border pt-8 sm:grid-cols-2 md:grid-cols-3"
         >
           {INFO.map((col) => (
             <div key={col.label}>

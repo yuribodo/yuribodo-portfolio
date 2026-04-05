@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, forwardRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { LiquidBackground } from "./contact-liquid-bg";
+import { LiquidText } from "./contact-liquid-text";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,7 +26,14 @@ const CONTACT_LINKS = [
 export function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const squirtleRef = useRef<HTMLVideoElement>(null);
+  const yugiRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (squirtleRef.current) squirtleRef.current.playbackRate = 0.8;
+    if (yugiRef.current) yugiRef.current.playbackRate = 0.8;
+  }, []);
 
   useGSAP(
     () => {
@@ -58,6 +66,44 @@ export function Contact() {
       aria-label="Contact"
       className="fixed inset-x-0 bottom-0 z-[1] h-screen overflow-hidden bg-background"
     >
+      {/* Squirtle silhouette — left side */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        ref={squirtleRef}
+        src="/squirtle.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[15%] left-0 z-[2] h-[300px] w-[300px] select-none object-contain mix-blend-screen md:left-[5%] md:h-[400px] md:w-[400px] lg:left-[8%]"
+        style={{
+          opacity: 0.08,
+          filter: "blur(1px) saturate(0.3)",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+        }}
+      />
+
+      {/* Yugi silhouette — right side */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        ref={yugiRef}
+        src="/yugi.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+        className="pointer-events-none absolute right-0 top-[10%] z-[2] h-[300px] w-[300px] select-none object-contain mix-blend-screen md:right-[5%] md:h-[400px] md:w-[400px] lg:right-[8%]"
+        style={{
+          opacity: 0.08,
+          filter: "blur(1px) saturate(0.3)",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+        }}
+      />
+
       {/* Liquid reactive background */}
       <LiquidBackground reducedMotion={reducedMotion} />
 
@@ -66,9 +112,7 @@ export function Contact() {
         ref={contentRef}
         className="relative z-10 flex h-full w-full flex-col items-center justify-center"
       >
-        <h2 className="text-center font-sans text-[clamp(3rem,12vw,8rem)] font-black leading-none tracking-tighter text-foreground-bright">
-          LET&apos;S TALK
-        </h2>
+        <LiquidText text="LET'S TALK" reducedMotion={reducedMotion} />
 
         <blockquote className="mt-8 flex flex-col items-center gap-1">
           <p className="text-center font-sans text-lg italic tracking-wide text-foreground/50 sm:text-xl">

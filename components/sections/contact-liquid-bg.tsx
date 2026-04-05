@@ -52,22 +52,31 @@ const FRAGMENT_SHADER = `
     vec2 mouseUV = u_mouse / u_resolution;
     mouseUV.y = 1.0 - mouseUV.y;
 
-    // Cursor ripple field
+    // Ambient noise — always alive, always moving
+    vec2 n1Coord = uv * 2.5 + u_time * 0.08;
+    vec2 n2Coord = uv * 4.0 - u_time * 0.12 + 50.0;
+    float n1 = fbm(n1Coord);
+    float n2 = fbm(n2Coord);
+    float ambient = (n1 + n2) * 0.5;
+
+    // Warped coordinates for organic flow
+    vec2 warpedUV = uv + vec2(
+      noise(uv * 3.0 + u_time * 0.1) * 0.06,
+      noise(uv * 3.0 + u_time * 0.1 + 100.0) * 0.06
+    );
+    float warpedNoise = fbm(warpedUV * 3.0 + u_time * 0.05);
+
+    // Cursor ripple — extra layer on top of ambient
     float dist = distance(uv, mouseUV);
+    float cursorGlow = (1.0 - smoothstep(0.0, 0.35, dist)) * 0.2;
     float ripple = sin(dist * 20.0 - u_time * 3.0) * 0.5 + 0.5;
-    ripple *= (1.0 - smoothstep(0.0, 0.4, dist));
+    ripple *= (1.0 - smoothstep(0.0, 0.3, dist)) * 0.1;
 
-    // Animated noise field
-    vec2 noiseCoord = uv * 3.0 + u_time * 0.15;
-    float n = fbm(noiseCoord);
+    // Combine: ambient base + warped detail + cursor accent
+    float field = ambient * 0.08 + warpedNoise * 0.06 + cursorGlow + ripple;
 
-    // Combine
-    float field = n * 0.12 + ripple * 0.15;
-
-    // Color: subtle accent glow around cursor, noise-driven variation
     vec3 color = u_bgColor;
-    color += u_accentColor * field * 0.6;
-    color += u_accentColor * ripple * 0.25;
+    color += u_accentColor * field;
 
     // Subtle vignette
     float vig = 1.0 - smoothstep(0.3, 0.85, length(uv - 0.5));
