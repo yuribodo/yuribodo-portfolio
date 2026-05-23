@@ -60,7 +60,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       data-lobby-active="true"
       className="fixed inset-0 z-50 bg-background"
     >
-      <Canvas dpr={[1, 2]}>
+      <Canvas dpr={[1, 2]} shadows="soft">
         <CameraRig ref={cameraRigRef} state={state} />
         <Suspense fallback={null}>
           <DeskEnvironment />

@@ -17,10 +17,12 @@ export default function Desk() {
       castShadow
       receiveShadow
     >
-      <meshStandardMaterial
+      <meshPhysicalMaterial
         color="#2a1f1a"
-        roughness={0.7}
-        metalness={0.0}
+        roughness={0.55}
+        metalness={0}
+        clearcoat={0.4}
+        clearcoatRoughness={0.2}
       />
     </RoundedBox>
   );
