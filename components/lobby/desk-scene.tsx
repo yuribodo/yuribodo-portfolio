@@ -13,7 +13,8 @@ import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
 import NintendoDS from "./objects/nintendo-ds";
 import XboxController from "./objects/xbox-controller";
-// TODO #13: import Decks from "./objects/decks";
+import PokemonDeck from "./objects/pokemon-deck";
+import YugiohDeck from "./objects/yugioh-deck";
 import AnimeFigures from "./objects/anime-figures";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
@@ -61,7 +62,8 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           <Macbook />
           <NintendoDS />
           <XboxController />
-          {/* TODO #13: <Decks /> */}
+          <PokemonDeck />
+          <YugiohDeck />
           <AnimeFigures />
         </Suspense>
       </Canvas>
