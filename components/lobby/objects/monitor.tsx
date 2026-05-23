@@ -76,6 +76,9 @@ export interface MonitorProps {
 export interface MonitorHandle {
   /** Called by the parent on ENTER_CLICKED to play the click flash. */
   flashComplete: () => void;
+  /** Returns the live screen mesh so the dive transition (#10) can measure
+   *  its world-space box for the FOV-fill camera-Z math. */
+  getScreenMesh: () => Mesh | null;
 }
 
 function pickMode(state: LobbyState): BootScreenMode {
@@ -129,6 +132,7 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
             ease: "power2.out",
           });
       },
+      getScreenMesh: () => screenMeshRef.current,
     }),
     [],
   );

@@ -1,13 +1,17 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { playLobbyToSiteTransition } from "@/lib/lobby/transition";
 import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import Desk from "./desk";
-import DeskEnvironment from "./desk-environment";
+import DeskEnvironment, {
+  type DeskEnvironmentHandle,
+} from "./desk-environment";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
@@ -26,6 +30,10 @@ interface DeskSceneProps {
 export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const cameraRigRef = useRef<CameraRigHandle>(null);
   const monitorRef = useRef<MonitorHandle>(null);
+  const environmentRef = useRef<DeskEnvironmentHandle>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [bootProgress, setBootProgress] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -39,6 +47,37 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
   useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
 
+  // The dive transition (#10). Fires exactly once when the state machine
+  // crosses into "booting" (the reducer guards against re-entry — a second
+  // ENTER_CLICKED while already booting is a no-op).
+  useEffect(() => {
+    if (state !== "booting") return;
+
+    const camera = cameraRigRef.current?.getCamera();
+    const screenMesh = monitorRef.current?.getScreenMesh();
+    if (!camera || !screenMesh) {
+      // The model isn't measurable yet — skip straight to done so the user
+      // isn't trapped. Logged because hitting this means a load race.
+      console.warn("[DeskScene] transition: missing camera or screen mesh");
+      dispatch({ type: "BOOT_COMPLETE" });
+      return;
+    }
+
+    const tl = playLobbyToSiteTransition({
+      camera,
+      screenMesh,
+      environment: environmentRef.current,
+      container: containerRef.current,
+      onBootProgress: setBootProgress,
+      onBootComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
+      prefersReducedMotion,
+    });
+
+    return () => {
+      tl.kill();
+    };
+  }, [state, dispatch, prefersReducedMotion]);
+
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
     monitorRef.current?.flashComplete();
@@ -47,6 +86,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
   return (
     <div
+      ref={containerRef}
       role="application"
       aria-label="Interactive desk lobby"
       data-lobby-active="true"
@@ -55,9 +95,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       <Canvas dpr={[1, 2]} shadows="soft">
         <CameraRig ref={cameraRigRef} state={state} />
         <Suspense fallback={null}>
-          <DeskEnvironment />
+          <DeskEnvironment ref={environmentRef} />
           <Desk />
-          <Monitor ref={monitorRef} onEnter={handleEnter} state={state} />
+          <Monitor
+            ref={monitorRef}
+            onEnter={handleEnter}
+            state={state}
+            bootProgress={bootProgress}
+          />
           <RazerPeripherals />
           <Macbook />
           <NintendoDS />

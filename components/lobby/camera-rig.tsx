@@ -15,10 +15,11 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { LobbyState } from "./use-lobby-state";
 
 export interface CameraRigHandle {
-  // Imperative API consumed later by the §6 transition timeline (issue #10).
-  // For FOV math at handoff: cameraZ = screenHeight / (2 * Math.tan(fov / 2))
-  dollyToMonitorScreen: () => Promise<void>;
-  reset: () => void;
+  /** Live camera for the §6 dive transition (#10). The transition timeline
+   *  owns the dolly / FOV tweens directly — simpler than wrapping each as
+   *  an imperative method. Drift in useFrame is gated by `state === "booting"`
+   *  so the timeline-driven values aren't clobbered. */
+  getCamera: () => PerspectiveCameraImpl | null;
 }
 
 interface CameraRigProps {
@@ -52,12 +53,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
   useImperativeHandle(
     ref,
     () => ({
-      dollyToMonitorScreen: async () => {
-        console.info("[CameraRig] dollyToMonitorScreen() — stub, impl in #10");
-      },
-      reset: () => {
-        console.info("[CameraRig] reset() — stub, impl in #10");
-      },
+      getCamera: () => cameraRef.current,
     }),
     [],
   );
@@ -94,6 +90,10 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
   }, []);
 
   useFrame((_, delta) => {
+    // Dive transition (#10) owns position + lookAt while booting. Returning
+    // here keeps the drift lerp from fighting the GSAP tween.
+    if (state === "booting") return;
+
     const camera = cameraRef.current;
     if (!camera) return;
 
