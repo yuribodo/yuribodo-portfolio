@@ -9,6 +9,7 @@ import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import Desk from "./desk";
 import DeskEnvironment from "./desk-environment";
 import { HoldProgress } from "./hold-progress";
+import Monitor, { type MonitorHandle } from "./objects/monitor";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -16,32 +17,26 @@ interface DeskSceneProps {
   dispatch: Dispatch<LobbyAction>;
 }
 
-function DevHoldPlaceholder({ dispatch }: { dispatch: Dispatch<LobbyAction> }) {
+export default function DeskScene({ state, dispatch }: DeskSceneProps) {
+  const cameraRigRef = useRef<CameraRigHandle>(null);
+  const monitorRef = useRef<MonitorHandle>(null);
+
+  // The lobby's single hold source of truth — feeds both the lobby state
+  // machine and the monitor's visual effects. The R3F-mounted power button
+  // mesh forwards pointer events into `bind`; the off-canvas sr-only button
+  // forwards keyboard Space-hold into the same `bind`. Progress accumulates
+  // against one timer regardless of input device.
   const { bind, progress, isHolding } = useHoldActivate({
     onStart: () => dispatch({ type: "HOLD_START" }),
-    onCancel: () => dispatch({ type: "HOLD_CANCEL" }),
+    onCancel: () => {
+      dispatch({ type: "HOLD_CANCEL" });
+      monitorRef.current?.cancelPress();
+    },
     onComplete: () => {
-      console.log("boot!");
+      monitorRef.current?.flashComplete();
       dispatch({ type: "HOLD_COMPLETE" });
     },
   });
-
-  return (
-    <>
-      <button
-        type="button"
-        {...bind}
-        className="fixed bottom-6 right-6 z-[55] rounded-md border border-border bg-surface px-4 py-3 font-mono text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-      >
-        DEV · hold to boot
-      </button>
-      <HoldProgress progress={progress} isHolding={isHolding} />
-    </>
-  );
-}
-
-export default function DeskScene({ state, dispatch }: DeskSceneProps) {
-  const cameraRigRef = useRef<CameraRigHandle>(null);
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -50,8 +45,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     }, 600);
     return () => window.clearTimeout(timer);
   }, [state, dispatch]);
-
-  const isDev = process.env.NODE_ENV === "development";
 
   return (
     <div
@@ -65,9 +58,20 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         <Suspense fallback={null}>
           <DeskEnvironment />
           <Desk />
+          <Monitor ref={monitorRef} bind={bind} isHolding={isHolding} />
         </Suspense>
       </Canvas>
-      {isDev ? <DevHoldPlaceholder dispatch={dispatch} /> : null}
+      <HoldProgress progress={progress} isHolding={isHolding} />
+      {/* Off-canvas keyboard surrogate for the monitor's power button. The
+          R3F mesh receives mouse holds; this <button> hosts the Space-hold
+          bind handlers so screen-reader + keyboard-only users have parity. */}
+      <button
+        type="button"
+        {...bind}
+        className="sr-only"
+      >
+        Power on monitor (hold Space to enter site)
+      </button>
     </div>
   );
 }
