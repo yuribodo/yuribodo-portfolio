@@ -245,17 +245,17 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
     return () => window.clearInterval(interval);
   }, [bootCanvas, bootTexture, state, bootProgress]);
 
+  const isInteractive = state === "idle" || state === "exploring";
+
   // Cursor pointer while hovering the screen mesh.
   useEffect(() => {
-    if (!isHovered) return;
+    if (!isHovered || !isInteractive) return;
     const previous = document.body.style.cursor;
     document.body.style.cursor = "pointer";
     return () => {
       document.body.style.cursor = previous;
     };
-  }, [isHovered]);
-
-  const isInteractive = state === "idle" || state === "exploring";
+  }, [isHovered, isInteractive]);
 
   // R3F bubbles pointer events from any child mesh up to the <primitive>
   // wrapper. We filter to the screen mesh so the bezel/stand stay inert,
