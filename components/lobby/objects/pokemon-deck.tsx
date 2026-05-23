@@ -10,7 +10,12 @@ const DESK_TOP_Y = -0.602;
 const POKEMON_POSITION: [number, number, number] = [-0.08, DESK_TOP_Y, -0.02];
 const POKEMON_ROTATION_Y = (12 * Math.PI) / 180;
 
-export default function PokemonDeck() {
+interface PokemonDeckProps {
+  /** Fires on every fan / restack click. Forwarded to CardDeckBase. */
+  onActivate?: () => void;
+}
+
+export default function PokemonDeck({ onActivate }: PokemonDeckProps) {
   return (
     <CardDeckBase
       position={POKEMON_POSITION}
@@ -22,6 +27,7 @@ export default function PokemonDeck() {
         back: "/lobby/textures/pokemon-back.webp",
       }}
       enableHoverIsolation
+      onActivate={onActivate}
     />
   );
 }
