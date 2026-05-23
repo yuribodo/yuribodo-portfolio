@@ -1,6 +1,7 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import gsap from "gsap";
 import {
   forwardRef,
@@ -20,7 +21,6 @@ import {
   SRGBColorSpace,
   Vector3,
 } from "three";
-import type { ThreeEvent } from "@react-three/fiber";
 import type {
   Mesh,
   MeshStandardMaterial as MeshStandardMaterialType,
@@ -29,11 +29,11 @@ import type {
 
 import { LOBBY_MODELS } from "@/lib/lobby/assets";
 import {
-  BOOT_CANVAS_HEIGHT,
-  BOOT_CANVAS_WIDTH,
-  drawBootScreen,
-  type BootScreenMode,
-} from "@/lib/lobby/boot-screen";
+  SCREEN_CANVAS_HEIGHT,
+  SCREEN_CANVAS_WIDTH,
+  paintScreen,
+  type ScreenMode,
+} from "@/lib/lobby/screen-paint";
 import type { LobbyState } from "../use-lobby-state";
 
 // Annelida MateView exports at ~0.72m wide including the stand foot. At the
@@ -51,42 +51,58 @@ const MONITOR_RISER_CENTER_Z = -0.28;
 // + intensity can be driven from React state.
 const SCREEN_MESH_NAME = "Screen_Display_0";
 
-// Screen flash on enter — same timeline as the old hold-complete flash.
+// Click flash on enter — short white spike, then back to the resting emissive
+// level. The glitch beat (driven via triggerGlitch) runs on top of the flash.
 const SCREEN_FLASH_INTENSITY = 6;
 const SCREEN_FLASH_RISE_S = 0.06;
 const SCREEN_FLASH_FALL_S = 0.3;
 
-// Screen emissive intensity in lit (ready/executing) states. Higher values
-// blow out under our dramatic key + rim lighting; 2.5 reads as a real CRT.
-const SCREEN_ON_INTENSITY = 2.5;
-// Cursor blink frequency — 2.5Hz feels like a real CRT.
-const CURSOR_BLINK_INTERVAL_MS = 400;
+// Resting emissive intensity. The screen carries Hero-matching content
+// (dithered "YURI BODO"), so the emissive lifts the texture into "lit
+// monitor" range without blowing it out under the warm key + rim lights.
+const SCREEN_ON_INTENSITY = 2.2;
+
+// Glitch beat duration triggered on click. 200ms = enough to register as
+// "channel change disturbance", short enough to not delay the dive.
+const GLITCH_DURATION_MS = 200;
+
+// Throttle the canvas repaint. Full-frame Bayer dither at 1024x512 is the
+// expensive bit (~6ms on a decent CPU). 30fps is indistinguishable from
+// 60fps at this distance and halves the per-second cost.
+const REPAINT_INTERVAL_MS = 1000 / 30;
 
 export interface MonitorProps {
   /** Fired when the user clicks the screen mesh. Parent dispatches the
-   *  ENTER_CLICKED action and may trigger flashComplete. */
+   *  ENTER_CLICKED action and may trigger flashComplete + glitch. */
   onEnter: () => void;
-  /** Drives screen content (ready vs executing) and gates hover/click. */
+  /** Drives screen content (idle vs diving) and gates hover/click. */
   state: LobbyState;
-  /** Executing-mode reveal progress in [0, 1]. The dive transition (#10)
-   *  animates this; 0 keeps the executing lines blank. */
-  bootProgress?: number;
+  /** Dive progress in [0, 1]. Tightens the dither during the dolly so the
+   *  preview "resolves" right before handoff. The transition timeline
+   *  drives this; default 0 keeps idle look. */
+  diveProgress?: number;
 }
 
 export interface MonitorHandle {
-  /** Called by the parent on ENTER_CLICKED to play the click flash. */
+  /** Fired by the parent on ENTER_CLICKED: plays the click flash and
+   *  starts the 200ms channel-change glitch on the screen content. */
   flashComplete: () => void;
-  /** Returns the live screen mesh so the dive transition (#10) can measure
-   *  its world-space box for the FOV-fill camera-Z math. */
+  /** Returns the live screen mesh so the dive transition (#10) can
+   *  measure its world-space box for the FOV-fill camera-Z math. */
   getScreenMesh: () => Mesh | null;
+  /** Tween-friendly handle on the emissive intensity so the transition
+   *  can do the t=1.60s "last bloom" beat without forking another ref. */
+  getScreenMaterial: () => MeshStandardMaterialType | null;
 }
 
-function pickMode(state: LobbyState): BootScreenMode {
-  return state === "idle" || state === "exploring" ? "ready" : "executing";
+function pickMode(state: LobbyState, glitchActive: boolean): ScreenMode {
+  if (glitchActive) return "glitch";
+  if (state === "booting") return "diving";
+  return "idle";
 }
 
 const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
-  { onEnter, state, bootProgress = 0 },
+  { onEnter, state, diveProgress = 0 },
   ref,
 ) {
   const { scene } = useGLTF(LOBBY_MODELS.monitor);
@@ -94,23 +110,37 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
   const screenMeshRef = useRef<Mesh | null>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const bootCanvas = useMemo(() => {
+  // Glitch state lives in a ref so the useFrame loop can read it without
+  // re-rendering the component every tick.
+  const glitchUntilRef = useRef(0);
+  const lastPaintRef = useRef(0);
+  // Mirror props in refs so the useFrame closure stays stable but always
+  // sees the latest state / diveProgress from the parent.
+  const stateRef = useRef(state);
+  const diveProgressRef = useRef(diveProgress);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+  useEffect(() => {
+    diveProgressRef.current = diveProgress;
+  }, [diveProgress]);
+
+  const screenCanvas = useMemo(() => {
     if (typeof document === "undefined") return null;
     const c = document.createElement("canvas");
-    c.width = BOOT_CANVAS_WIDTH;
-    c.height = BOOT_CANVAS_HEIGHT;
+    c.width = SCREEN_CANVAS_WIDTH;
+    c.height = SCREEN_CANVAS_HEIGHT;
     return c;
   }, []);
-  const bootTexture = useMemo(() => {
-    if (!bootCanvas) return null;
-    const tex = new CanvasTexture(bootCanvas);
+  const screenTexture = useMemo(() => {
+    if (!screenCanvas) return null;
+    const tex = new CanvasTexture(screenCanvas);
     tex.colorSpace = SRGBColorSpace;
     tex.minFilter = LinearFilter;
     tex.magFilter = LinearFilter;
     tex.generateMipmaps = false;
     return tex;
-  }, [bootCanvas]);
-  const cursorVisibleRef = useRef(true);
+  }, [screenCanvas]);
 
   useImperativeHandle(
     ref,
@@ -131,8 +161,10 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
             duration: SCREEN_FLASH_FALL_S,
             ease: "power2.out",
           });
+        glitchUntilRef.current = performance.now() + GLITCH_DURATION_MS;
       },
       getScreenMesh: () => screenMeshRef.current,
+      getScreenMaterial: () => screenMaterialRef.current,
     }),
     [],
   );
@@ -168,15 +200,13 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       mesh.receiveShadow = true;
 
       if (mesh.name === SCREEN_MESH_NAME) {
-        // Swap the shipped Display material for a controllable emissive that
-        // we can drive (ready prompt, executing reveal, flash on click).
         const screenMaterial = new MeshStandardMaterial({
           color: new Color("#000000"),
           emissive: new Color("#ffffff"),
-          emissiveIntensity: 0,
+          emissiveIntensity: state === "loading" ? 0 : SCREEN_ON_INTENSITY,
           roughness: 0.25,
           metalness: 0,
-          emissiveMap: bootTexture,
+          emissiveMap: screenTexture,
         });
         mesh.material = screenMaterial;
         screenMaterialRef.current = screenMaterial;
@@ -189,69 +219,55 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       screenMaterialRef.current = null;
       screenMeshRef.current = null;
     };
-  }, [scene, bootTexture]);
+    // `state` only matters for the initial emissive level — we don't want
+    // to rebuild the material when it changes (the useFrame manages it).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene, screenTexture]);
 
-  // Dispose the boot texture when the component unmounts.
   useEffect(() => {
     return () => {
-      bootTexture?.dispose();
+      screenTexture?.dispose();
     };
-  }, [bootTexture]);
+  }, [screenTexture]);
 
-  // Draw the appropriate screen contents based on lobby state.
-  //   - loading:           screen off (intensity 0, no draw)
-  //   - idle / exploring:  ready prompt
-  //   - booting:           executing reveal (driven by bootProgress)
-  //   - done:              n/a, lobby unmounts
+  // Resting emissive level follows the lobby state — off while loading,
+  // lit otherwise. The GSAP flash + transition bloom tween write directly
+  // to this material so we don't fight them here.
   useEffect(() => {
-    if (!bootCanvas || !bootTexture) return;
     const screen = screenMaterialRef.current;
     if (!screen) return;
+    if (gsap.isTweening(screen)) return;
+    screen.emissiveIntensity = state === "loading" ? 0 : SCREEN_ON_INTENSITY;
+  }, [state]);
 
-    if (state === "loading") {
-      screen.emissiveIntensity = 0;
-      return;
-    }
+  // Single continuous paint loop. Reads stateRef / diveProgressRef /
+  // glitchUntilRef so the closure never goes stale and the cost stays at
+  // one paint per ~33ms regardless of how often React re-renders.
+  useFrame(() => {
+    if (!screenCanvas || !screenTexture) return;
+    if (stateRef.current === "loading") return;
 
-    drawBootScreen(bootCanvas, {
-      mode: pickMode(state),
-      progress: bootProgress,
-      showCursor: cursorVisibleRef.current,
+    const now = performance.now();
+    if (now - lastPaintRef.current < REPAINT_INTERVAL_MS) return;
+    lastPaintRef.current = now;
+
+    const glitchRemaining = glitchUntilRef.current - now;
+    const glitchActive = glitchRemaining > 0;
+    const glitchIntensity = glitchActive
+      ? glitchRemaining / GLITCH_DURATION_MS
+      : 0;
+
+    paintScreen(screenCanvas, {
+      mode: pickMode(stateRef.current, glitchActive),
+      progress: diveProgressRef.current,
+      time: now,
+      glitchIntensity,
     });
-    bootTexture.needsUpdate = true;
-
-    // Don't fight the flashComplete GSAP tween — it transiently writes
-    // emissiveIntensity for ~360ms and we'd otherwise clobber it.
-    if (!gsap.isTweening(screen)) {
-      screen.emissiveIntensity = SCREEN_ON_INTENSITY;
-    }
-  }, [bootCanvas, bootTexture, state, bootProgress]);
-
-  // Cursor blink. Runs whenever the cursor would be visually meaningful:
-  //   - ready mode: the prompt cursor at the end of "./enter"
-  //   - executing mode mid-reveal: the typing-line trailing block
-  useEffect(() => {
-    if (!bootCanvas || !bootTexture) return;
-    const isReady = state === "idle" || state === "exploring";
-    const isTyping =
-      state === "booting" && bootProgress > 0 && bootProgress < 1;
-    if (!isReady && !isTyping) return;
-
-    const interval = window.setInterval(() => {
-      cursorVisibleRef.current = !cursorVisibleRef.current;
-      drawBootScreen(bootCanvas, {
-        mode: pickMode(state),
-        progress: bootProgress,
-        showCursor: cursorVisibleRef.current,
-      });
-      bootTexture.needsUpdate = true;
-    }, CURSOR_BLINK_INTERVAL_MS);
-    return () => window.clearInterval(interval);
-  }, [bootCanvas, bootTexture, state, bootProgress]);
+    screenTexture.needsUpdate = true;
+  });
 
   const isInteractive = state === "idle" || state === "exploring";
 
-  // Cursor pointer while hovering the screen mesh.
   useEffect(() => {
     if (!isHovered || !isInteractive) return;
     const previous = document.body.style.cursor;
@@ -261,9 +277,6 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
     };
   }, [isHovered, isInteractive]);
 
-  // R3F bubbles pointer events from any child mesh up to the <primitive>
-  // wrapper. We filter to the screen mesh so the bezel/stand stay inert,
-  // and to the actionable states so clicks during boot/loading are no-ops.
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     if (!isInteractive) return;
     if (e.object !== screenMeshRef.current) return;

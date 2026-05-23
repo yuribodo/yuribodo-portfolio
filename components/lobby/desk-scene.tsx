@@ -32,7 +32,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const monitorRef = useRef<MonitorHandle>(null);
   const environmentRef = useRef<DeskEnvironmentHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [bootProgress, setBootProgress] = useState(0);
+  const [diveProgress, setDiveProgress] = useState(0);
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -55,6 +55,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
     const camera = cameraRigRef.current?.getCamera();
     const screenMesh = monitorRef.current?.getScreenMesh();
+    const screenMaterial = monitorRef.current?.getScreenMaterial() ?? null;
     if (!camera || !screenMesh) {
       // The model isn't measurable yet — skip straight to done so the user
       // isn't trapped. Logged because hitting this means a load race.
@@ -66,10 +67,11 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     const tl = playLobbyToSiteTransition({
       camera,
       screenMesh,
+      screenMaterial,
       environment: environmentRef.current,
       container: containerRef.current,
-      onBootProgress: setBootProgress,
-      onBootComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
+      onDiveProgress: setDiveProgress,
+      onDiveComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
       prefersReducedMotion,
     });
 
@@ -101,7 +103,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             ref={monitorRef}
             onEnter={handleEnter}
             state={state}
-            bootProgress={bootProgress}
+            diveProgress={diveProgress}
           />
           <RazerPeripherals />
           <Macbook />
