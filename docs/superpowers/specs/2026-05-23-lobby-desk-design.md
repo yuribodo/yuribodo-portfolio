@@ -126,6 +126,60 @@ The composition is intentionally **asymmetric and slightly disarranged** — des
 
 **Atmospheric layer**: dust motes via `Sprite` instances with noise displacement. ~50 particles, very low alpha. Separates "asset marketplace render" from "feels real."
 
+## Set Design — Desk, Background, Floor
+
+The 3/4 isometric framing exposes substantial area **behind** and **below** the desk. Set design isolates the desk in atmospheric darkness rather than modeling a full room — focus stays on the personal objects, asset cost stays low, and the transition into the existing site (whose `bg-background` is near-black) feels continuous.
+
+### Desk surface
+
+| Property | Value |
+|---|---|
+| Material | Dark fumed oak (PBR) |
+| Base color | `#2a1f1a` (warm dark brown, slight reddish undertone) |
+| Roughness | 0.7 (fosca, with subtle micro-scratches in normal map) |
+| Metalness | 0.0 |
+| Dimensions visible | ~1.6m × 0.8m (length × depth), thickness ~0.04m |
+| Edges | Chamfered ~3mm (no perfect 90° corners) |
+| Wear detail | Subtle albedo variation (light coffee ring near MacBook, faint scratches under mousepad) added via texture overlay |
+
+The warm wood deliberately contrasts with the cool peripherals (Razer black + RGB) and the cool background fog, giving the desk plane its own thermal presence.
+
+### Background
+
+| Property | Value |
+|---|---|
+| Approach | Volumetric darkness via fog — no modeled walls |
+| Fog type | `THREE.FogExp2` |
+| Fog color | `#0a0a0f` (matches site `--background` for transition continuity) |
+| Fog density | `0.08` (objects beyond ~3 units fade fully into darkness) |
+| HDRi role | **Reflection-only**, not visible. Use `<Environment background={false}>` to apply IBL without showing the HDRi backdrop |
+| Sky | None — fog absorbs everything past the desk |
+
+### Floor
+
+| Property | Value |
+|---|---|
+| Visible floor mesh | None |
+| Shadow handling | `<ContactShadows>` on an invisible plane at desk-base level (y = 0) |
+| Desk legs | **Optional** — if modeled, fade to fog within ~0.3m of the floor. Recommended to crop the lower legs out of frame entirely via camera elevation |
+| Below-desk space | Pure fog black — reinforces "floating desk in darkness" feel |
+
+### Implied environment (off-camera light sources)
+
+To suggest "a room exists" without modeling one, two **invisible** point lights sit outside the frame:
+
+1. **Warm lamp** — position `(2.5, 2, 1)`, color `#ffb87a` (~2700K), intensity 2.5. Off-camera right, simulates desk lamp throwing warm light onto monitor + figures
+2. **Window glow** — position `(-3, 3, -2)`, color `#7090b0` (~6500K), intensity 0.8. Off-camera left-rear, simulates cool ambient leak from a window
+
+These are in addition to the key/fill/rim of §6 — they extend the lighting story so the eye reads "this desk is in a space" even though the space itself is fog.
+
+### Why this approach
+
+- **Asset cost**: one desk mesh + zero room geometry. All atmosphere comes from fog + lights, which are free
+- **Focus**: the personal objects become the entire visual subject; the desk is a stage, not a competing detail
+- **Transition continuity**: when the dive completes and the site (`bg-background: #0a0a0f`) appears, the fog color matches — no jarring background swap
+- **Tone**: aligns with Bruno Simon's lived-in isolation; rejects "showroom render" reading
+
 ## Object Inventory
 
 | Object | Source strategy | Click action | Hover state |
