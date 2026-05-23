@@ -6,18 +6,18 @@ import { Box3, Vector3 } from "three";
 import type { Mesh, Object3D } from "three";
 
 const MONITOR_MODEL_PATH = "/lobby/models/monitor.glb";
-// 27" widescreen is ~0.62m. The Annelida MateView model exports at ~0.72m
-// wide including the stand foot, which reads slightly oversized at the new
-// seated POV (#5). 0.62m target keeps the bezel at a believable angular size.
-const MONITOR_TARGET_WIDTH = 0.62;
-// World-Y of the desk's writing surface (the TableTop_DeskBoards_0 mesh).
-// The seanb desk model is normalised in desk.tsx with its hutch shelf at y=0,
-// which pushes the actual writing surface down by the hutch clearance.
-// Probed empirically from desk.tsx during integration — keep in sync if the
-// desk's normalisation ever changes.
-const MONITOR_DESK_SURFACE_Y = -0.602;
-// Pushed back toward the hutch so the screen reads as "at the back of the desk".
-const MONITOR_OFFSET_Z = -0.15;
+// Annelida MateView exports at ~0.72m wide including the stand foot. At the
+// seated POV (#5), 0.62m read too imposing relative to the hutch opening, so
+// we ease back to 0.54m — still believable as a 24-27" panel, but framed by
+// the hutch rather than crowding it.
+const MONITOR_TARGET_WIDTH = 0.54;
+// The seanb desk model has a raised monitor riser at the back of the writing
+// surface (SmallSupportL1_MiniBoard_0). Its top sits at world y=-0.533 and it
+// spans z ∈ [-0.405, -0.154] — exactly the shelf a real monitor would sit on.
+// Both values probed empirically from the desk mesh; keep in sync if the
+// desk's normalisation in desk.tsx ever changes.
+const MONITOR_RISER_TOP_Y = -0.533;
+const MONITOR_RISER_CENTER_Z = -0.28;
 
 useGLTF.preload(MONITOR_MODEL_PATH);
 
@@ -44,8 +44,8 @@ export default function Monitor() {
     finalBox.getCenter(finalCentre);
     scene.position.set(
       -finalCentre.x,
-      MONITOR_DESK_SURFACE_Y - finalBox.min.y,
-      MONITOR_OFFSET_Z - finalCentre.z,
+      MONITOR_RISER_TOP_Y - finalBox.min.y,
+      MONITOR_RISER_CENTER_Z - finalCentre.z,
     );
 
     scene.traverse((obj: Object3D) => {
