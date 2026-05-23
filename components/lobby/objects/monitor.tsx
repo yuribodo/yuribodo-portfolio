@@ -8,10 +8,19 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
-import { Box3, Color, MeshStandardMaterial, Vector3 } from "three";
+import {
+  Box3,
+  CanvasTexture,
+  Color,
+  LinearFilter,
+  MeshStandardMaterial,
+  SRGBColorSpace,
+  Vector3,
+} from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import type {
   Mesh,
@@ -21,6 +30,11 @@ import type {
 import type { PointerEvent as ReactPointerEvent } from "react";
 
 import type { HoldActivateBind } from "@/hooks/use-hold-activate";
+import {
+  BOOT_CANVAS_HEIGHT,
+  BOOT_CANVAS_WIDTH,
+  drawBootScreen,
+} from "@/lib/lobby/boot-screen";
 
 const MONITOR_MODEL_PATH = "/lobby/models/monitor.glb";
 // Annelida MateView exports at ~0.72m wide including the stand foot. At the
@@ -63,11 +77,20 @@ const SCREEN_FLASH_INTENSITY = 6;
 const SCREEN_FLASH_RISE_S = 0.06;
 const SCREEN_FLASH_FALL_S = 0.3;
 
+// Boot screen — emissive intensity once any glyph is visible. Higher values
+// blow out under our dramatic key + rim lighting; 2.5 reads as a real CRT.
+const SCREEN_ON_INTENSITY = 2.5;
+// Cursor blink frequency on the typing line — 2.5Hz feels like a real CRT.
+const CURSOR_BLINK_INTERVAL_MS = 400;
+
 useGLTF.preload(MONITOR_MODEL_PATH);
 
 export interface MonitorProps {
   bind: HoldActivateBind;
   isHolding: boolean;
+  /** External boot-screen reveal in [0, 1]. The dive transition (#10) animates
+   *  this from 0 → 1; 0 keeps the screen black. */
+  bootProgress?: number;
 }
 
 export interface MonitorHandle {
@@ -79,7 +102,7 @@ export interface MonitorHandle {
 }
 
 const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
-  { bind, isHolding },
+  { bind, isHolding, bootProgress = 0 },
   ref,
 ) {
   const { scene } = useGLTF(MONITOR_MODEL_PATH);
@@ -90,6 +113,26 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
   const pressedIntensityRef = useRef(0);
   const cancelTweenRef = useRef<gsap.core.Tween | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Lazily allocate the canvas once per mount; the same CanvasTexture is
+  // bound to the screen material so re-draws don't require a material swap.
+  const bootCanvas = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const c = document.createElement("canvas");
+    c.width = BOOT_CANVAS_WIDTH;
+    c.height = BOOT_CANVAS_HEIGHT;
+    return c;
+  }, []);
+  const bootTexture = useMemo(() => {
+    if (!bootCanvas) return null;
+    const tex = new CanvasTexture(bootCanvas);
+    tex.colorSpace = SRGBColorSpace;
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
+    tex.generateMipmaps = false;
+    return tex;
+  }, [bootCanvas]);
+  const cursorVisibleRef = useRef(true);
 
   useImperativeHandle(
     ref,
@@ -164,18 +207,16 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
 
       if (mesh.name === SCREEN_MESH_NAME) {
         // The shipped Display material is a static emissive image. Swap it
-        // for a controllable MeshStandardMaterial so the rest of the system
-        // (boot glyphs in #7, pulse/states in #5, dive in #10) can mutate
-        // emissiveMap + emissiveIntensity without re-cloning per frame.
+        // for a controllable MeshStandardMaterial whose emissiveMap is our
+        // boot-screen canvas — the rest of the system (pulse/states in #5,
+        // boot glyphs in #7, dive in #10) only mutates emissiveIntensity.
         const screenMaterial = new MeshStandardMaterial({
           color: new Color("#000000"),
           emissive: new Color("#ffffff"),
           emissiveIntensity: 0,
           roughness: 0.25,
           metalness: 0,
-          // The boot-glyphs texture lands in #7; until then the screen reads
-          // as a powered-off black panel.
-          emissiveMap: null,
+          emissiveMap: bootTexture,
         });
         mesh.material = screenMaterial;
         screenMaterialRef.current = screenMaterial;
@@ -186,7 +227,51 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       screenMaterialRef.current?.dispose();
       screenMaterialRef.current = null;
     };
-  }, [scene]);
+  }, [scene, bootTexture]);
+
+  // Dispose the boot texture when the component unmounts.
+  useEffect(() => {
+    return () => {
+      bootTexture?.dispose();
+    };
+  }, [bootTexture]);
+
+  // Re-draw boot screen + drive screen emissive intensity on bootProgress
+  // change. Drawing is cheap (~1ms for a 1024×512 canvas with 3 lines).
+  useEffect(() => {
+    if (!bootCanvas || !bootTexture) return;
+    drawBootScreen(bootCanvas, {
+      progress: bootProgress,
+      showCursor: cursorVisibleRef.current,
+    });
+    bootTexture.needsUpdate = true;
+
+    const screen = screenMaterialRef.current;
+    if (!screen) return;
+    // Don't fight GSAP — the complete-flash tween writes emissiveIntensity
+    // for ~360ms and we'd otherwise clobber it. Once flash finishes the
+    // tween settles to 0; if the dive (#10) has started, bootProgress > 0
+    // pushes it back up.
+    if (bootProgress > 0 && !gsap.isTweening(screen)) {
+      screen.emissiveIntensity = SCREEN_ON_INTENSITY;
+    }
+  }, [bootCanvas, bootTexture, bootProgress]);
+
+  // Blink the typing cursor while glyphs are mid-reveal. Pauses when the
+  // boot screen is hidden (progress === 0) or fully revealed (progress >= 1).
+  useEffect(() => {
+    if (!bootCanvas || !bootTexture) return;
+    if (bootProgress <= 0 || bootProgress >= 1) return;
+    const interval = window.setInterval(() => {
+      cursorVisibleRef.current = !cursorVisibleRef.current;
+      drawBootScreen(bootCanvas, {
+        progress: bootProgress,
+        showCursor: cursorVisibleRef.current,
+      });
+      bootTexture.needsUpdate = true;
+    }, CURSOR_BLINK_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, [bootCanvas, bootTexture, bootProgress]);
 
   // Cursor pointer while hovering the power button.
   useEffect(() => {
