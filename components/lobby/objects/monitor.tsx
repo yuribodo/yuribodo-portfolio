@@ -30,13 +30,12 @@ import type {
 import type { PointerEvent as ReactPointerEvent } from "react";
 
 import type { HoldActivateBind } from "@/hooks/use-hold-activate";
+import { LOBBY_MODELS } from "@/lib/lobby/assets";
 import {
   BOOT_CANVAS_HEIGHT,
   BOOT_CANVAS_WIDTH,
   drawBootScreen,
 } from "@/lib/lobby/boot-screen";
-
-const MONITOR_MODEL_PATH = "/lobby/models/monitor.glb";
 // Annelida MateView exports at ~0.72m wide including the stand foot. At the
 // seated POV (#5), 0.62m read too imposing relative to the hutch opening, so
 // we ease back to 0.54m — still believable as a 24-27" panel, but framed by
@@ -83,8 +82,6 @@ const SCREEN_ON_INTENSITY = 2.5;
 // Cursor blink frequency on the typing line — 2.5Hz feels like a real CRT.
 const CURSOR_BLINK_INTERVAL_MS = 400;
 
-useGLTF.preload(MONITOR_MODEL_PATH);
-
 export interface MonitorProps {
   bind: HoldActivateBind;
   isHolding: boolean;
@@ -105,7 +102,7 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
   { bind, isHolding, bootProgress = 0 },
   ref,
 ) {
-  const { scene } = useGLTF(MONITOR_MODEL_PATH);
+  const { scene } = useGLTF(LOBBY_MODELS.monitor);
   const screenMaterialRef = useRef<MeshStandardMaterialType | null>(null);
   const ledMaterialRef = useRef<MeshStandardMaterialType>(null);
   // Decoupled from React state — useFrame reads/writes this every frame; the

@@ -5,17 +5,16 @@ import { useLayoutEffect } from "react";
 import { Box3, Vector3 } from "three";
 import type { Mesh, Object3D } from "three";
 
-const DESK_MODEL_PATH = "/lobby/models/wooden_desk.glb";
+import { LOBBY_MODELS } from "@/lib/lobby/assets";
+
 const DESK_TARGET_WIDTH = 1.6;
 // Sketchfab seanb's model exports with its long axis on Z and its front facing
 // +X; rotating -90° around Y puts the writing surface across the camera view
 // with the front (where you'd sit) facing the camera.
 const DESK_Y_ROTATION = -Math.PI / 2;
 
-useGLTF.preload(DESK_MODEL_PATH);
-
 export default function Desk() {
-  const { scene } = useGLTF(DESK_MODEL_PATH);
+  const { scene } = useGLTF(LOBBY_MODELS.desk);
 
   useLayoutEffect(() => {
     // Reset before measuring so re-renders are idempotent
