@@ -47,7 +47,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
   const prefersReducedMotion = useReducedMotion();
 
   const isDriftEnabled =
-    !prefersReducedMotion && state !== "holding" && state !== "booting" && state !== "loading";
+    !prefersReducedMotion && state !== "booting" && state !== "loading";
 
   useImperativeHandle(
     ref,
