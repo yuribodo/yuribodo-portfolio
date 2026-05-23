@@ -53,6 +53,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const {
     play: playCue,
     startAmbient,
+    stopAmbient,
     isMuted,
     toggleMuted,
   } = useLobbyAudio();
@@ -191,13 +192,20 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       container: containerRef.current,
       onDiveProgress: setDiveProgress,
       onDiveComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
+      onHandoff: () => {
+        playCue("stinger");
+        // Fade the ambient bed out as Hero's soundtrack ramps in (3s fade
+        // from 0). Without this the bed plays for ~500ms past lobby
+        // opacity:0, audibly bleeding through while the user sees Hero.
+        stopAmbient();
+      },
       prefersReducedMotion,
     });
 
     return () => {
       tl.kill();
     };
-  }, [state, dispatch, prefersReducedMotion]);
+  }, [state, dispatch, prefersReducedMotion, playCue, stopAmbient]);
 
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
