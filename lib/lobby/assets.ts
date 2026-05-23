@@ -18,6 +18,7 @@ export const LOBBY_MODELS = {
   figureSeismitoad: "/lobby/models/seismitoad.glb",
   figureDrago: "/lobby/models/drago.glb",
   nintendoDs: "/lobby/models/nintendo-ds.glb",
+  xboxController: "/lobby/models/xbox-controller.glb",
 } as const;
 
 for (const path of Object.values(LOBBY_MODELS)) {
