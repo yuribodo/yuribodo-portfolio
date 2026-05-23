@@ -6,16 +6,13 @@ export type LobbyState =
   | "loading"
   | "idle"
   | "exploring"
-  | "holding"
   | "booting"
   | "done";
 
 export type LobbyAction =
   | { type: "ASSETS_READY" }
   | { type: "DISCOVER" }
-  | { type: "HOLD_START" }
-  | { type: "HOLD_CANCEL" }
-  | { type: "HOLD_COMPLETE" }
+  | { type: "ENTER_CLICKED" }
   | { type: "BOOT_COMPLETE" }
   | { type: "SKIP" };
 
@@ -25,12 +22,8 @@ function reducer(state: LobbyState, action: LobbyAction): LobbyState {
       return state === "loading" ? "idle" : state;
     case "DISCOVER":
       return state === "idle" ? "exploring" : state;
-    case "HOLD_START":
-      return state === "idle" || state === "exploring" ? "holding" : state;
-    case "HOLD_CANCEL":
-      return state === "holding" ? "exploring" : state;
-    case "HOLD_COMPLETE":
-      return state === "holding" ? "booting" : state;
+    case "ENTER_CLICKED":
+      return state === "idle" || state === "exploring" ? "booting" : state;
     case "BOOT_COMPLETE":
       return state === "booting" ? "done" : state;
     case "SKIP":

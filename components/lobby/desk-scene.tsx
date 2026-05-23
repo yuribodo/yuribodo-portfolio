@@ -4,18 +4,17 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useRef } from "react";
 import type { Dispatch } from "react";
 
-import { useHoldActivate } from "@/hooks/use-hold-activate";
+import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
 import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import Desk from "./desk";
 import DeskEnvironment from "./desk-environment";
-import { HoldProgress } from "./hold-progress";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
-// TODO #11: import NintendoDS from "./objects/nintendo-ds";
+import NintendoDS from "./objects/nintendo-ds";
 // TODO #12: import XboxController from "./objects/xbox-controller";
 // TODO #13: import Decks from "./objects/decks";
-// TODO #14: import AnimeFigures from "./objects/anime-figures";
+import AnimeFigures from "./objects/anime-figures";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -27,23 +26,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const cameraRigRef = useRef<CameraRigHandle>(null);
   const monitorRef = useRef<MonitorHandle>(null);
 
-  // The lobby's single hold source of truth — feeds both the lobby state
-  // machine and the monitor's visual effects. The R3F-mounted power button
-  // mesh forwards pointer events into `bind`; the off-canvas sr-only button
-  // forwards keyboard Space-hold into the same `bind`. Progress accumulates
-  // against one timer regardless of input device.
-  const { bind, progress, isHolding } = useHoldActivate({
-    onStart: () => dispatch({ type: "HOLD_START" }),
-    onCancel: () => {
-      dispatch({ type: "HOLD_CANCEL" });
-      monitorRef.current?.cancelPress();
-    },
-    onComplete: () => {
-      monitorRef.current?.flashComplete();
-      dispatch({ type: "HOLD_COMPLETE" });
-    },
-  });
-
   useEffect(() => {
     if (state !== "loading") return;
     const timer = window.setTimeout(() => {
@@ -51,6 +33,16 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     }, 600);
     return () => window.clearTimeout(timer);
   }, [state, dispatch]);
+
+  // Discovery affordance (issue #14): fires once per session on the user's
+  // first mouse move, pulsing 3–4 registered objects to signal interactivity.
+  useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
+
+  const handleEnter = () => {
+    if (state !== "idle" && state !== "exploring") return;
+    monitorRef.current?.flashComplete();
+    dispatch({ type: "ENTER_CLICKED" });
+  };
 
   return (
     <div
@@ -64,25 +56,23 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         <Suspense fallback={null}>
           <DeskEnvironment />
           <Desk />
-          <Monitor ref={monitorRef} bind={bind} isHolding={isHolding} />
+          <Monitor ref={monitorRef} onEnter={handleEnter} state={state} />
           <RazerPeripherals />
           <Macbook />
-          {/* TODO #11: <NintendoDS /> */}
+          <NintendoDS />
           {/* TODO #12: <XboxController /> */}
           {/* TODO #13: <Decks /> */}
-          {/* TODO #14: <AnimeFigures /> */}
+          <AnimeFigures />
         </Suspense>
       </Canvas>
-      <HoldProgress progress={progress} isHolding={isHolding} />
-      {/* Off-canvas keyboard surrogate for the monitor's power button. The
-          R3F mesh receives mouse holds; this <button> hosts the Space-hold
-          bind handlers so screen-reader + keyboard-only users have parity. */}
+      {/* Off-canvas keyboard surrogate. Tab → Enter/Space triggers the same
+          enter action as clicking the screen mesh. */}
       <button
         type="button"
-        {...bind}
+        onClick={handleEnter}
         className="sr-only"
       >
-        Power on monitor (hold Space to enter site)
+        Enter portfolio
       </button>
     </div>
   );

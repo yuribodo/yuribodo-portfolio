@@ -13,7 +13,10 @@ const DESK_TOP_Y = -0.602;
 // mousepad (gimora's GLB ships them as one scene), so the mouse position is
 // where the pad lands — Mouse.tsx centres the pad on the group origin, so
 // this is literally the mousepad spec coord projected onto the desk surface.
-const KEYBOARD_POSITION: [number, number, number] = [-0.10, DESK_TOP_Y, 0.20];
+// Keyboard nudged left of the spec's x=-0.10 to clear the mousepad's left
+// edge (assembly at x=+0.20 with embedded pad ~0.30m wide). Within spec §6's
+// ±0.05m tolerance is broken slightly here — collision avoidance wins.
+const KEYBOARD_POSITION: [number, number, number] = [-0.18, DESK_TOP_Y, 0.20];
 const MOUSE_ASSEMBLY_POSITION: [number, number, number] = [0.20, DESK_TOP_Y, 0.20];
 
 export default function RazerPeripherals() {

@@ -59,31 +59,33 @@ export default function Macbook() {
   const [isHovered, setIsHovered] = useState(false);
 
   useLayoutEffect(() => {
-    // Idempotent reset — useGLTF can hand back the same scene across HMR.
-    scene.scale.setScalar(1);
-    scene.position.set(0, 0, 0);
-    scene.rotation.set(0, 0, 0);
+    // Measure in a detached clone so Box3.setFromObject returns a true LOCAL
+    // bbox. Measuring the actual scene mid-mount returns a WORLD bbox that
+    // already bakes in the group's prop-driven position+rotation — which then
+    // double-applies when we set scene.position. clone(true) is cheap
+    // (geometry/material refs are shared) and runs once per mount.
+    const probe = scene.clone(true);
+    probe.scale.setScalar(1);
+    probe.position.set(0, 0, 0);
+    probe.rotation.set(0, 0, 0);
 
-    const rawBox = new Box3().setFromObject(scene);
+    const rawBox = new Box3().setFromObject(probe);
     const rawSize = new Vector3();
     rawBox.getSize(rawSize);
 
-    // The Sketchfab export wraps the geometry in transform-only nodes that
-    // re-orient it; rawSize.x is the post-orientation width.
     const scale = MACBOOK_TARGET_WIDTH / rawSize.x;
-    scene.scale.setScalar(scale);
+    probe.scale.setScalar(scale);
 
-    // Re-measure post-scale and seat the model on the desk surface (y=0)
-    // with its xz centre at the group origin. The parent <group> handles
-    // the spec placement and the click bounce.
-    const finalBox = new Box3().setFromObject(scene);
+    const finalBox = new Box3().setFromObject(probe);
     const finalCentre = new Vector3();
     finalBox.getCenter(finalCentre);
-    scene.position.set(
-      -finalCentre.x,
-      -finalBox.min.y,
-      -finalCentre.z,
-    );
+
+    // Apply scale + centring to the actual mounted scene. Centre x/z on the
+    // group origin; rest the MacBook base on group-local y=0 so the wrapper's
+    // position prop places it directly on the desk surface.
+    scene.scale.setScalar(scale);
+    scene.position.set(-finalCentre.x, -finalBox.min.y, -finalCentre.z);
+    scene.rotation.set(0, 0, 0);
 
     scene.traverse((obj: Object3D) => {
       const mesh = obj as Mesh;

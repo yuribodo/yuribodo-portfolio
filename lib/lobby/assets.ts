@@ -14,6 +14,10 @@ export const LOBBY_MODELS = {
   macbook: "/lobby/models/macbook_pro_closed.glb",
   keyboard: "/lobby/models/keyboard-razer.glb",
   mouse: "/lobby/models/mouse-razer.glb",
+  figureMinato: "/lobby/models/minato.glb",
+  figureSeismitoad: "/lobby/models/seismitoad.glb",
+  figureDrago: "/lobby/models/drago.glb",
+  nintendoDs: "/lobby/models/nintendo-ds.glb",
 } as const;
 
 for (const path of Object.values(LOBBY_MODELS)) {

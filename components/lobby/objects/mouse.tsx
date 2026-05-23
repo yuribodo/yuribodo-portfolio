@@ -188,23 +188,28 @@ export default function Mouse({ position = [0, 0, 0] }: MouseProps) {
       }
 
       if (mesh.name === BODY_MESH_NAME) {
-        // Mouse body's xz centre in world space — convert back to the
-        // group's local space by subtracting the scene's now-applied offset.
+        // Mouse body's xz centre, expressed in scene-local space — i.e.,
+        // where the body sits relative to the GLB's root. getWorldPosition
+        // includes the group's prop-applied position, which we then strip
+        // by subtracting scene's world position.
         tmpBox.setFromObject(mesh);
         tmpBox.getCenter(tmpVec);
-        bodyCentreX = tmpVec.x - scene.position.x;
-        bodyCentreZ = tmpVec.z - scene.position.z;
+        const sceneWorld = new Vector3();
+        scene.getWorldPosition(sceneWorld);
+        bodyCentreX = tmpVec.x - sceneWorld.x;
+        bodyCentreZ = tmpVec.z - sceneWorld.z;
       }
     });
 
-    // Now that we know the body's xz centre, position the spill plane.
-    // Pad top sits at y=0 in this local space after the offset above.
-    if (spillMeshRef.current) {
-      spillMeshRef.current.position.set(
-        bodyCentreX,
-        SPILL_Y_OFFSET,
-        bodyCentreZ,
-      );
+    // Re-parent the spill plane into scene so it inherits the same transform
+    // chain as the mouse body. Position it in scene-local space at the body
+    // centre (the same coord frame we just resolved). This makes the spill
+    // track the mouse correctly regardless of the wrapping group's position.
+    const spillMesh = spillMeshRef.current;
+    if (spillMesh) {
+      if (spillMesh.parent !== scene) scene.add(spillMesh);
+      spillMesh.position.set(bodyCentreX, SPILL_Y_OFFSET, bodyCentreZ);
+      spillMesh.rotation.set(-Math.PI / 2, 0, 0);
     }
 
     return () => {
