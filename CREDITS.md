@@ -91,3 +91,14 @@ Verbatim attribution per the license:
 Verbatim attribution per the license:
 
 > "Bakugan Battle Brawlers - Dragonoid" (https://sketchfab.com/3d-models/bakugan-battle-brawlers-dragonoid-9abb64bb6b7d490787a8e7cb92f7fbe4) by Elpaput is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+### Nintendo DS Lite
+
+- **Author:** zombitt
+- **Source:** https://sketchfab.com/3d-models/nintendo-ds-lite-b13d2c9ac9404958b8358f9af871f2dc (Sketchfab)
+- **License:** [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+- **Used in:** lobby DS — clamshell open + screen boot mini-interaction (issue #11)
+
+Verbatim attribution per the license:
+
+> "Nintendo DS Lite" (https://sketchfab.com/3d-models/nintendo-ds-lite-b13d2c9ac9404958b8358f9af871f2dc) by zombitt is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).

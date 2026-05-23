@@ -11,7 +11,7 @@ import DeskEnvironment from "./desk-environment";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
-// TODO #11: import NintendoDS from "./objects/nintendo-ds";
+import NintendoDS from "./objects/nintendo-ds";
 // TODO #12: import XboxController from "./objects/xbox-controller";
 // TODO #13: import Decks from "./objects/decks";
 import AnimeFigures from "./objects/anime-figures";
@@ -59,7 +59,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           <Monitor ref={monitorRef} onEnter={handleEnter} state={state} />
           <RazerPeripherals />
           <Macbook />
-          {/* TODO #11: <NintendoDS /> */}
+          <NintendoDS />
           {/* TODO #12: <XboxController /> */}
           {/* TODO #13: <Decks /> */}
           <AnimeFigures />
