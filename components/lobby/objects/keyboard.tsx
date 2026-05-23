@@ -17,10 +17,10 @@ import { useObjectHover } from "@/hooks/use-object-hover";
 import { LOBBY_MODELS } from "@/lib/lobby/assets";
 
 // Mieshu's BlackWidow Chroma exports at ~7.5m wide in raw model space. A real
-// BlackWidow is ~44cm; at the seated POV we want it to feel like the
-// hands-area anchor without overwhelming the monitor, so 0.42m reads correct
-// once the camera is at (0, 0.4, 1.9) and the keyboard is at z=+0.20.
-const KEYBOARD_TARGET_WIDTH = 0.42;
+// BlackWidow Chroma TKL is ~36cm; sizing the model at 0.36m keeps it from
+// colliding with the mousepad (assembly at x=+0.20, pad ~0.30m wide, so the
+// pad's left edge sits at x≈+0.05). The previous 0.42m clipped into the pad.
+const KEYBOARD_TARGET_WIDTH = 0.36;
 
 // Hover lift — matches spec §5 "lift ~0.05u".
 const HOVER_LIFT_Y = 0.05;
@@ -101,31 +101,36 @@ export default function Keyboard({ position = [0, 0, 0] }: KeyboardProps) {
   const { isHovered, bind: hoverBind } = useObjectHover();
 
   useLayoutEffect(() => {
-    scene.scale.setScalar(1);
-    scene.position.set(0, 0, 0);
-    scene.rotation.set(0, 0, 0);
+    // Measure in a detached clone so Box3.setFromObject returns a true
+    // LOCAL bbox. Measuring the actual scene mid-mount returns a WORLD bbox
+    // that already bakes in the group's prop-driven position+rotation —
+    // which then double-applies when we set scene.position. clone(true) is
+    // cheap (geometry/material refs are shared, only Object3D wrappers
+    // duplicate) and runs once per mount.
+    const probe = scene.clone(true);
+    probe.scale.setScalar(1);
+    probe.position.set(0, 0, 0);
+    probe.rotation.set(0, 0, 0);
 
-    // Raw bbox first — drives the shader uniforms (which see pre-scale
-    // local coords) and the scale calculation in one pass.
-    const rawBox = new Box3().setFromObject(scene);
+    const rawBox = new Box3().setFromObject(probe);
     const rawSize = new Vector3();
     rawBox.getSize(rawSize);
     uniforms.uRazerMinX.value = rawBox.min.x;
     uniforms.uRazerMaxX.value = rawBox.max.x;
 
     const scale = KEYBOARD_TARGET_WIDTH / rawSize.x;
-    scene.scale.setScalar(scale);
+    probe.scale.setScalar(scale);
 
-    const finalBox = new Box3().setFromObject(scene);
+    const finalBox = new Box3().setFromObject(probe);
     const finalCentre = new Vector3();
     finalBox.getCenter(finalCentre);
-    // Centre x and z on origin; rest the keyboard base on y=0 so the wrapper
-    // can place it directly on the desk surface (y=0 by Desk's convention).
-    scene.position.set(
-      -finalCentre.x,
-      -finalBox.min.y,
-      -finalCentre.z,
-    );
+
+    // Apply scale + centring to the actual scene (mounted in the group).
+    // Centre x/z on origin; rest the keyboard base on group-local y=0 so the
+    // wrapper's position prop places it directly on the desk surface.
+    scene.scale.setScalar(scale);
+    scene.position.set(-finalCentre.x, -finalBox.min.y, -finalCentre.z);
+    scene.rotation.set(0, 0, 0);
 
     scene.traverse((obj: Object3D) => {
       const mesh = obj as Mesh;
@@ -270,7 +275,18 @@ export default function Keyboard({ position = [0, 0, 0] }: KeyboardProps) {
   };
 
   return (
-    <group ref={groupRef} position={position} onClick={handleClick} {...hoverBind}>
+    <group
+      ref={groupRef}
+      position={position}
+      // Mieshu's GLB exports with the spacebar facing the monitor (+Z towards
+      // the viewer in our seated POV is the number row). Flip 180° around Y
+      // on the wrapping group so the spacebar/palm-rest faces the visitor —
+      // rotating on the group instead of inside the scene keeps the model's
+      // internal scale + base-y placement untouched.
+      rotation={[0, Math.PI, 0]}
+      onClick={handleClick}
+      {...hoverBind}
+    >
       <primitive object={scene} />
     </group>
   );
