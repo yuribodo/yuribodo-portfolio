@@ -1,6 +1,6 @@
 "use client";
 
-import { ContactShadows, Environment, SoftShadows } from "@react-three/drei";
+import { ContactShadows, Environment } from "@react-three/drei";
 
 export default function DeskEnvironment() {
   return (
@@ -15,9 +15,6 @@ export default function DeskEnvironment() {
         background={false}
         environmentIntensity={0.55}
       />
-
-      {/* Soft PCF shadow filtering — quality over framerate, the scene is static. */}
-      <SoftShadows size={25} samples={16} focus={0.5} />
 
       {/* KEY — warm overhead, the hero light. Strong enough to throw a
           legible shadow once peripherals land in #7/#8/#9. */}
