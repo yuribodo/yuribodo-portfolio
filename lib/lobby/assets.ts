@@ -11,6 +11,9 @@ import { useGLTF } from "@react-three/drei";
 export const LOBBY_MODELS = {
   desk: "/lobby/models/wooden_desk.glb",
   monitor: "/lobby/models/monitor.glb",
+  macbook: "/lobby/models/macbook_pro_closed.glb",
+  keyboard: "/lobby/models/keyboard-razer.glb",
+  mouse: "/lobby/models/mouse-razer.glb",
 } as const;
 
 for (const path of Object.values(LOBBY_MODELS)) {
