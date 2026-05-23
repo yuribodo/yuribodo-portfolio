@@ -104,27 +104,85 @@ done     → site visible; lobby unmounts after 500ms, GPU memory freed
 
 ## Scene Composition
 
-**Camera**: position ~(0, 4, 5), elevation ~50°, FOV 35° (long lens, cinematic). Parallax drift ±0.3 units on mouse move, lerp factor 0.1.
+> **History note (2026-05-23):** This section was originally written assuming a 3/4 isometric camera at `(0, 4, 5)` FOV 35°. During issue #18 implementation, the framing pivoted to a **seated first-person POV** because the isometric direction read as "render showcase" rather than personal space. The original 3/4 values are preserved at the bottom of this section as a historical reference. Treat the seated POV values below as authoritative for issues #8 onwards.
 
-**Layout** (top-down conceptual):
-- **Center-rear**: Monitor (the hero — slightly elevated by stand)
-- **Front of monitor**: Razer keyboard, Razer mouse, mousepad (mouse rests on mousepad)
-- **Left of keyboard**: MacBook (closed)
-- **Right of monitor**: Anime figures (2-3 figures, varied heights)
-- **Front-left**: Nintendo DS Lite (closed)
-- **Front-right**: Xbox controller
-- **Front-center, scattered**: Pokémon deck, Yu-Gi-Oh deck (slightly offset, asymmetric)
+### Camera (current, seated POV)
 
-The composition is intentionally **asymmetric and slightly disarranged** — desk feels lived-in, not photoshoot-perfect.
+| Property | Value |
+|---|---|
+| Position | `(0, 0.4, 1.9)` — sitting at the desk, eyes ~40cm above surface, ~1.9m back from desk origin |
+| Look-at | `(0, 0, 0)` — desk center (slight downward angle, ~12°) |
+| FOV | 50° (natural, not wide) |
+| Parallax drift | ±0.15 units on mouse, lerp 0.1 — tighter than original because closer camera amplifies movement |
 
-**Lighting**:
-- Key light: warm (~3000K), upper-right, simulating desk lamp
-- Fill: cool (~6500K), low intensity, simulating window ambient
+The reduced height + closer distance means objects appear **much larger** in frame than the original isometric framing implied. Foreground objects (keyboard, mouse) may be partially cropped at the bottom edge — this is intentional and reads as "you're sitting here."
+
+### Layout (seated POV, top-down map)
+
+Desk dimensions: ~1.6m × 0.8m, top surface at `y = 0`. Coordinates in meters: `x` horizontal (negative = left), `z` depth (negative = away from camera, positive = toward camera).
+
+```
+                    BACK (z < 0)
+   ┌─────────────────────────────────────────────────┐
+   │              [Decks: Pokémon + YGO]             │  z = -0.30
+   │      [MacBook]   [MONITOR]   [Figures × 3]      │  z = -0.15
+   │       (closed)    (hero)                        │  z = -0.05
+   │                                                 │
+   │   [Nintendo DS]                  [Mousepad]     │  z = +0.10
+   │     (closed)     [BlackWidow]    + [Mouse]      │  z = +0.20
+   │                                  [Xbox ctrl]    │  z = +0.30
+   └─────────────────────────────────────────────────┘
+        x=-0.6    x=-0.2   x=0   x=+0.2     x=+0.6
+                          ↑
+                    CAMERA (0, 0.4, 1.9)
+                  FRONT (z > 0, toward viewer)
+```
+
+### Object positions (target coordinates)
+
+| Object | x | z | y (above desk) | Zone | Notes |
+|---|---|---|---|---|---|
+| **Monitor** | 0 | -0.40 | stand height | back-center | hero, dominant in frame. Shipped in #7. |
+| **Razer BlackWidow** | -0.10 | +0.20 | 0 | foreground-center | second heaviest visual weight; visitor's hands area |
+| **Razer DeathAdder** | +0.25 | +0.22 | ~0.005 | foreground-right | rests on mousepad |
+| **Mousepad** | +0.20 | +0.20 | ~0.002 | foreground-right | base for mouse; ~0.3m × 0.25m |
+| **MacBook (closed)** | -0.50 | -0.10 | 0 | mid-left | lateral, slightly back, doesn't compete with monitor |
+| **Anime figures × 3** | +0.45 | -0.30 | 0 | back-right | clustered or fanned; human scale reference next to monitor |
+| **Nintendo DS (closed)** | -0.40 | +0.15 | 0 | mid-left-front | casual, near MacBook (the "portables" grouping) |
+| **Xbox controller** | +0.45 | +0.30 | 0 | foreground-right | beside mouse, casual placement |
+| **Pokémon + Yu-Gi-Oh decks** | -0.10 | -0.20 | 0 | mid-back-center | small; placed in the visual gap between keyboard and monitor to fill empty space |
+
+Tolerance: ±0.05m on each coordinate is fine — these are target values, not exact constraints. Visual coherence matters more than literal positions.
+
+### Layout principles
+
+- **Visual hierarchy**: monitor (hero) > keyboard + mouse (mid-weight, foreground) > everything else (accents)
+- **Side balance**: MacBook + DS on the left; figures + Xbox + decks on the right. Asymmetric but balanced.
+- **Decks placement**: small objects (≤5cm tall) need to sit in the **visual gap** between keyboard and monitor — otherwise they get lost. Don't push them to the front-edge.
+- **Foreground gets surface detail**: peripherals near camera (keyboard, mouse) show their textures, RGB, and keycaps prominently. Worth higher poly budget.
+- **No photoshoot symmetry**: the desk feels lived-in. Slight rotation on the MacBook (~5° off-axis), DS slightly angled toward camera, figures not perfectly lined up.
+
+### Lighting
+
+- Key light: warm (~3000K), upper-right, simulating desk lamp (already in `<DeskEnvironment>` from #18)
+- Fill: cool (~6500K), low intensity, simulating window ambient (already in #18)
 - Rim: behind monitor, separates silhouette
-- HDRi: neutral studio for material reflections (`drei`'s `Environment preset="studio"` or `"warehouse"`)
-- Shadows: `ContactShadows` (not dynamic shadow maps — performance)
+- HDRi: `<Environment background={false}>` from drei (#18) — IBL reflections only
+- Shadows: `<ContactShadows>` from drei (#18) — not dynamic shadow maps (performance)
 
-**Atmospheric layer**: dust motes via `Sprite` instances with noise displacement. ~50 particles, very low alpha. Separates "asset marketplace render" from "feels real."
+### Atmospheric layer
+
+Dust motes via `Sprite` instances with noise displacement. ~50 particles, very low alpha. Separates "asset marketplace render" from "feels real." Deferred to polish phase (#16).
+
+### Historical reference: original 3/4 isometric framing (rejected)
+
+For posterity / context only. **Do not use these values.**
+
+> Original camera: position ~(0, 4, 5), elevation ~50°, FOV 35° (long lens, cinematic). Parallax drift ±0.3 units on mouse, lerp factor 0.1.
+>
+> Original layout was conceptual (top-down): center-rear monitor, peripherals in front, MacBook left, figures right, DS front-left, Xbox front-right, decks front-center.
+>
+> Rejected because the elevated angle made the scene read as a render showcase rather than a personal space the visitor is *in*.
 
 ## Set Design — Desk, Background, Floor
 
