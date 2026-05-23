@@ -10,6 +10,12 @@ import Desk from "./desk";
 import DeskEnvironment from "./desk-environment";
 import { HoldProgress } from "./hold-progress";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
+// TODO #8: import RazerPeripherals from "./objects/razer-peripherals";
+// TODO #9: import Macbook from "./objects/macbook";
+// TODO #11: import NintendoDS from "./objects/nintendo-ds";
+// TODO #12: import XboxController from "./objects/xbox-controller";
+// TODO #13: import Decks from "./objects/decks";
+// TODO #14: import AnimeFigures from "./objects/anime-figures";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -59,6 +65,12 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           <DeskEnvironment />
           <Desk />
           <Monitor ref={monitorRef} bind={bind} isHolding={isHolding} />
+          {/* TODO #8: <RazerPeripherals /> */}
+          {/* TODO #9: <Macbook /> */}
+          {/* TODO #11: <NintendoDS /> */}
+          {/* TODO #12: <XboxController /> */}
+          {/* TODO #13: <Decks /> */}
+          {/* TODO #14: <AnimeFigures /> */}
         </Suspense>
       </Canvas>
       <HoldProgress progress={progress} isHolding={isHolding} />
