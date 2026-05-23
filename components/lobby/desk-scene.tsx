@@ -1,7 +1,8 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
@@ -32,8 +33,21 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const monitorRef = useRef<MonitorHandle>(null);
   const environmentRef = useRef<DeskEnvironmentHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Black overlay that sits over the Canvas. Starts opaque so the loading
+  // → idle entrance reads as a smooth power-on rather than the scene
+  // snapping in fully lit. Tweened to opacity 0 once state hits "idle".
+  const fadeOverlayRef = useRef<HTMLDivElement>(null);
+  const hasEnteredRef = useRef(false);
   const [diveProgress, setDiveProgress] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+
+  // Snap the fade overlay opaque before paint so nobody sees a flash of the
+  // unanimated scene between mount and the entrance tween starting.
+  useLayoutEffect(() => {
+    if (fadeOverlayRef.current) {
+      fadeOverlayRef.current.style.opacity = "1";
+    }
+  }, []);
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -46,6 +60,36 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
   useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
+
+  // Lobby entrance: fade the overlay from black on the first loading → idle
+  // transition. The camera dolly (camera-rig.tsx), light ramp
+  // (desk-environment.tsx), and screen boot flicker (monitor.tsx) all kick
+  // off independently on the same state change — together they read as the
+  // monitor + room "powering on" rather than appearing fully lit at once.
+  useEffect(() => {
+    if (state !== "idle" || hasEnteredRef.current) return;
+    hasEnteredRef.current = true;
+
+    const overlay = fadeOverlayRef.current;
+    if (!overlay) return;
+
+    if (prefersReducedMotion) {
+      overlay.style.opacity = "0";
+      return;
+    }
+
+    gsap.to(overlay, {
+      opacity: 0,
+      duration: 1.4,
+      ease: "power2.out",
+      onComplete: () => {
+        // Drop pointer-events fully once invisible so it can never trap
+        // clicks on the scene (it's already pointer-events-none, but belt +
+        // suspenders).
+        overlay.style.display = "none";
+      },
+    });
+  }, [state, prefersReducedMotion]);
 
   // The dive transition (#10). Fires exactly once when the state machine
   // crosses into "booting" (the reducer guards against re-entry — a second
@@ -97,7 +141,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       <Canvas dpr={[1, 2]} shadows="soft">
         <CameraRig ref={cameraRigRef} state={state} />
         <Suspense fallback={null}>
-          <DeskEnvironment ref={environmentRef} />
+          <DeskEnvironment ref={environmentRef} state={state} />
           <Desk />
           <Monitor
             ref={monitorRef}
@@ -114,6 +158,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           <AnimeFigures />
         </Suspense>
       </Canvas>
+      {/* Fade-from-black overlay for the loading → idle entrance. Sits
+          above the Canvas but pointer-events-none so hover / click still
+          land on the screen mesh. */}
+      <div
+        ref={fadeOverlayRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10 bg-background"
+      />
       {/* Off-canvas keyboard surrogate. Tab → Enter/Space triggers the same
           enter action as clicking the screen mesh. */}
       <button

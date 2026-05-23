@@ -3,20 +3,21 @@
 //
 // Timing (relative to t=0 = timeline start, fires from state === "booting"):
 //
-//   t=0.00s  FOV pre-pull (50 → 47, 200ms, ease "power2.out")
-//            Lighting dimmer 1.0 → 0.2 (200ms) — collapses warm/cool beat
-//            Monitor's own click handler already fired flashComplete which
-//            triggers a 200ms RGB-shift glitch on the screen content.
-//   t=0.20s  Camera dolly into the screen plane (1.4s, "power3.inOut")
-//   t=0.20s→1.60s  diveProgress 0→1 tightens the screen's dither so the
-//                   "YURI BODO" preview resolves as we arrive.
-//   t=1.40s  Screen mesh fills viewport (±2px) — verified by debug border.
-//   t=1.60s  Emissive bloom (2.2 → 5 → 0) over 200ms — last flash before
-//            handoff. Simultaneously: lobby container opacity 1 → 0 and
-//            startSoundtrack() (idempotent — Hero's later call no-ops).
-//            Because the monitor and Hero share palette + font + dither
-//            algorithm, the fade reads as visual continuity, not a cut.
-//   t=2.20s  onDiveComplete() → desk-scene dispatches BOOT_COMPLETE →
+//   t=0.00s  FOV pre-pull (50 → 47, 400ms, "power2.out") + lighting dimmer
+//            1.0 → 0.2 (400ms). The pre-dive beat now breathes alongside
+//            the monitor's 200ms RGB-shift glitch (kicked by flashComplete
+//            in the click handler) — together they read as the system
+//            "preparing to dive" rather than snapping into it.
+//   t=0.40s  Camera dolly into the screen plane (1.7s, "power2.inOut").
+//            diveProgress 0→1 over the same window tightens the screen's
+//            dither so the "YURI BODO" preview resolves as we arrive.
+//   t=2.10s  Handoff. Emissive bloom (2.2 → 5 → 0, 320ms) punctuates the
+//            moment. Lobby container opacity 1 → 0 (300ms) reveals Hero
+//            behind. startSoundtrack() fires (idempotent — Hero's later
+//            call no-ops). Because monitor + Hero share palette + font +
+//            dither + the YURI/BODO colour split, the fade reads as
+//            continuity, not a cut.
+//   t=2.60s  onDiveComplete() → desk-scene dispatches BOOT_COMPLETE →
 //            state "booting" → "done" → LobbyGate unmounts.
 
 import gsap from "gsap";
@@ -31,19 +32,28 @@ import type { DeskEnvironmentHandle } from "@/components/lobby/desk-environment"
 // pre-pull mapped onto our 50° baseline becomes 50° → 47° — same "lens
 // compresses, tension before the dive" beat, no global FOV rewrite.
 const FOV_PRE_PULL = 47;
-const FOV_TWEEN_DUR = 0.2;
+// Pre-dive beats stretched 200 → 400ms — the original 200ms read as a
+// snap on top of the click; doubling lets the FOV compression + light dim
+// breathe alongside the monitor's 200ms glitch.
+const FOV_TWEEN_DUR = 0.4;
 
 const LIGHTING_DIM_RATIO = 0.2;
-const LIGHTING_TWEEN_DUR = 0.2;
+const LIGHTING_TWEEN_DUR = 0.4;
 
-const DOLLY_START = 0.2;
-const DOLLY_DUR = 1.4;
+// Dolly starts at t=0.40 (after the pre-pull settles) and runs 1.7s with
+// power2.inOut — power3 read as "slow → snap → slow", power2 holds a
+// gentler middle and lands softer at the screen.
+const DOLLY_START = 0.4;
+const DOLLY_DUR = 1.7;
 
-const DIVE_PROGRESS_START = 0.2;
-const DIVE_PROGRESS_DUR = 1.4;
+const DIVE_PROGRESS_START = 0.4;
+const DIVE_PROGRESS_DUR = 1.7;
 
-const HANDOFF_START = 1.6;
-const HANDOFF_DUR = 0.2;
+// Handoff lands right as the dolly finishes (t=2.10s). The 300ms fade
+// gives the lobby container more travel than the original 200ms so the
+// fade reads as "Hero rising up" rather than "lobby snapped off".
+const HANDOFF_START = 2.1;
+const HANDOFF_DUR = 0.3;
 const SOUNDTRACK_URL = "/audio/soundtrack.mp3";
 
 // Last-flash bloom on the screen mesh — a quick overshoot of the resting
@@ -52,10 +62,12 @@ const SOUNDTRACK_URL = "/audio/soundtrack.mp3";
 // (no flash-bleed into Hero).
 const BLOOM_PEAK = 5;
 const BLOOM_END = 0;
-const BLOOM_RISE_DUR = 0.08;
-const BLOOM_FALL_DUR = 0.18;
+const BLOOM_RISE_DUR = 0.1;
+const BLOOM_FALL_DUR = 0.22;
 
-const COMPLETE_AT = 2.2;
+// Lobby unmount fires ~200ms after the fade completes — gives the fade a
+// chance to fully settle to opacity 0 before the WebGL context tears down.
+const COMPLETE_AT = 2.6;
 
 interface TransitionDeps {
   camera: PerspectiveCamera;
@@ -151,13 +163,13 @@ export function playLobbyToSiteTransition(
       y: targetY,
       z: targetZ,
       duration: DOLLY_DUR,
-      ease: "power3.inOut",
+      ease: "power2.inOut",
       onUpdate: () => camera.lookAt(worldCentre),
     },
     DOLLY_START,
   );
 
-  // t=0.20s → 1.60s — diveProgress 0 → 1 drives the screen's dither
+  // Dolly window — diveProgress 0 → 1 drives the screen's dither
   // tightening so the "YURI BODO" preview resolves right as we arrive.
   const diveProxy = { p: 0 };
   tl.to(
@@ -165,7 +177,7 @@ export function playLobbyToSiteTransition(
     {
       p: 1,
       duration: DIVE_PROGRESS_DUR,
-      ease: "power3.inOut",
+      ease: "power2.inOut",
       onUpdate: () => onDiveProgress(diveProxy.p),
     },
     DIVE_PROGRESS_START,

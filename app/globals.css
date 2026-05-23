@@ -87,6 +87,14 @@ body:has([data-lobby-active="true"]) .custom-cursor {
   cursor: default !important;
 }
 
+/* Monitor hover override — flipped on by Monitor's hover handler so the
+   screen mesh shows a pointer cursor without losing the !important guard
+   that keeps stray DOM cursors out of the lobby. */
+[data-lobby-active="true"][data-lobby-cursor="pointer"],
+[data-lobby-active="true"][data-lobby-cursor="pointer"] * {
+  cursor: pointer !important;
+}
+
 ::selection {
   background: rgba(250, 75, 18, 0.3);
   color: inherit;

@@ -2,6 +2,7 @@
 
 import { PerspectiveCamera } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import gsap from "gsap";
 import {
   forwardRef,
   useEffect,
@@ -17,8 +18,7 @@ import type { LobbyState } from "./use-lobby-state";
 export interface CameraRigHandle {
   /** Live camera for the §6 dive transition (#10). The transition timeline
    *  owns the dolly / FOV tweens directly — simpler than wrapping each as
-   *  an imperative method. Drift in useFrame is gated by `state === "booting"`
-   *  so the timeline-driven values aren't clobbered. */
+   *  an imperative method. */
   getCamera: () => PerspectiveCameraImpl | null;
 }
 
@@ -34,10 +34,15 @@ interface CameraRigProps {
 //   - look-at sits below the desk surface line → ~35° downward gaze, the angle
 //     you naturally hit when looking at the keyboard while seated
 const BASE_POSITION = { x: 0, y: 0.4, z: 1.9 } as const;
+// Slight pull-back the rig holds during "loading" — gives the entrance
+// tween somewhere to come from (zoom in + slight head-drop into seated POV).
+const LOADING_POSITION = { x: 0, y: 0.55, z: 2.7 } as const;
 const LOOKAT_TARGET = { x: 0, y: -0.05, z: -0.2 } as const;
 // Drift drops 10x — at this close range, 0.3 felt like a head-jerk
 const DRIFT_AMPLITUDE = 0.06;
 const LERP_FACTOR = 0.1;
+
+const ENTRANCE_DOLLY_DUR = 1.7;
 
 const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig(
   { state, fov = 50 },
@@ -46,6 +51,10 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
   const cameraRef = useRef<PerspectiveCameraImpl>(null);
   const mouseTargetRef = useRef({ x: 0, y: 0 });
   const prefersReducedMotion = useReducedMotion();
+  // Entrance lock — true while the loading → idle dolly tween is in flight.
+  // Drift skips this frame while locked so the lerp doesn't fight the tween.
+  const entranceLockRef = useRef(false);
+  const hasEnteredRef = useRef(false);
 
   const isDriftEnabled =
     !prefersReducedMotion && state !== "booting" && state !== "loading";
@@ -89,10 +98,46 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
     cameraRef.current?.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
   }, []);
 
+  // First transition into "idle" (loading → idle) runs the entrance dolly.
+  // Subsequent state changes (idle ↔ exploring ↔ booting) don't replay it.
+  useEffect(() => {
+    if (state !== "idle" || hasEnteredRef.current) return;
+    hasEnteredRef.current = true;
+
+    const camera = cameraRef.current;
+    if (!camera) return;
+
+    if (prefersReducedMotion) {
+      camera.position.set(BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z);
+      camera.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
+      return;
+    }
+
+    // Force-start from LOADING_POSITION in case anything nudged it (drift was
+    // gated during loading, but defensive). Then tween in.
+    camera.position.set(
+      LOADING_POSITION.x,
+      LOADING_POSITION.y,
+      LOADING_POSITION.z,
+    );
+    entranceLockRef.current = true;
+    gsap.to(camera.position, {
+      x: BASE_POSITION.x,
+      y: BASE_POSITION.y,
+      z: BASE_POSITION.z,
+      duration: ENTRANCE_DOLLY_DUR,
+      ease: "power3.out",
+      onUpdate: () => camera.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z),
+      onComplete: () => {
+        entranceLockRef.current = false;
+      },
+    });
+  }, [state, prefersReducedMotion]);
+
   useFrame((_, delta) => {
-    // Dive transition (#10) owns position + lookAt while booting. Returning
-    // here keeps the drift lerp from fighting the GSAP tween.
-    if (state === "booting") return;
+    // Dive transition (#10) and entrance dolly own the camera while active —
+    // drift would otherwise lerp against the GSAP tweens.
+    if (state === "booting" || entranceLockRef.current) return;
 
     const camera = cameraRef.current;
     if (!camera) return;
@@ -112,7 +157,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
     <PerspectiveCamera
       ref={cameraRef}
       makeDefault
-      position={[BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z]}
+      position={[LOADING_POSITION.x, LOADING_POSITION.y, LOADING_POSITION.z]}
       fov={fov}
     />
   );

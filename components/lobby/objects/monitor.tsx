@@ -27,6 +27,7 @@ import type {
   Object3D,
 } from "three";
 
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { LOBBY_MODELS } from "@/lib/lobby/assets";
 import {
   SCREEN_CANVAS_HEIGHT,
@@ -200,10 +201,13 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       mesh.receiveShadow = true;
 
       if (mesh.name === SCREEN_MESH_NAME) {
+        // Always start dark — the boot-up effect (in the state useEffect
+        // below) tweens to the resting intensity on loading → idle, so the
+        // screen "powers on" rather than appearing already-lit.
         const screenMaterial = new MeshStandardMaterial({
           color: new Color("#000000"),
           emissive: new Color("#ffffff"),
-          emissiveIntensity: state === "loading" ? 0 : SCREEN_ON_INTENSITY,
+          emissiveIntensity: 0,
           roughness: 0.25,
           metalness: 0,
           emissiveMap: screenTexture,
@@ -219,9 +223,6 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       screenMaterialRef.current = null;
       screenMeshRef.current = null;
     };
-    // `state` only matters for the initial emissive level — we don't want
-    // to rebuild the material when it changes (the useFrame manages it).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene, screenTexture]);
 
   useEffect(() => {
@@ -230,15 +231,48 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
     };
   }, [screenTexture]);
 
-  // Resting emissive level follows the lobby state — off while loading,
-  // lit otherwise. The GSAP flash + transition bloom tween write directly
-  // to this material so we don't fight them here.
+  // Track whether the loading → idle boot-up has fired so it only plays
+  // once per session (subsequent state changes shouldn't re-flicker).
+  const hasBootedRef = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Resting emissive level follows the lobby state. The first loading →
+  // idle transition plays a brief CRT boot-up flicker (0 → 5 → 1.5 → 4 →
+  // 2.2) so the screen "powers on" rather than snapping bright. The flash
+  // and dive-bloom tweens (handled elsewhere) write directly to the
+  // material, so we bail when one of those is in flight.
   useEffect(() => {
     const screen = screenMaterialRef.current;
     if (!screen) return;
     if (gsap.isTweening(screen)) return;
-    screen.emissiveIntensity = state === "loading" ? 0 : SCREEN_ON_INTENSITY;
-  }, [state]);
+
+    if (state === "loading") {
+      screen.emissiveIntensity = 0;
+      return;
+    }
+
+    if (state === "idle" && !hasBootedRef.current) {
+      hasBootedRef.current = true;
+      if (prefersReducedMotion) {
+        screen.emissiveIntensity = SCREEN_ON_INTENSITY;
+        return;
+      }
+      screen.emissiveIntensity = 0;
+      gsap
+        .timeline()
+        .to(screen, { emissiveIntensity: 5, duration: 0.1, ease: "none" }, 0.4)
+        .to(screen, { emissiveIntensity: 1.5, duration: 0.05, ease: "none" })
+        .to(screen, { emissiveIntensity: 4, duration: 0.06, ease: "none" })
+        .to(screen, {
+          emissiveIntensity: SCREEN_ON_INTENSITY,
+          duration: 0.45,
+          ease: "power2.out",
+        });
+      return;
+    }
+
+    screen.emissiveIntensity = SCREEN_ON_INTENSITY;
+  }, [state, prefersReducedMotion]);
 
   // Single continuous paint loop. Reads stateRef / diveProgressRef /
   // glitchUntilRef so the closure never goes stale and the cost stays at
@@ -263,17 +297,24 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
       time: now,
       glitchIntensity,
     });
+    // Three.js requires this mutation to push the new canvas frame to the
+    // GPU — not a React anti-pattern.
+    // eslint-disable-next-line react-hooks/immutability
     screenTexture.needsUpdate = true;
   });
 
   const isInteractive = state === "idle" || state === "exploring";
 
+  // Flip a data attribute on the lobby container so globals.css can switch
+  // to cursor:pointer without losing the !important guard that keeps stray
+  // DOM cursors out of the rest of the lobby surface.
   useEffect(() => {
     if (!isHovered || !isInteractive) return;
-    const previous = document.body.style.cursor;
-    document.body.style.cursor = "pointer";
+    const lobbyEl = document.querySelector<HTMLElement>('[data-lobby-active="true"]');
+    if (!lobbyEl) return;
+    lobbyEl.dataset.lobbyCursor = "pointer";
     return () => {
-      document.body.style.cursor = previous;
+      delete lobbyEl.dataset.lobbyCursor;
     };
   }, [isHovered, isInteractive]);
 
