@@ -131,17 +131,17 @@ The composition is intentionally **asymmetric and slightly disarranged** — des
 | Object | Source strategy | Click action | Hover state |
 |---|---|---|---|
 | Monitor | Generic gaming monitor (Sketchfab) | Main action only (hold power button) | Power LED gentle pulse |
-| Razer keyboard | Sketchfab/CGTrader (Razer tag) | RGB wave left→right across keycaps (800ms) | Faint per-key glow |
+| Razer BlackWidow keyboard | Sketchfab/CGTrader (BlackWidow specifically) | RGB wave left→right across keycaps (800ms) | Faint per-key glow |
 | Razer mouse | Sketchfab DeathAdder free | RGB spectrum cycle (1.5s) | LED scroll wheel intensifies |
-| Mousepad | Custom plane + texture (Razer logo or abstract) | None (atmospheric) | Soft RGB spill from mouse |
-| MacBook | Generic MacBook Pro (Sketchfab) | Lid opens (1.2s), screen shows scrolling TS code 2s, closes | Faint Apple logo glow |
+| Mousepad | Custom plane + generic texture (no brand) | None (atmospheric) | Soft RGB spill from mouse |
+| MacBook | Generic MacBook Pro (Sketchfab) | Lid opens (1.2s), screen shows scrolling TS code with humorous easter-egg comments for 2s, closes | Faint Apple logo glow |
 | Nintendo DS | Sketchfab zombitt (PBR 4K) | Clamshell opens 1.0s, top screen shows a sprite + boot tone, closes after 2s | Power LED green dot |
 | Xbox controller | Sketchfab (xbox-controller tag) | Visual shake 200ms + Xbox button LED green + button pulse | Subtle bumper highlight |
 | Pokémon deck | Sketchfab Pokemon Card 3D (holo, free) | Top 3 cards fan out (10°/20°/30°), hover isolates one card face | Top card lifts 0.05u |
 | Yu-Gi-Oh deck | Trading Card Pack model + re-texture | Fan out + 1 hero card rises 0.3u and slow Y-axis spin | Top card lifts |
-| Anime figures (2-3) | Meshy CC0 (Goku/Naruto/etc — Yuri to specify) | Each rotates 360° on Y over 2s | Subtle glow ring |
+| Anime figures (3) | Sketchfab — Minato (Naruto), Seismitoad (Pokémon), Lelouch (Code Geass) | Each rotates 360° on Y over 2s | Subtle glow ring |
 
-**Specific anime figure choices** are deferred to implementation. Yuri to provide 2-3 character preferences.
+**Specific anime figure choices**: Minato Namikaze + Seismitoad + Lelouch Lamperouge. Models verified available on Sketchfab (links in references).
 
 ## Main Action — Hold to Power On
 
@@ -264,9 +264,9 @@ Each phase produces a working PR mergeable to `main`. Branch: `feat/lobby-desk` 
 - Multiplayer / multi-cursor interactions.
 - Multiple lobby variants / themes.
 
-## Open Questions
+## Resolved Decisions (originally open)
 
-1. Final anime figure choices (Yuri to specify 2-3 characters before phase 3).
-2. Specific Razer keyboard model preference (BlackWidow / Huntsman / Cynosa)?
-3. Mousepad design — Razer-branded, custom personal, or abstract?
-4. MacBook scrolling TS snippet content — real code from the site repo, or curated?
+1. **Anime figures**: Minato + Seismitoad + Lelouch — all confirmed available as free Sketchfab models
+2. **Razer keyboard**: BlackWidow
+3. **Mousepad**: generic, no brand — focus on cohesion of dark desk rather than logo
+4. **MacBook code content**: humorous easter-egg TypeScript — playful comments like `// TODO: get a life`, `const sleep = false`, etc. Tone: self-aware, personal, not corporate
