@@ -3,7 +3,14 @@
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Box3, Color, MeshStandardMaterial, Vector3 } from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import type {
@@ -13,7 +20,7 @@ import type {
 } from "three";
 import type { PointerEvent as ReactPointerEvent } from "react";
 
-import { useHoldActivate } from "@/hooks/use-hold-activate";
+import type { HoldActivateBind } from "@/hooks/use-hold-activate";
 
 const MONITOR_MODEL_PATH = "/lobby/models/monitor.glb";
 // Annelida MateView exports at ~0.72m wide including the stand foot. At the
@@ -58,7 +65,23 @@ const SCREEN_FLASH_FALL_S = 0.3;
 
 useGLTF.preload(MONITOR_MODEL_PATH);
 
-export default function Monitor() {
+export interface MonitorProps {
+  bind: HoldActivateBind;
+  isHolding: boolean;
+}
+
+export interface MonitorHandle {
+  /** Called by the parent's useHoldActivate.onComplete to play the press-complete
+   *  visual: a brief white flash on the screen mesh. The scanline sweep lands in #7. */
+  flashComplete: () => void;
+  /** Called by the parent on cancel so the LED eases back to baseline. */
+  cancelPress: () => void;
+}
+
+const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
+  { bind, isHolding },
+  ref,
+) {
   const { scene } = useGLTF(MONITOR_MODEL_PATH);
   const screenMaterialRef = useRef<MeshStandardMaterialType | null>(null);
   const ledMaterialRef = useRef<MeshStandardMaterialType>(null);
@@ -68,41 +91,46 @@ export default function Monitor() {
   const cancelTweenRef = useRef<gsap.core.Tween | null>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // NOTE: this useHoldActivate instance drives only the monitor's local
-  // visuals (LED state + screen flash). Issue #6's instance in desk-scene.tsx
-  // still owns the lobby state machine. They are lifted into a single source
-  // of truth in the next commit (#7 task 6).
-  const { bind, isHolding } = useHoldActivate({
-    onStart: () => {
-      cancelTweenRef.current?.kill();
-      pressedIntensityRef.current = LED_PRESSED_INTENSITY;
-    },
-    onCancel: () => {
-      cancelTweenRef.current = gsap.to(pressedIntensityRef, {
-        current: 0,
-        duration: CANCEL_EASE_DURATION_S,
-        ease: "power3.out",
-      });
-    },
-    onComplete: () => {
-      cancelTweenRef.current?.kill();
-      pressedIntensityRef.current = LED_PRESSED_INTENSITY;
-      const screen = screenMaterialRef.current;
-      if (!screen) return;
-      gsap
-        .timeline()
-        .to(screen, {
-          emissiveIntensity: SCREEN_FLASH_INTENSITY,
-          duration: SCREEN_FLASH_RISE_S,
-          ease: "none",
-        })
-        .to(screen, {
-          emissiveIntensity: 0,
-          duration: SCREEN_FLASH_FALL_S,
-          ease: "power2.out",
+  useImperativeHandle(
+    ref,
+    () => ({
+      flashComplete: () => {
+        cancelTweenRef.current?.kill();
+        pressedIntensityRef.current = LED_PRESSED_INTENSITY;
+        const screen = screenMaterialRef.current;
+        if (!screen) return;
+        gsap
+          .timeline()
+          .to(screen, {
+            emissiveIntensity: SCREEN_FLASH_INTENSITY,
+            duration: SCREEN_FLASH_RISE_S,
+            ease: "none",
+          })
+          .to(screen, {
+            emissiveIntensity: 0,
+            duration: SCREEN_FLASH_FALL_S,
+            ease: "power2.out",
+          });
+      },
+      cancelPress: () => {
+        cancelTweenRef.current = gsap.to(pressedIntensityRef, {
+          current: 0,
+          duration: CANCEL_EASE_DURATION_S,
+          ease: "power3.out",
         });
-    },
-  });
+      },
+    }),
+    [],
+  );
+
+  // The press-start visual side-effect — fires when the parent's useHoldActivate
+  // flips isHolding true. Spec says the LED snaps to full intensity on press
+  // start, no easing.
+  useEffect(() => {
+    if (!isHolding) return;
+    cancelTweenRef.current?.kill();
+    pressedIntensityRef.current = LED_PRESSED_INTENSITY;
+  }, [isHolding]);
 
   useLayoutEffect(() => {
     scene.scale.setScalar(1);
@@ -176,7 +204,7 @@ export default function Monitor() {
     const t = clock.elapsedTime;
 
     // Pressed / cancelling: pressedIntensityRef holds the instantaneous value
-    // (set by onStart, eased back to 0 by GSAP on cancel/after complete fade).
+    // (set on isHolding=true, eased back to 0 by GSAP on cancel/after complete fade).
     if (isHolding || pressedIntensityRef.current > 0.01) {
       led.emissiveIntensity = pressedIntensityRef.current;
       return;
@@ -232,4 +260,6 @@ export default function Monitor() {
       </mesh>
     </>
   );
-}
+});
+
+export default Monitor;
