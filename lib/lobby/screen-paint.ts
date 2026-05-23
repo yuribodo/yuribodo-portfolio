@@ -186,24 +186,28 @@ function drawHeroText(
   w: number,
   h: number,
 ): void {
-  // "difference" composite mirrors Hero's `mix-blend-difference` — the
-  // text inverts against whatever is underneath, so it stays readable
-  // over both the dark and the warm regions of the gradient.
-  const fontSize = Math.round(h * 0.28);
+  // Sizes are tuned so that when the dive ends and the screen mesh fills
+  // the viewport, "YURI BODO" lands at roughly the same visual size as
+  // Hero's `lg:text-[140px]` h1 (140px on a 1400px+ viewport). Larger
+  // canvas text scaled to viewport produced a visible "text shrink"
+  // layout shift at the moment of the fade handoff.
+  const fontSize = Math.round(h * 0.16);
   const font = `900 ${fontSize}px "Geist", "Inter", sans-serif`;
 
   ctx.save();
+  // "difference" composite mirrors Hero's `mix-blend-difference` — text
+  // inverts against the gradient so it stays readable over both dark and
+  // warm regions.
   ctx.globalCompositeOperation = "difference";
   ctx.font = font;
   ctx.textBaseline = "middle";
 
-  // Measure "YURI" and " " so we can lay them out as two coloured runs
-  // around the visual centre — same layout as Hero's two adjacent spans
-  // with a thin separator.
+  // Two coloured runs around the visual centre, same layout as Hero's
+  // two adjacent <span>s with a thin separator.
   ctx.textAlign = "left";
   const yuri = "YURI";
   const bodo = "BODO";
-  const gap = fontSize * 0.2;
+  const gap = fontSize * 0.22;
   const yuriW = ctx.measureText(yuri).width;
   const bodoW = ctx.measureText(bodo).width;
   const totalW = yuriW + gap + bodoW;
@@ -218,14 +222,15 @@ function drawHeroText(
   ctx.restore();
 
   // Subtitle reads against the warm midtones — no blend needed.
+  // Sized to match Hero's `text-xs md:text-sm` (~14px at desktop scale).
   ctx.save();
   ctx.fillStyle = "rgba(220, 220, 220, 0.55)";
-  const subSize = Math.round(h * 0.046);
+  const subSize = Math.round(h * 0.024);
   ctx.font = `600 ${subSize}px "Geist", sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.letterSpacing = "4px";
-  ctx.fillText("FULL STACK ENGINEER", w / 2, yMid + h * 0.21);
+  ctx.fillText("FULL STACK ENGINEER", w / 2, yMid + h * 0.13);
   ctx.restore();
 }
 

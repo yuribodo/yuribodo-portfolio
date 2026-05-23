@@ -69,6 +69,12 @@ const BLOOM_FALL_DUR = 0.22;
 // chance to fully settle to opacity 0 before the WebGL context tears down.
 const COMPLETE_AT = 2.6;
 
+// Rig's resting lookAt — kept in sync with camera-rig.tsx's LOOKAT_TARGET.
+// Used as the START of the lookAt tween so the camera smoothly rotates
+// toward the screen during the FOV pre-pull rather than snapping at the
+// moment the dolly's first onUpdate fires camera.lookAt(worldCentre).
+const RIG_LOOKAT = { x: 0, y: -0.05, z: -0.2 } as const;
+
 interface TransitionDeps {
   camera: PerspectiveCamera;
   screenMesh: Mesh;
@@ -133,6 +139,29 @@ export function playLobbyToSiteTransition(
       duration: FOV_TWEEN_DUR,
       ease: "power2.out",
       onUpdate: () => camera.updateProjectionMatrix(),
+    },
+    0,
+  );
+
+  // t=0.00s → 0.40s — lookAt rotates smoothly from rig's resting target to
+  // the screen centre. Without this, the dolly's first onUpdate at t=0.40s
+  // would snap the camera rotation discontinuously (rig was looking at
+  // RIG_LOOKAT; dolly switches to worldCentre).
+  const lookAtProxy = {
+    x: RIG_LOOKAT.x,
+    y: RIG_LOOKAT.y,
+    z: RIG_LOOKAT.z,
+  };
+  tl.to(
+    lookAtProxy,
+    {
+      x: worldCentre.x,
+      y: worldCentre.y,
+      z: worldCentre.z,
+      duration: FOV_TWEEN_DUR,
+      ease: "power2.out",
+      onUpdate: () =>
+        camera.lookAt(lookAtProxy.x, lookAtProxy.y, lookAtProxy.z),
     },
     0,
   );
