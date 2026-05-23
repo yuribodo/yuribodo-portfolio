@@ -20,9 +20,7 @@ export const projects: Project[] = [
     tech: ["TypeScript", "React", "Node.js"],
     featured: true,
     image: "/projects/launchlist.jpg",
-    links: {
-      github: "https://github.com/yuribodo/launchlist",
-    },
+    links: {},
   },
   {
     slug: "bugless",
@@ -32,7 +30,7 @@ export const projects: Project[] = [
     tech: ["TypeScript", "AI", "Node.js"],
     featured: true,
     links: {
-      github: "https://github.com/yuribodo/bugless",
+      github: "https://github.com/yuribodo/HB03-2025_bugless",
     },
   },
   {
@@ -44,7 +42,7 @@ export const projects: Project[] = [
     featured: true,
     image: "/projects/mariocharts.svg",
     links: {
-      github: "https://github.com/yuribodo/mario-charts",
+      github: "https://github.com/yuribodo/mariocharts",
     },
   },
   {
@@ -66,7 +64,7 @@ export const projects: Project[] = [
     tech: ["Solana", "Rust", "TypeScript"],
     featured: false,
     links: {
-      github: "https://github.com/yuribodo/givememoney",
+      github: "https://github.com/yuribodo/givememoney-front",
     },
   },
   {
@@ -78,6 +76,17 @@ export const projects: Project[] = [
     featured: false,
     links: {
       github: "https://github.com/yuribodo/pattpay",
+    },
+  },
+  {
+    slug: "zksettle",
+    title: "zkSettle",
+    description:
+      "Zero-knowledge compliance infrastructure for stablecoin payments on Solana. Prove KYC, sanctions clearance, and travel rule compliance without exposing user data on-chain.",
+    tech: ["Rust", "Solana", "ZK Proofs"],
+    featured: false,
+    links: {
+      github: "https://github.com/yuribodo/zksettle",
     },
   },
 ];

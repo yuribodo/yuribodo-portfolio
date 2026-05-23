@@ -45,12 +45,13 @@ const TECH_BADGES: { name: string; Icon: IconType }[] = [
 ];
 
 const PROJECTS = [
-  { name: "Mario Charts", desc: "Open-source React component library — CLI-driven (npx mario-charts)", href: "https://github.com/yuribodo/mario-charts" },
+  { name: "Mario Charts", desc: "Open-source React component library — CLI-driven (npx mario-charts)", href: "https://github.com/yuribodo/mariocharts" },
   { name: "CodeLord", desc: "Codebase architecture visualizer — Obsidian graph view for devs", href: "https://github.com/yuribodo/codelord" },
-  { name: "BugLess", desc: "AI dev tool — real-time LLM streaming, Redis queues, React/Ink CLI", href: "https://github.com/yuribodo/bugless" },
+  { name: "BugLess", desc: "AI dev tool — real-time LLM streaming, Redis queues, React/Ink CLI", href: "https://github.com/yuribodo/HB03-2025_bugless" },
   { name: "Auto-Issue", desc: "Autonomous coding agent in Go — opens PRs without humans", href: "https://github.com/yuribodo/auto-issue" },
-  { name: "GiveMeMoney", desc: "Multi-chain crypto payments — Ethereum + Solana + NEAR", href: "https://github.com/yuribodo/givememoney" },
+  { name: "GiveMeMoney", desc: "Multi-chain crypto payments — Ethereum + Solana + NEAR", href: "https://github.com/yuribodo/givememoney-front" },
   { name: "PattPay", desc: "Solana subscription billing protocol in Rust", href: "https://github.com/yuribodo/pattpay" },
+  { name: "zkSettle", desc: "Zero-knowledge compliance for stablecoin payments on Solana — KYC & sanctions proofs without exposing data", href: "https://github.com/yuribodo/zksettle" },
 ];
 
 const INFO = [
