@@ -11,6 +11,8 @@
   "dependencies": {
     "@chenglou/pretext": "^0.0.4",
     "@gsap/react": "^2.1.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
     "geist": "^1.7.0",
