@@ -22,9 +22,10 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const monitorRef = useRef<MonitorHandle>(null);
 
   // The lobby's single hold source of truth — feeds both the lobby state
-  // machine and the monitor's visual effects. Mouse hold on the monitor's
-  // power button (via R3F bind cast) and the dev keyboard/click button both
-  // share this instance, so progress accumulates against one timer.
+  // machine and the monitor's visual effects. The R3F-mounted power button
+  // mesh forwards pointer events into `bind`; the off-canvas sr-only button
+  // forwards keyboard Space-hold into the same `bind`. Progress accumulates
+  // against one timer regardless of input device.
   const { bind, progress, isHolding } = useHoldActivate({
     onStart: () => dispatch({ type: "HOLD_START" }),
     onCancel: () => {
@@ -45,8 +46,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     return () => window.clearTimeout(timer);
   }, [state, dispatch]);
 
-  const isDev = process.env.NODE_ENV === "development";
-
   return (
     <div
       role="application"
@@ -63,15 +62,16 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         </Suspense>
       </Canvas>
       <HoldProgress progress={progress} isHolding={isHolding} />
-      {isDev ? (
-        <button
-          type="button"
-          {...bind}
-          className="fixed bottom-6 right-6 z-[55] rounded-md border border-border bg-surface px-4 py-3 font-mono text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          DEV · hold to boot
-        </button>
-      ) : null}
+      {/* Off-canvas keyboard surrogate for the monitor's power button. The
+          R3F mesh receives mouse holds; this <button> hosts the Space-hold
+          bind handlers so screen-reader + keyboard-only users have parity. */}
+      <button
+        type="button"
+        {...bind}
+        className="sr-only"
+      >
+        Power on monitor (hold Space to enter site)
+      </button>
     </div>
   );
 }
