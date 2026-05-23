@@ -32,8 +32,8 @@ interface CameraRigProps {
 //   - ~40cm forward of the desk's front edge (front edge at z=0.4)
 //   - look-at sits below the desk surface line → ~35° downward gaze, the angle
 //     you naturally hit when looking at the keyboard while seated
-const BASE_POSITION = { x: 0, y: 0.6, z: 0.8 } as const;
-const LOOKAT_TARGET = { x: 0, y: -0.1, z: -0.2 } as const;
+const BASE_POSITION = { x: 0, y: 0.4, z: 1.9 } as const;
+const LOOKAT_TARGET = { x: 0, y: -0.05, z: -0.2 } as const;
 // Drift drops 10x — at this close range, 0.3 felt like a head-jerk
 const DRIFT_AMPLITUDE = 0.06;
 const LERP_FACTOR = 0.1;
