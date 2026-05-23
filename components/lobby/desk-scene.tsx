@@ -10,8 +10,8 @@ import Desk from "./desk";
 import DeskEnvironment from "./desk-environment";
 import { HoldProgress } from "./hold-progress";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
-// TODO #8: import RazerPeripherals from "./objects/razer-peripherals";
-// TODO #9: import Macbook from "./objects/macbook";
+import RazerPeripherals from "./objects/razer-peripherals";
+import Macbook from "./objects/macbook";
 // TODO #11: import NintendoDS from "./objects/nintendo-ds";
 // TODO #12: import XboxController from "./objects/xbox-controller";
 // TODO #13: import Decks from "./objects/decks";
@@ -65,8 +65,8 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           <DeskEnvironment />
           <Desk />
           <Monitor ref={monitorRef} bind={bind} isHolding={isHolding} />
-          {/* TODO #8: <RazerPeripherals /> */}
-          {/* TODO #9: <Macbook /> */}
+          <RazerPeripherals />
+          <Macbook />
           {/* TODO #11: <NintendoDS /> */}
           {/* TODO #12: <XboxController /> */}
           {/* TODO #13: <Decks /> */}

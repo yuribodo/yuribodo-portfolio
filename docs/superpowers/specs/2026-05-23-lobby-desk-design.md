@@ -246,7 +246,7 @@ These are in addition to the key/fill/rim of §6 — they extend the lighting st
 | Razer BlackWidow keyboard | Sketchfab/CGTrader (BlackWidow specifically) | RGB wave left→right across keycaps (800ms) | Faint per-key glow |
 | Razer mouse | Sketchfab DeathAdder free | RGB spectrum cycle (1.5s) | LED scroll wheel intensifies |
 | Mousepad | Custom plane + generic texture (no brand) | None (atmospheric) | Soft RGB spill from mouse |
-| MacBook | Generic MacBook Pro (Sketchfab) | Lid opens (1.2s), screen shows scrolling TS code with humorous easter-egg comments for 2s, closes | Faint Apple logo glow |
+| MacBook | NoXiou5 "MacBook Pro Closed" (Sketchfab) — **fused geometry, lid not separable** | Apple-logo emissive flash (200ms ramp up, 400ms ease out) + subtle 0.015u bounce | Lift 0.015u + Apple logo emissive intensifies (×3) |
 | Nintendo DS | Sketchfab zombitt (PBR 4K) | Clamshell opens 1.0s, top screen shows a sprite + boot tone, closes after 2s | Power LED green dot |
 | Xbox controller | Sketchfab (xbox-controller tag) | Visual shake 200ms + Xbox button LED green + button pulse | Subtle bumper highlight |
 | Pokémon deck | Sketchfab Pokemon Card 3D (holo, free) | Top 3 cards fan out (10°/20°/30°), hover isolates one card face | Top card lifts 0.05u |
@@ -381,4 +381,4 @@ Each phase produces a working PR mergeable to `main`. Branch: `feat/lobby-desk` 
 1. **Anime figures**: Minato + Seismitoad + Lelouch — all confirmed available as free Sketchfab models
 2. **Razer keyboard**: BlackWidow
 3. **Mousepad**: generic, no brand — focus on cohesion of dark desk rather than logo
-4. **MacBook code content**: humorous easter-egg TypeScript — playful comments like `// TODO: get a life`, `const sleep = false`, etc. Tone: self-aware, personal, not corporate
+4. **MacBook lid + code content**: ~~lid opens revealing TS code~~ — **pivoted**. The NoXiou5 model ships as a single fused mesh (lid not separable), and after evaluation we kept the lid closed rather than splitting in Blender or downloading a riskier fallback. Click interaction is now a brief Apple-logo emissive flash + small bounce — same "this is the dev's laptop" beat without faking an animation the geometry can't carry. The humorous-TS-code idea is shelved (could resurface as a floating hologram in a future polish pass, but out of scope for #9).
