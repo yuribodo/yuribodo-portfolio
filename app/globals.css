@@ -77,6 +77,16 @@ body {
   shape-rendering: geometricPrecision;
 }
 
+/* Lobby owns its own cursor presentation: hide global blob, restore OS cursor inside lobby */
+body:has([data-lobby-active="true"]) .custom-cursor {
+  display: none;
+}
+
+[data-lobby-active="true"],
+[data-lobby-active="true"] * {
+  cursor: default !important;
+}
+
 ::selection {
   background: rgba(250, 75, 18, 0.3);
   color: inherit;
