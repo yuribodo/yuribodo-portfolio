@@ -4,6 +4,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import type { Mesh } from "three";
 import type { Dispatch } from "react";
+
+import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -29,6 +31,8 @@ function PlaceholderCube() {
 }
 
 export default function DeskScene({ state, dispatch }: DeskSceneProps) {
+  const cameraRigRef = useRef<CameraRigHandle>(null);
+
   useEffect(() => {
     if (state !== "loading") return;
     const timer = window.setTimeout(() => {
@@ -43,7 +47,8 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       aria-label="Interactive desk lobby"
       className="fixed inset-0 z-50 bg-background"
     >
-      <Canvas camera={{ position: [0, 0, 4], fov: 35 }} dpr={[1, 2]}>
+      <Canvas dpr={[1, 2]}>
+        <CameraRig ref={cameraRigRef} state={state} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 5, 2]} intensity={1.2} />
         <PlaceholderCube />
