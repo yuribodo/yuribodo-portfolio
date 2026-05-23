@@ -26,12 +26,20 @@ interface CameraRigProps {
   fov?: number;
 }
 
-const BASE_POSITION = { x: 0, y: 4, z: 5 } as const;
-const DRIFT_AMPLITUDE = 0.3;
+// First-person "sitting at the desk" POV — head height of a seated adult,
+// gaze tilted ~35° down toward the keyboard area:
+//   - eyes ~60cm above the writing surface (desk top is at y=0)
+//   - ~40cm forward of the desk's front edge (front edge at z=0.4)
+//   - look-at sits below the desk surface line → ~35° downward gaze, the angle
+//     you naturally hit when looking at the keyboard while seated
+const BASE_POSITION = { x: 0, y: 0.4, z: 1.9 } as const;
+const LOOKAT_TARGET = { x: 0, y: -0.05, z: -0.2 } as const;
+// Drift drops 10x — at this close range, 0.3 felt like a head-jerk
+const DRIFT_AMPLITUDE = 0.06;
 const LERP_FACTOR = 0.1;
 
 const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig(
-  { state, fov = 35 },
+  { state, fov = 50 },
   ref,
 ) {
   const cameraRef = useRef<PerspectiveCameraImpl>(null);
@@ -82,7 +90,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
   }, [isDriftEnabled]);
 
   useEffect(() => {
-    cameraRef.current?.lookAt(0, 0, 0);
+    cameraRef.current?.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
   }, []);
 
   useFrame((_, delta) => {
@@ -97,7 +105,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
 
     camera.position.x += (targetX - camera.position.x) * t;
     camera.position.y += (targetY - camera.position.y) * t;
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
   });
 
   return (

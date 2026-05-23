@@ -1,35 +1,19 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect, useRef } from "react";
 import type { Dispatch } from "react";
-import type { Mesh } from "three";
 
 import { useHoldActivate } from "@/hooks/use-hold-activate";
 import CameraRig, { type CameraRigHandle } from "./camera-rig";
+import Desk from "./desk";
+import DeskEnvironment from "./desk-environment";
 import { HoldProgress } from "./hold-progress";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
   state: LobbyState;
   dispatch: Dispatch<LobbyAction>;
-}
-
-function PlaceholderCube() {
-  const meshRef = useRef<Mesh>(null);
-
-  useFrame((_, delta) => {
-    if (!meshRef.current) return;
-    meshRef.current.rotation.x += delta * 0.6;
-    meshRef.current.rotation.y += delta * 0.9;
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="hotpink" />
-    </mesh>
-  );
 }
 
 function DevHoldPlaceholder({ dispatch }: { dispatch: Dispatch<LobbyAction> }) {
@@ -76,11 +60,12 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       data-lobby-active="true"
       className="fixed inset-0 z-50 bg-background"
     >
-      <Canvas dpr={[1, 2]}>
+      <Canvas dpr={[1, 2]} shadows="soft">
         <CameraRig ref={cameraRigRef} state={state} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[3, 5, 2]} intensity={1.2} />
-        <PlaceholderCube />
+        <Suspense fallback={null}>
+          <DeskEnvironment />
+          <Desk />
+        </Suspense>
       </Canvas>
       {isDev ? <DevHoldPlaceholder dispatch={dispatch} /> : null}
     </div>
