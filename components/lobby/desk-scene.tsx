@@ -9,6 +9,7 @@ import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import Desk from "./desk";
 import DeskEnvironment from "./desk-environment";
 import { HoldProgress } from "./hold-progress";
+import Monitor from "./objects/monitor";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -65,6 +66,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         <Suspense fallback={null}>
           <DeskEnvironment />
           <Desk />
+          <Monitor />
         </Suspense>
       </Canvas>
       {isDev ? <DevHoldPlaceholder dispatch={dispatch} /> : null}
