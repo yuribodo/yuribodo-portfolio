@@ -14,6 +14,7 @@ import Desk from "./desk";
 import DeskEnvironment, {
   type DeskEnvironmentHandle,
 } from "./desk-environment";
+import { MuteToggle } from "./mute-toggle";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
@@ -49,7 +50,12 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   // Destructure to capture the stable useCallback identities. Re-using
   // `audio` as a whole would invalidate every dep array on each mute flip
   // (the wrapper object's identity is per-render).
-  const { play: playCue, startAmbient } = useLobbyAudio();
+  const {
+    play: playCue,
+    startAmbient,
+    isMuted,
+    toggleMuted,
+  } = useLobbyAudio();
 
   // Snap the fade overlay opaque before paint so nobody sees a flash of the
   // unanimated scene between mount and the entrance tween starting.
@@ -255,6 +261,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       >
         Enter portfolio
       </button>
+      <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );
 }
