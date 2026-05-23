@@ -36,7 +36,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
-  useFirstPointermoveSweep({ enabled: state === "idle" });
+  useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
 
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
