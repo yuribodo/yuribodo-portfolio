@@ -58,3 +58,36 @@ Verbatim attribution per the license:
 Verbatim attribution per the license:
 
 > "Mouse - Razer Deathadder" (https://sketchfab.com/3d-models/mouse-razer-deathadder-783913c7b9df441ab99ec666eee4e052) by gimora is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+### FreeFire New 3D Character Minato Namikaze
+
+- **Author:** 3DJagat
+- **Source:** https://sketchfab.com/3d-models/freefire-new-3d-character-minato-namikaze-d7a786ae01074e6798633a8d62b3c66c (Sketchfab)
+- **License:** [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+- **Used in:** lobby anime figure — Minato (issue #14)
+
+Verbatim attribution per the license:
+
+> "FreeFire New 3D Character Minato Namikaze" (https://sketchfab.com/3d-models/freefire-new-3d-character-minato-namikaze-d7a786ae01074e6798633a8d62b3c66c) by 3DJagat is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+### Seismitoad
+
+- **Author:** nguyenlouis32
+- **Source:** https://sketchfab.com/3d-models/seismitoad-12a0d0539b984262842b10e093057cbe (Sketchfab)
+- **License:** [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+- **Used in:** lobby anime figure — Seismitoad (issue #14)
+
+Verbatim attribution per the license:
+
+> "Seismitoad" (https://sketchfab.com/3d-models/seismitoad-12a0d0539b984262842b10e093057cbe) by nguyenlouis32 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+### Bakugan Battle Brawlers - Dragonoid
+
+- **Author:** Elpaput
+- **Source:** https://sketchfab.com/3d-models/bakugan-battle-brawlers-dragonoid-9abb64bb6b7d490787a8e7cb92f7fbe4 (Sketchfab)
+- **License:** [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+- **Used in:** lobby anime figure — Dragonoid (issue #14)
+
+Verbatim attribution per the license:
+
+> "Bakugan Battle Brawlers - Dragonoid" (https://sketchfab.com/3d-models/bakugan-battle-brawlers-dragonoid-9abb64bb6b7d490787a8e7cb92f7fbe4) by Elpaput is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
