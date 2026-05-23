@@ -27,7 +27,6 @@ import type {
   Object3D,
 } from "three";
 
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { LOBBY_MODELS } from "@/lib/lobby/assets";
 import {
   SCREEN_CANVAS_HEIGHT,
@@ -82,6 +81,11 @@ export interface MonitorProps {
    *  preview "resolves" right before handoff. The transition timeline
    *  drives this; default 0 keeps idle look. */
   diveProgress?: number;
+  /** When false (default), the canvas paints once on state change and
+   *  freezes — the gradient is static. desk-scene flips this true after
+   *  the entrance fade so the heavy per-frame Bayer dither doesn't
+   *  compete with the fade tween for main-thread time. */
+  livePaint?: boolean;
 }
 
 export interface MonitorHandle {
@@ -103,7 +107,7 @@ function pickMode(state: LobbyState, glitchActive: boolean): ScreenMode {
 }
 
 const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
-  { onEnter, state, diveProgress = 0 },
+  { onEnter, state, diveProgress = 0, livePaint = false },
   ref,
 ) {
   const { scene } = useGLTF(LOBBY_MODELS.monitor);
@@ -231,55 +235,51 @@ const Monitor = forwardRef<MonitorHandle, MonitorProps>(function Monitor(
     };
   }, [screenTexture]);
 
-  // Track whether the loading → idle boot-up has fired so it only plays
-  // once per session (subsequent state changes shouldn't re-flicker).
-  const hasBootedRef = useRef(false);
-  const prefersReducedMotion = useReducedMotion();
-
-  // Resting emissive level follows the lobby state. The first loading →
-  // idle transition plays a brief CRT boot-up flicker (0 → 5 → 1.5 → 4 →
-  // 2.2) so the screen "powers on" rather than snapping bright. The flash
-  // and dive-bloom tweens (handled elsewhere) write directly to the
-  // material, so we bail when one of those is in flight.
+  // Resting emissive follows state — dark while loading, lit otherwise.
+  // The screen's "appearance" is owned by the desk-scene overlay fade so
+  // the snap-on here is hidden behind the opaque overlay until the fade
+  // begins. flashComplete + dive-bloom tween directly to this material,
+  // so we bail when one of those is in flight.
   useEffect(() => {
     const screen = screenMaterialRef.current;
     if (!screen) return;
     if (gsap.isTweening(screen)) return;
+    screen.emissiveIntensity = state === "loading" ? 0 : SCREEN_ON_INTENSITY;
+  }, [state]);
 
-    if (state === "loading") {
-      screen.emissiveIntensity = 0;
-      return;
-    }
+  // Mirror livePaint in a ref so the useFrame closure stays stable.
+  const livePaintRef = useRef(livePaint);
+  useEffect(() => {
+    livePaintRef.current = livePaint;
+  }, [livePaint]);
 
-    if (state === "idle" && !hasBootedRef.current) {
-      hasBootedRef.current = true;
-      if (prefersReducedMotion) {
-        screen.emissiveIntensity = SCREEN_ON_INTENSITY;
-        return;
-      }
-      screen.emissiveIntensity = 0;
-      gsap
-        .timeline()
-        .to(screen, { emissiveIntensity: 5, duration: 0.1, ease: "none" }, 0.4)
-        .to(screen, { emissiveIntensity: 1.5, duration: 0.05, ease: "none" })
-        .to(screen, { emissiveIntensity: 4, duration: 0.06, ease: "none" })
-        .to(screen, {
-          emissiveIntensity: SCREEN_ON_INTENSITY,
-          duration: 0.45,
-          ease: "power2.out",
-        });
-      return;
-    }
+  // One-shot paint so the screen has visible content the moment lights
+  // come up — even before the live paint loop activates. Re-runs on state
+  // change so the visual matches (idle ↔ booting) without waiting for
+  // livePaint to flip. Glitch is suppressed because it's animation-only.
+  useEffect(() => {
+    if (!screenCanvas || !screenTexture) return;
+    if (state === "loading") return;
+    paintScreen(screenCanvas, {
+      mode: state === "booting" ? "diving" : "idle",
+      progress: diveProgress,
+      time: performance.now(),
+      glitchIntensity: 0,
+    });
+    // eslint-disable-next-line react-hooks/immutability
+    screenTexture.needsUpdate = true;
+  }, [screenCanvas, screenTexture, state, diveProgress]);
 
-    screen.emissiveIntensity = SCREEN_ON_INTENSITY;
-  }, [state, prefersReducedMotion]);
-
-  // Single continuous paint loop. Reads stateRef / diveProgressRef /
-  // glitchUntilRef so the closure never goes stale and the cost stays at
-  // one paint per ~33ms regardless of how often React re-renders.
+  // Live paint loop. Skipped entirely until desk-scene flips livePaint
+  // true post-entrance — full per-pixel Bayer dither is ~10ms / paint and
+  // would otherwise compete with the entrance fade tween for main-thread
+  // time, causing jank. During the dive (state === "booting") the loop
+  // also runs because the dither tightening relies on the diveProgress
+  // sweep being visible.
   useFrame(() => {
     if (!screenCanvas || !screenTexture) return;
     if (stateRef.current === "loading") return;
+    if (!livePaintRef.current && stateRef.current !== "booting") return;
 
     const now = performance.now();
     if (now - lastPaintRef.current < REPAINT_INTERVAL_MS) return;

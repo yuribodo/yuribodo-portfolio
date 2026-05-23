@@ -35,10 +35,15 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Black overlay that sits over the Canvas. Starts opaque so the loading
   // → idle entrance reads as a smooth power-on rather than the scene
-  // snapping in fully lit. Tweened to opacity 0 once state hits "idle".
+  // snapping in fully lit. Tweened to opacity 0 once the render loop has
+  // stabilised (first frames hitch on shader compile + texture upload).
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
   const hasEnteredRef = useRef(false);
   const [diveProgress, setDiveProgress] = useState(0);
+  // Live monitor paint is deferred until after the entrance fade so the
+  // heavy per-pixel Bayer dither (~10ms / paint) doesn't compete with the
+  // fade tween. Monitor paints once on state change as a fallback.
+  const [livePaintEnabled, setLivePaintEnabled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   // Snap the fade overlay opaque before paint so nobody sees a flash of the
@@ -62,33 +67,68 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
 
   // Lobby entrance: fade the overlay from black on the first loading → idle
-  // transition. The camera dolly (camera-rig.tsx), light ramp
-  // (desk-environment.tsx), and screen boot flicker (monitor.tsx) all kick
-  // off independently on the same state change — together they read as the
-  // monitor + room "powering on" rather than appearing fully lit at once.
+  // transition. Everything else (camera, lights, screen emissive) snaps
+  // into place behind the opaque overlay so the fade itself is the ONLY
+  // thing animating on the main thread → no jank competing with the tween.
+  //
+  // The fade waits until rAF has produced N consecutive stable frames
+  // (delta < 22ms ≈ >45fps) — gives the first-frame stalls (shader compile,
+  // texture upload) time to clear before the user sees motion.
   useEffect(() => {
     if (state !== "idle" || hasEnteredRef.current) return;
     hasEnteredRef.current = true;
 
-    const overlay = fadeOverlayRef.current;
+    const overlay: HTMLDivElement | null = fadeOverlayRef.current;
     if (!overlay) return;
+    const el = overlay;
 
     if (prefersReducedMotion) {
-      overlay.style.opacity = "0";
+      el.style.opacity = "0";
+      el.style.display = "none";
+      setLivePaintEnabled(true);
       return;
     }
 
-    gsap.to(overlay, {
-      opacity: 0,
-      duration: 1.4,
-      ease: "power2.out",
-      onComplete: () => {
-        // Drop pointer-events fully once invisible so it can never trap
-        // clicks on the scene (it's already pointer-events-none, but belt +
-        // suspenders).
-        overlay.style.display = "none";
-      },
-    });
+    let stableFrames = 0;
+    const startTime = performance.now();
+    let lastTime = startTime;
+    let raf = 0;
+    let started = false;
+
+    function tick(now: number) {
+      const delta = now - lastTime;
+      lastTime = now;
+      if (delta < 22) stableFrames++;
+      else stableFrames = 0;
+
+      // Hard cap — if rAF never stabilises (low-end device under load) we
+      // still start the fade after ~600ms so the user isn't stuck on black.
+      const elapsed = now - startTime;
+      if (stableFrames >= 4 || elapsed > 600) {
+        started = true;
+        gsap.to(el, {
+          opacity: 0,
+          duration: 1.2,
+          ease: "power2.out",
+          onComplete: () => {
+            el.style.display = "none";
+            // Activate the live paint loop now that nothing else is
+            // animating — the heavy dither has the main thread to itself.
+            setLivePaintEnabled(true);
+          },
+        });
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (!started) {
+        gsap.killTweensOf(el);
+      }
+    };
   }, [state, prefersReducedMotion]);
 
   // The dive transition (#10). Fires exactly once when the state machine
@@ -141,13 +181,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       <Canvas dpr={[1, 2]} shadows="soft">
         <CameraRig ref={cameraRigRef} state={state} />
         <Suspense fallback={null}>
-          <DeskEnvironment ref={environmentRef} state={state} />
+          <DeskEnvironment ref={environmentRef} />
           <Desk />
           <Monitor
             ref={monitorRef}
             onEnter={handleEnter}
             state={state}
             diveProgress={diveProgress}
+            livePaint={livePaintEnabled}
           />
           <RazerPeripherals />
           <Macbook />

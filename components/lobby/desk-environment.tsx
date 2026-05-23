@@ -1,17 +1,12 @@
 "use client";
 
 import { ContactShadows, Environment } from "@react-three/drei";
-import gsap from "gsap";
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import type {
   AmbientLight,
   DirectionalLight,
   PointLight,
 } from "three";
-
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
-
-import type { LobbyState } from "./use-lobby-state";
 
 export interface DeskEnvironmentHandle {
   /** Multiplies every light's resting intensity. Called by the dive
@@ -19,14 +14,6 @@ export interface DeskEnvironmentHandle {
    *  beat so the screen's emissive pops as we dolly in. */
   setLightingDimmer: (ratio: number) => void;
 }
-
-interface DeskEnvironmentProps {
-  state: LobbyState;
-}
-
-// Lights ramp up from this dim ratio on the loading → idle entrance.
-const ENTRANCE_DIM_RATIO = 0.3;
-const ENTRANCE_RAMP_DUR = 1.5;
 
 // Resting intensities — sourced from the previous tuned values. Kept as
 // module constants so the imperative dimmer has something to multiply
@@ -39,8 +26,8 @@ const WINDOW_INTENSITY = 3.0;
 const ACCENT_INTENSITY = 1.2;
 const AMBIENT_INTENSITY = 0.06;
 
-const DeskEnvironment = forwardRef<DeskEnvironmentHandle, DeskEnvironmentProps>(
-  function DeskEnvironment({ state }, ref) {
+const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(
+  function DeskEnvironment(_props, ref) {
     const keyRef = useRef<DirectionalLight>(null);
     const fillRef = useRef<DirectionalLight>(null);
     const rimRef = useRef<DirectionalLight>(null);
@@ -48,70 +35,23 @@ const DeskEnvironment = forwardRef<DeskEnvironmentHandle, DeskEnvironmentProps>(
     const windowRef = useRef<PointLight>(null);
     const accentRef = useRef<PointLight>(null);
     const ambientRef = useRef<AmbientLight>(null);
-    const hasEnteredRef = useRef(false);
-    const prefersReducedMotion = useReducedMotion();
-
-    const applyDimmer = (ratio: number) => {
-      const r = Math.max(0, Math.min(1, ratio));
-      if (keyRef.current) keyRef.current.intensity = KEY_INTENSITY * r;
-      if (fillRef.current) fillRef.current.intensity = FILL_INTENSITY * r;
-      if (rimRef.current) rimRef.current.intensity = RIM_INTENSITY * r;
-      if (lampRef.current) lampRef.current.intensity = LAMP_INTENSITY * r;
-      if (windowRef.current) windowRef.current.intensity = WINDOW_INTENSITY * r;
-      if (accentRef.current) accentRef.current.intensity = ACCENT_INTENSITY * r;
-      if (ambientRef.current) ambientRef.current.intensity = AMBIENT_INTENSITY * r;
-    };
 
     useImperativeHandle(
       ref,
       () => ({
-        setLightingDimmer: applyDimmer,
+        setLightingDimmer: (ratio: number) => {
+          const r = Math.max(0, Math.min(1, ratio));
+          if (keyRef.current) keyRef.current.intensity = KEY_INTENSITY * r;
+          if (fillRef.current) fillRef.current.intensity = FILL_INTENSITY * r;
+          if (rimRef.current) rimRef.current.intensity = RIM_INTENSITY * r;
+          if (lampRef.current) lampRef.current.intensity = LAMP_INTENSITY * r;
+          if (windowRef.current) windowRef.current.intensity = WINDOW_INTENSITY * r;
+          if (accentRef.current) accentRef.current.intensity = ACCENT_INTENSITY * r;
+          if (ambientRef.current) ambientRef.current.intensity = AMBIENT_INTENSITY * r;
+        },
       }),
       [],
     );
-
-    // Loading → idle entrance: ramp from ENTRANCE_DIM_RATIO to full. Lights
-    // sit at the dim ratio during "loading" so the ramp has somewhere to come
-    // from; subsequent state changes (idle ↔ exploring ↔ booting) leave the
-    // ratio at 1.0 (the dive's own dimmer tween still drives it on click).
-    useEffect(() => {
-      if (state === "loading" && !hasEnteredRef.current) {
-        // Lights may not have mounted in the first commit — retry on the
-        // next animation frame. Drei's <Environment> suspends, so refs are
-        // null until the warehouse preset resolves.
-        let raf = 0;
-        const settle = () => {
-          if (keyRef.current) {
-            applyDimmer(ENTRANCE_DIM_RATIO);
-          } else {
-            raf = requestAnimationFrame(settle);
-          }
-        };
-        settle();
-        return () => cancelAnimationFrame(raf);
-      }
-
-      if (state === "idle" && !hasEnteredRef.current) {
-        hasEnteredRef.current = true;
-        if (prefersReducedMotion) {
-          applyDimmer(1);
-          return;
-        }
-        // Snap to the dim ratio before starting the tween. Otherwise, if
-        // the env mounted after state already became "idle" (Suspense
-        // race), the first applyDimmer would drop lights full → 30% on
-        // frame 1 of the tween — visible as a flicker. Snapping first
-        // hides that under the fade-from-black overlay in desk-scene.
-        applyDimmer(ENTRANCE_DIM_RATIO);
-        const proxy = { ratio: ENTRANCE_DIM_RATIO };
-        gsap.to(proxy, {
-          ratio: 1,
-          duration: ENTRANCE_RAMP_DUR,
-          ease: "power2.out",
-          onUpdate: () => applyDimmer(proxy.ratio),
-        });
-      }
-    }, [state, prefersReducedMotion]);
 
     return (
       <>
