@@ -82,6 +82,15 @@ body:has([data-lobby-active="true"]) .custom-cursor {
   display: none;
 }
 
+/* Lock background scroll while the lobby is active. The lobby covers the
+   viewport with fixed positioning, but Hero / About / the reveal spacer
+   underneath remain scrollable — without this lock, wheel and arrow keys
+   shift the underlying page even though the user only sees the lobby. */
+html:has([data-lobby-active="true"]),
+body:has([data-lobby-active="true"]) {
+  overflow: hidden;
+}
+
 [data-lobby-active="true"],
 [data-lobby-active="true"] * {
   cursor: default !important;
