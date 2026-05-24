@@ -3,7 +3,15 @@
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Box3, Color, MeshStandardMaterial, Vector3 } from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { Group, Material, Mesh, Object3D } from "three";
@@ -87,7 +95,16 @@ interface FigureProps {
   onSpin?: () => void;
 }
 
-function Figure({ config, onSpin }: FigureProps) {
+/** Single-figure imperative handle — the parent AnimeFigures fans these
+ *  out and exposes a top-level `activate()` that spins all three. */
+interface FigureHandle {
+  activate: () => void;
+}
+
+const Figure = forwardRef<FigureHandle, FigureProps>(function Figure(
+  { config, onSpin },
+  ref,
+) {
   const { scene } = useGLTF(config.modelPath);
   const groupRef = useRef<Group>(null);
   // Cloned materials. We clone on mount so any tween we run only affects this
@@ -209,8 +226,7 @@ function Figure({ config, onSpin }: FigureProps) {
     });
   });
 
-  const handleClick = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation();
+  const activate = useCallback(() => {
     const group = groupRef.current;
     if (!group) return;
 
@@ -248,6 +264,13 @@ function Figure({ config, onSpin }: FigureProps) {
         rotationTweenRef.current = null;
       },
     });
+  }, [onSpin]);
+
+  useImperativeHandle(ref, () => ({ activate }), [activate]);
+
+  const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    event.stopPropagation();
+    activate();
   };
 
   const handlePointerOver = (event: ThreeEvent<PointerEvent>) => {
@@ -274,7 +297,7 @@ function Figure({ config, onSpin }: FigureProps) {
       <primitive object={sceneClone} />
     </group>
   );
-}
+});
 
 interface AnimeFiguresProps {
   /** Fires when any figure starts a rotation (full spin or snap). Hook for
@@ -283,12 +306,41 @@ interface AnimeFiguresProps {
   onSpin?: () => void;
 }
 
-export default function AnimeFigures({ onSpin }: AnimeFiguresProps) {
-  return (
-    <>
-      {FIGURES.map((config) => (
-        <Figure key={config.id} config={config} onSpin={onSpin} />
-      ))}
-    </>
-  );
+/** Imperative handle so the keyboard surrogate can spin all three figures
+ *  with one Enter press. */
+export interface AnimeFiguresHandle {
+  activate: () => void;
 }
+
+const AnimeFigures = forwardRef<AnimeFiguresHandle, AnimeFiguresProps>(
+  function AnimeFigures({ onSpin }, ref) {
+    const figureRefs = useRef<Array<FigureHandle | null>>([]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        activate: () => {
+          figureRefs.current.forEach((figure) => figure?.activate());
+        },
+      }),
+      [],
+    );
+
+    return (
+      <>
+        {FIGURES.map((config, i) => (
+          <Figure
+            key={config.id}
+            ref={(node) => {
+              figureRefs.current[i] = node;
+            }}
+            config={config}
+            onSpin={onSpin}
+          />
+        ))}
+      </>
+    );
+  },
+);
+
+export default AnimeFigures;

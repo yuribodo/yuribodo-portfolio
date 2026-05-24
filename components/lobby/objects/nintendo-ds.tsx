@@ -4,7 +4,9 @@ import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 import {
+  forwardRef,
   useCallback,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -70,7 +72,14 @@ interface NintendoDsProps {
   onScreenOn?: () => void;
 }
 
-export default function NintendoDS({ onScreenOn }: NintendoDsProps) {
+/** Imperative handle so the keyboard surrogate can fire the same animation
+ *  as a click. */
+export interface NintendoDsHandle {
+  activate: () => void;
+}
+
+const NintendoDS = forwardRef<NintendoDsHandle, NintendoDsProps>(
+  function NintendoDS({ onScreenOn }, ref) {
   const { scene } = useGLTF(LOBBY_MODELS.nintendoDs);
   const groupRef = useRef<Group>(null);
   const shellMaterialsRef = useRef<MeshStandardMaterial[]>([]);
@@ -186,27 +195,33 @@ export default function NintendoDS({ onScreenOn }: NintendoDsProps) {
     });
   });
 
+  const activate = useCallback(() => {
+    const screen = screenMaterialRef.current;
+    if (!screen) return;
+    gsap.killTweensOf(screen, "emissiveIntensity");
+    onScreenOn?.();
+    gsap
+      .timeline()
+      .to(screen, {
+        emissiveIntensity: SCREEN_PULSE_INTENSITY,
+        duration: SCREEN_PULSE_UP_S,
+        ease: "power2.out",
+      })
+      .to(screen, {
+        emissiveIntensity: 0,
+        duration: SCREEN_PULSE_DOWN_S,
+        ease: "power2.in",
+      });
+  }, [onScreenOn]);
+
+  useImperativeHandle(ref, () => ({ activate }), [activate]);
+
   const handleClick = useCallback(
     (e: ThreeEvent<MouseEvent>) => {
       e.stopPropagation();
-      const screen = screenMaterialRef.current;
-      if (!screen) return;
-      gsap.killTweensOf(screen, "emissiveIntensity");
-      onScreenOn?.();
-      gsap
-        .timeline()
-        .to(screen, {
-          emissiveIntensity: SCREEN_PULSE_INTENSITY,
-          duration: SCREEN_PULSE_UP_S,
-          ease: "power2.out",
-        })
-        .to(screen, {
-          emissiveIntensity: 0,
-          duration: SCREEN_PULSE_DOWN_S,
-          ease: "power2.in",
-        });
+      activate();
     },
-    [onScreenOn],
+    [activate],
   );
 
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
@@ -256,4 +271,6 @@ export default function NintendoDS({ onScreenOn }: NintendoDsProps) {
       </group>
     </group>
   );
-}
+});
+
+export default NintendoDS;

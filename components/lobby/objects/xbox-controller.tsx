@@ -4,7 +4,9 @@ import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 import {
+  forwardRef,
   useCallback,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -89,7 +91,14 @@ interface XboxControllerProps {
   onActivate?: () => void;
 }
 
-export default function XboxController({ onActivate }: XboxControllerProps) {
+/** Imperative handle so the keyboard surrogate can fire the same vibration
+ *  cascade as a click. */
+export interface XboxControllerHandle {
+  activate: () => void;
+}
+
+const XboxController = forwardRef<XboxControllerHandle, XboxControllerProps>(
+  function XboxController({ onActivate }, ref) {
   const { scene } = useGLTF(LOBBY_MODELS.xboxController);
   const groupRef = useRef<Group>(null);
   // Inner group absorbs the click shake so it doesn't fight the hover-lift
@@ -254,9 +263,7 @@ export default function XboxController({ onActivate }: XboxControllerProps) {
     });
   });
 
-  const handleClick = useCallback(
-    (e: ThreeEvent<MouseEvent>) => {
-      e.stopPropagation();
+  const activate = useCallback(() => {
       onActivate?.();
 
       // Vibration: brief offset shake on the inner group so the hover
@@ -319,8 +326,16 @@ export default function XboxController({ onActivate }: XboxControllerProps) {
             ease: "power2.in",
           });
       });
+    }, [onActivate]);
+
+  useImperativeHandle(ref, () => ({ activate }), [activate]);
+
+  const handleClick = useCallback(
+    (e: ThreeEvent<MouseEvent>) => {
+      e.stopPropagation();
+      activate();
     },
-    [onActivate],
+    [activate],
   );
 
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
@@ -348,4 +363,6 @@ export default function XboxController({ onActivate }: XboxControllerProps) {
       </group>
     </group>
   );
-}
+});
+
+export default XboxController;
