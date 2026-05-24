@@ -82,9 +82,12 @@ const PULSE_FALL_S = 0.25;
 
 interface FigureProps {
   config: FigureConfig;
+  /** Fires when a rotation tween starts (full spin or mid-spin snap). Hook
+   *  for the lobby audio system (#15). */
+  onSpin?: () => void;
 }
 
-function Figure({ config }: FigureProps) {
+function Figure({ config, onSpin }: FigureProps) {
   const { scene } = useGLTF(config.modelPath);
   const groupRef = useRef<Group>(null);
   // Cloned materials. We clone on mount so any tween we run only affects this
@@ -224,6 +227,7 @@ function Figure({ config }: FigureProps) {
       const target = Math.abs(next90 - current) < 1e-4
         ? next90 + QUARTER_TURN
         : next90;
+      onSpin?.();
       rotationTweenRef.current = gsap.to(group.rotation, {
         y: target,
         duration: SNAP_DURATION_S,
@@ -235,6 +239,7 @@ function Figure({ config }: FigureProps) {
       return;
     }
 
+    onSpin?.();
     rotationTweenRef.current = gsap.to(group.rotation, {
       y: `+=${Math.PI * 2}`,
       duration: ROTATION_DURATION_S,
@@ -271,11 +276,18 @@ function Figure({ config }: FigureProps) {
   );
 }
 
-export default function AnimeFigures() {
+interface AnimeFiguresProps {
+  /** Fires when any figure starts a rotation (full spin or snap). Hook for
+   *  the lobby audio system (#15) — desk-scene passes a single callback
+   *  that plays the figure-spin cue. */
+  onSpin?: () => void;
+}
+
+export default function AnimeFigures({ onSpin }: AnimeFiguresProps) {
   return (
     <>
       {FIGURES.map((config) => (
-        <Figure key={config.id} config={config} />
+        <Figure key={config.id} config={config} onSpin={onSpin} />
       ))}
     </>
   );

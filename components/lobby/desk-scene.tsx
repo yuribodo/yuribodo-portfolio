@@ -6,6 +6,7 @@ import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
+import { useLobbyAudio } from "@/hooks/use-lobby-audio";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { playLobbyToSiteTransition } from "@/lib/lobby/transition";
 import CameraRig, { type CameraRigHandle } from "./camera-rig";
@@ -13,6 +14,7 @@ import Desk from "./desk";
 import DeskEnvironment, {
   type DeskEnvironmentHandle,
 } from "./desk-environment";
+import { MuteToggle } from "./mute-toggle";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
@@ -45,6 +47,16 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   // fade tween. Monitor paints once on state change as a fallback.
   const [livePaintEnabled, setLivePaintEnabled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  // Destructure to capture the stable useCallback identities. Re-using
+  // `audio` as a whole would invalidate every dep array on each mute flip
+  // (the wrapper object's identity is per-render).
+  const {
+    play: playCue,
+    startAmbient,
+    stopAmbient,
+    isMuted,
+    toggleMuted,
+  } = useLobbyAudio();
 
   // Snap the fade overlay opaque before paint so nobody sees a flash of the
   // unanimated scene between mount and the entrance tween starting.
@@ -65,6 +77,30 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
   useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
+
+  // Ambient bed (issue #15) — boots on the user's first gesture so browser
+  // autoplay policy doesn't block the AudioContext. Listens for any input
+  // type (pointer, click, keyboard) so keyboard-only users hear it too. The
+  // listeners self-remove on first fire via the `once: true` flag plus the
+  // shared startedRef short-circuit (so a tab-key gesture before the first
+  // pointermove still starts ambient exactly once).
+  useEffect(() => {
+    if (state !== "idle" && state !== "exploring") return;
+    let started = false;
+    function handleGesture() {
+      if (started) return;
+      started = true;
+      startAmbient();
+    }
+    window.addEventListener("pointermove", handleGesture, { once: true });
+    window.addEventListener("pointerdown", handleGesture, { once: true });
+    window.addEventListener("keydown", handleGesture, { once: true });
+    return () => {
+      window.removeEventListener("pointermove", handleGesture);
+      window.removeEventListener("pointerdown", handleGesture);
+      window.removeEventListener("keydown", handleGesture);
+    };
+  }, [state, startAmbient]);
 
   // Lobby entrance: fade the overlay from black on the first loading → idle
   // transition. Everything else (camera, lights, screen emissive) snaps
@@ -156,16 +192,24 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       container: containerRef.current,
       onDiveProgress: setDiveProgress,
       onDiveComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
+      onHandoff: () => {
+        playCue("stinger");
+        // Fade the ambient bed out as Hero's soundtrack ramps in (3s fade
+        // from 0). Without this the bed plays for ~500ms past lobby
+        // opacity:0, audibly bleeding through while the user sees Hero.
+        stopAmbient();
+      },
       prefersReducedMotion,
     });
 
     return () => {
       tl.kill();
     };
-  }, [state, dispatch, prefersReducedMotion]);
+  }, [state, dispatch, prefersReducedMotion, playCue, stopAmbient]);
 
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
+    playCue("monitor-power");
     monitorRef.current?.flashComplete();
     dispatch({ type: "ENTER_CLICKED" });
   };
@@ -192,11 +236,20 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           />
           <RazerPeripherals />
           <Macbook />
-          <NintendoDS />
-          <XboxController />
-          <PokemonDeck />
-          <YugiohDeck />
-          <AnimeFigures />
+          <NintendoDS onScreenOn={() => playCue("ds-chime")} />
+          <XboxController onActivate={() => playCue("xbox-rumble")} />
+          <PokemonDeck onActivate={() => playCue("card-fan")} />
+          <YugiohDeck
+            onActivate={() => {
+              playCue("card-fan");
+              // Yu-Gi-Oh's Mago Negro lift lands ~120ms after the flick; a
+              // staggered low thwack punctuates that beat. Timed against
+              // CardDeckBase's HERO_RISE_DUR_S (0.45s) — thwack peaks while
+              // the card is still rising.
+              window.setTimeout(() => playCue("yugioh-thwack"), 120);
+            }}
+          />
+          <AnimeFigures onSpin={() => playCue("figure-spin")} />
         </Suspense>
       </Canvas>
       {/* Fade-from-black overlay for the loading → idle entrance. Sits
@@ -216,6 +269,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       >
         Enter portfolio
       </button>
+      <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );
 }
