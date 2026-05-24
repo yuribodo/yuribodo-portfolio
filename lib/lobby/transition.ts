@@ -83,6 +83,10 @@ interface TransitionDeps {
   container: HTMLElement | null;
   onDiveProgress: (progress: number) => void;
   onDiveComplete: () => void;
+  /** Fires at HANDOFF_START alongside startSoundtrack. Lobby audio (#15)
+   *  uses it to play the transition stinger — a bass impact + airy whoosh
+   *  that bridges into the Hero soundtrack as the lobby fades. */
+  onHandoff?: () => void;
   prefersReducedMotion: boolean;
 }
 
@@ -97,6 +101,7 @@ export function playLobbyToSiteTransition(
     container,
     onDiveProgress,
     onDiveComplete,
+    onHandoff,
     prefersReducedMotion,
   } = deps;
 
@@ -239,6 +244,11 @@ export function playLobbyToSiteTransition(
   tl.call(
     () => {
       startSoundtrack(SOUNDTRACK_URL);
+      // Lobby audio stinger (#15) — bass impact that lands as the soundtrack
+      // begins its 3s fade-in from 0; the stinger's 400ms decay finishes
+      // before the soundtrack is consciously audible, so they bridge rather
+      // than clash. No-op when lobby is muted (masterGain handles it).
+      onHandoff?.();
     },
     [],
     HANDOFF_START,
