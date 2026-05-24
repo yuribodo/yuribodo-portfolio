@@ -2,7 +2,7 @@
 
 :root {
   /* Kubrick Cinema Palette */
-  --background: #1a1a1a;
+  --background: #0a0a0f;
   --surface: #222222;
   --surface-hover: #2a2a2a;
   --foreground: #cfbfb6;
@@ -75,6 +75,33 @@ body {
 
 .custom-cursor path {
   shape-rendering: geometricPrecision;
+}
+
+/* Lobby owns its own cursor presentation: hide global blob, restore OS cursor inside lobby */
+body:has([data-lobby-active="true"]) .custom-cursor {
+  display: none;
+}
+
+/* Lock background scroll while the lobby is active. The lobby covers the
+   viewport with fixed positioning, but Hero / About / the reveal spacer
+   underneath remain scrollable — without this lock, wheel and arrow keys
+   shift the underlying page even though the user only sees the lobby. */
+html:has([data-lobby-active="true"]),
+body:has([data-lobby-active="true"]) {
+  overflow: hidden;
+}
+
+[data-lobby-active="true"],
+[data-lobby-active="true"] * {
+  cursor: default !important;
+}
+
+/* Monitor hover override — flipped on by Monitor's hover handler so the
+   screen mesh shows a pointer cursor without losing the !important guard
+   that keeps stray DOM cursors out of the lobby. */
+[data-lobby-active="true"][data-lobby-cursor="pointer"],
+[data-lobby-active="true"][data-lobby-cursor="pointer"] * {
+  cursor: pointer !important;
 }
 
 ::selection {
