@@ -18,11 +18,15 @@ import { MuteToggle } from "./mute-toggle";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
 import Macbook from "./objects/macbook";
-import NintendoDS from "./objects/nintendo-ds";
-import XboxController from "./objects/xbox-controller";
-import PokemonDeck from "./objects/pokemon-deck";
-import YugiohDeck from "./objects/yugioh-deck";
-import AnimeFigures from "./objects/anime-figures";
+import NintendoDS, { type NintendoDsHandle } from "./objects/nintendo-ds";
+import XboxController, {
+  type XboxControllerHandle,
+} from "./objects/xbox-controller";
+import PokemonDeck, { type PokemonDeckHandle } from "./objects/pokemon-deck";
+import YugiohDeck, { type YugiohDeckHandle } from "./objects/yugioh-deck";
+import AnimeFigures, {
+  type AnimeFiguresHandle,
+} from "./objects/anime-figures";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -35,6 +39,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const monitorRef = useRef<MonitorHandle>(null);
   const environmentRef = useRef<DeskEnvironmentHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Imperative handles for every interactive object — used by the off-canvas
+  // DOM mirror below so keyboard-only users can fire the same animations as
+  // a mouse click.
+  const dsRef = useRef<NintendoDsHandle>(null);
+  const xboxRef = useRef<XboxControllerHandle>(null);
+  const pokemonRef = useRef<PokemonDeckHandle>(null);
+  const yugiohRef = useRef<YugiohDeckHandle>(null);
+  const figuresRef = useRef<AnimeFiguresHandle>(null);
   // Black overlay that sits over the Canvas. Starts opaque so the loading
   // → idle entrance reads as a smooth power-on rather than the scene
   // snapping in fully lit. Tweened to opacity 0 once the render loop has
@@ -214,6 +226,27 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     dispatch({ type: "ENTER_CLICKED" });
   };
 
+  const handleSkip = () => {
+    if (state === "done") return;
+    dispatch({ type: "SKIP" });
+  };
+
+  // Esc anywhere in the lobby skips straight to the site. Listener lives on
+  // the window so it works regardless of which surrogate button (if any)
+  // has focus. Suppressed during the dive — once the transition starts the
+  // user can't change their mind.
+  useEffect(() => {
+    if (state === "booting" || state === "done") return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        dispatch({ type: "SKIP" });
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state, dispatch]);
+
   return (
     <div
       ref={containerRef}
@@ -236,10 +269,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           />
           <RazerPeripherals />
           <Macbook />
-          <NintendoDS onScreenOn={() => playCue("ds-chime")} />
-          <XboxController onActivate={() => playCue("xbox-rumble")} />
-          <PokemonDeck onActivate={() => playCue("card-fan")} />
+          <NintendoDS ref={dsRef} onScreenOn={() => playCue("ds-chime")} />
+          <XboxController
+            ref={xboxRef}
+            onActivate={() => playCue("xbox-rumble")}
+          />
+          <PokemonDeck ref={pokemonRef} onActivate={() => playCue("card-fan")} />
           <YugiohDeck
+            ref={yugiohRef}
             onActivate={() => {
               playCue("card-fan");
               // Yu-Gi-Oh's Mago Negro lift lands ~120ms after the flick; a
@@ -249,7 +286,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
               window.setTimeout(() => playCue("yugioh-thwack"), 120);
             }}
           />
-          <AnimeFigures onSpin={() => playCue("figure-spin")} />
+          <AnimeFigures ref={figuresRef} onSpin={() => playCue("figure-spin")} />
         </Suspense>
       </Canvas>
       {/* Fade-from-black overlay for the loading → idle entrance. Sits
@@ -260,15 +297,55 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         aria-hidden
         className="pointer-events-none absolute inset-0 z-10 bg-background"
       />
-      {/* Off-canvas keyboard surrogate. Tab → Enter/Space triggers the same
-          enter action as clicking the screen mesh. */}
-      <button
-        type="button"
-        onClick={handleEnter}
+      {/* Off-canvas DOM mirror. Each interactive 3D object gets a sr-only
+          surrogate so Tab cycles through them in scene-graph order and
+          Enter/Space fires the same animation as a click. The 3D outline
+          post-processing for visible focus rings is intentionally NOT
+          added — it costs ~2ms/frame for marginal benefit; this mirror
+          already satisfies screen-reader users, and the focus ring on the
+          DOM button itself is enough for sighted keyboard users. */}
+      <div
+        role="region"
+        aria-label="Interactive desk lobby"
         className="sr-only"
       >
-        Enter portfolio
-      </button>
+        <button type="button" onClick={handleSkip}>
+          Skip lobby and enter site
+        </button>
+        <button type="button" onClick={handleEnter}>
+          Enter portfolio (main action)
+        </button>
+        <button
+          type="button"
+          onClick={() => dsRef.current?.activate()}
+        >
+          Pulse Nintendo DS screen
+        </button>
+        <button
+          type="button"
+          onClick={() => xboxRef.current?.activate()}
+        >
+          Vibrate Xbox controller
+        </button>
+        <button
+          type="button"
+          onClick={() => pokemonRef.current?.activate()}
+        >
+          Fan out Pokémon deck
+        </button>
+        <button
+          type="button"
+          onClick={() => yugiohRef.current?.activate()}
+        >
+          Fan out Yu-Gi-Oh deck
+        </button>
+        <button
+          type="button"
+          onClick={() => figuresRef.current?.activate()}
+        >
+          Spin anime figure trio
+        </button>
+      </div>
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

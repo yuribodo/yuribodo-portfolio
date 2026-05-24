@@ -4,8 +4,10 @@ import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 import {
+  forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -83,6 +85,12 @@ export interface DeckTextures {
   back: string;
 }
 
+/** Imperative handle so the keyboard surrogate can toggle the fan from
+ *  the DOM mirror without traversing into the r3f scene. */
+export interface CardDeckHandle {
+  activate: () => void;
+}
+
 export interface CardDeckProps {
   position: [number, number, number];
   rotation: [number, number, number];
@@ -103,16 +111,20 @@ export interface CardDeckProps {
   onActivate?: () => void;
 }
 
-export default function CardDeckBase({
-  position,
-  rotation,
-  pulseTargetId,
-  fanDirection,
-  textures,
-  enableHoverIsolation = false,
-  enableHeroRise = false,
-  onActivate,
-}: CardDeckProps) {
+const CardDeckBase = forwardRef<CardDeckHandle, CardDeckProps>(
+  function CardDeckBase(
+    {
+      position,
+      rotation,
+      pulseTargetId,
+      fanDirection,
+      textures,
+      enableHoverIsolation = false,
+      enableHeroRise = false,
+      onActivate,
+    },
+    ref,
+  ) {
   const groupRef = useRef<Group>(null);
   const cardPivotRefs = useRef<Array<Group | null>>([null, null, null]);
   const cardMaterialsRef = useRef<Array<MeshStandardMaterial | null>>([
@@ -225,16 +237,22 @@ export default function CardDeckBase({
     [fanDirection, enableHeroRise],
   );
 
+  const activate = useCallback(() => {
+    const next = !isFannedRef.current;
+    isFannedRef.current = next;
+    onActivate?.();
+    if (!next) setIsolatedIndex(null);
+    animateFan(next);
+  }, [animateFan, onActivate]);
+
+  useImperativeHandle(ref, () => ({ activate }), [activate]);
+
   const handleClick = useCallback(
     (e: ThreeEvent<MouseEvent>) => {
       e.stopPropagation();
-      const next = !isFannedRef.current;
-      isFannedRef.current = next;
-      onActivate?.();
-      if (!next) setIsolatedIndex(null);
-      animateFan(next);
+      activate();
     },
-    [animateFan, onActivate],
+    [activate],
   );
 
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
@@ -405,4 +423,6 @@ export default function CardDeckBase({
       ))}
     </group>
   );
-}
+});
+
+export default CardDeckBase;

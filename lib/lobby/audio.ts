@@ -593,6 +593,17 @@ export class LobbyAudio {
   startAmbient(): void {
     if (this.disposed) return;
     if (this.ambientSource) return;
+    // Safari only accepts ctx.resume() when the call originates inside the
+    // synchronous stack of a user gesture. If startAmbient() runs before
+    // the preload promise resolves, the actual playback would happen on a
+    // later microtask outside that stack and Safari would silently keep
+    // the context suspended. Resuming here — synchronously, in whatever
+    // gesture handler called us — secures the gesture credit upfront so
+    // the deferred startAmbientNow() lands on a running context.
+    const ctx = this.ensureContext();
+    if (ctx && ctx.state === "suspended") {
+      void ctx.resume();
+    }
     if (this.ambientBuffer) {
       this.startAmbientNow();
       return;
