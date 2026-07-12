@@ -116,8 +116,12 @@ const Beyblade = forwardRef<BeybladeHandle, BeybladeProps>(function Beyblade(
     });
     materialsRef.current = materials;
     return () => {
-      materials.forEach((m) => m.dispose());
+      materials.forEach((m) => {
+        gsap.killTweensOf(m);
+        m.dispose();
+      });
       materialsRef.current = [];
+      reducedTweenRef.current?.kill();
     };
   }, [sceneClone]);
 
@@ -139,10 +143,16 @@ const Beyblade = forwardRef<BeybladeHandle, BeybladeProps>(function Beyblade(
       return;
     }
 
-    // At rest: settle rotation/position back and apply hover lift.
+    // At rest (idle or toppled): ease back to the upright resting pose at the
+    // anchor — undo the topple tilt and the xz wander — then apply hover lift.
+    // Frame-rate independent lerp (matches camera-rig.tsx).
     const targetY = POSITION[1] + (isHovered ? HOVER_LIFT_M : 0);
     const t = 1 - Math.pow(1 - HOVER_LERP_FACTOR, dt * 60);
+    group.position.x += (POSITION[0] - group.position.x) * t;
+    group.position.z += (POSITION[2] - group.position.z) * t;
     group.position.y += (targetY - group.position.y) * t;
+    group.rotation.x += (0 - group.rotation.x) * t;
+    group.rotation.z += (0 - group.rotation.z) * t;
   });
 
   // Hover emissive.
