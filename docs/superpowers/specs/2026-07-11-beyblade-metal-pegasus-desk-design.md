@@ -55,6 +55,14 @@ atravessar o mouse, o xbox ou as figures.
 com o usuário antes de tratar modelo ruim): (a) beyblade metal genérico livre,
 (b) usuário fornece o modelo, (c) modelo procedural simplificado.
 
+**Atualização (execução):** o risco se materializou. O primeiro pick ("Storm
+Pegasus 105 RF", uid `2093ae37…`, 762k tris / 63MB, export CAD) resistiu à
+decimação automática — topologia estilhaçada, o simplificador meshopt não
+colapsava (só ~2% de redução em qualquer ratio). Trocado por um modelo
+game-ready: **"Storm Pegasus" por RECZ P3D**, uid `70e9b69eef4e4d529d69acce7073c2d8`,
+**8.493 tris / 0.44 MB / 0 texturas**, CC-BY — cabe direto no budget sem
+decimação.
+
 ## Arquitetura
 
 Espelha o padrão de `components/lobby/objects/anime-figures.tsx`.

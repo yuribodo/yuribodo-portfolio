@@ -10,8 +10,9 @@
 
 ## Global Constraints
 
-- **Asset budget:** the lobby route must stay inside an **8 MB total-asset budget** (`scripts/compress-assets.ts` header). The raw Pegasus GLB is **63 MB / 762,774 tris / ~1.5M verts / 10× 1k textures** — it MUST be decimated + compressed before it ships. Target the compressed Pegasus at **≤ 1.2 MB** and re-verify the whole `public/lobby/models/` sum stays < 8 MB.
-- **License:** the model is **CC Attribution (CC-BY 4.0)**. Attribution is mandatory — credit "Storm Pegasus 105 RF by IcaroAndradeOliveira1 (@andradeoliveiraicaro785), CC-BY 4.0, Sketchfab" in a credits file.
+- **Asset budget:** the lobby route must stay inside an **8 MB total-asset budget** (`scripts/compress-assets.ts` header). Existing models already sum ~4.54 MB. The chosen Pegasus GLB is **0.44 MB / 8,493 tris / 5,109 verts / 0 textures** (game-ready) — no decimation required; a light meshopt pass keeps it well under any concern. Re-verify the whole `public/lobby/models/` sum stays < 8 MB.
+- **License:** the model is **CC Attribution (CC-BY 4.0)**. Attribution is mandatory — credit "Storm Pegasus by RECZ P3D (@recz.contacto), CC-BY 4.0, Sketchfab" in a credits file.
+- **Model source (chosen after the first pick failed):** Sketchfab uid `70e9b69eef4e4d529d69acce7073c2d8` (https://sketchfab.com/3d-models/70e9b69eef4e4d529d69acce7073c2d8). The originally-picked "Storm Pegasus 105 RF" (762k-tri CAD export) resisted automated decimation (topologically shattered — the meshopt simplifier could not collapse it) and was abandoned; this game-ready model replaces it.
 - **No `any`** — type everything; infer with `satisfies`/`as const` (CLAUDE.md).
 - **`prefers-reduced-motion`** must be respected — reduced motion gets a short, gentle spin, no violent wobble/topple.
 - **GPU-friendly animation** — only `transform`-equivalent props (rotation/position/emissiveIntensity); no per-frame React re-renders (drive Object3D + material directly, like `anime-figures.tsx`).
@@ -45,48 +46,48 @@
 **Interfaces:**
 - Produces: `LOBBY_MODELS.beybladePegasus: string` (path `"/lobby/models/beyblade-pegasus.glb"`), preloaded at module load.
 
-The raw file is already downloaded at `~/Downloads/storm_pegasus_105_rf_versao_exclusiva.glb` (63 MB).
+The raw file is downloaded by the user to `~/Downloads/` (a ~0.44 MB `storm_pegasus*.glb`). **This model is already game-ready (8,493 tris, 0 textures) — no decimation is needed**; a light meshopt geometry pass is all it gets.
 
-- [ ] **Step 1: Install the gltf-transform toolchain (once)**
+- [ ] **Step 1: Install the toolchain (once)**
 
 ```bash
-pnpm add -D @gltf-transform/cli @gltf-transform/core ffmpeg-static
+pnpm add -D @gltf-transform/cli tsx
 ```
 
-- [ ] **Step 2: Place the raw GLB into the models dir under its final name**
+(`tsx` is also required by Task 2's physics tests and the existing `assets:compress` script — it was missing from devDependencies. `@gltf-transform/cli` bundles core + meshopt; `ffmpeg-static` from the repo header is only for audio, not needed here.)
+
+- [ ] **Step 2: Place the downloaded GLB into the models dir under its final name**
 
 ```bash
-cp ~/Downloads/storm_pegasus_105_rf_versao_exclusiva.glb \
+cp "$(ls -t ~/Downloads/storm_pegasus*.glb | head -1)" \
    public/lobby/models/beyblade-pegasus.glb
 ```
 
-- [ ] **Step 3: Decimate + compress this one file (do NOT re-process the whole dir)**
+- [ ] **Step 3: Light meshopt compression (no simplify, no textures)**
 
-The repo script processes every GLB; run the CLI on just the new file so the already-optimized models are untouched. `--simplify` with a low ratio does the heavy decimation the 762k-tri CAD mesh needs.
+Geometry quantization + reorder only. `--simplify` is intentionally omitted — 8,493 tris needs no decimation, and simplify risks marring the small mesh.
 
 ```bash
+mkdir -p public/lobby/models/optimized
 pnpm exec gltf-transform optimize \
   public/lobby/models/beyblade-pegasus.glb \
   public/lobby/models/optimized/beyblade-pegasus.glb \
-  --compress meshopt --texture-compress webp \
-  --simplify --simplify-error 0.001
+  --compress meshopt --no-simplify
 ```
 
-Expected: console reports a large tri-count reduction (target ≤ ~40k tris) and output well under 2 MB.
+Expected: output ≈ 0.1–0.3 MB, tri count unchanged (~8,493).
 
-- [ ] **Step 4: Verify the compressed size and the total budget**
+- [ ] **Step 4: Verify the size and the total budget**
 
 ```bash
-ls -la public/lobby/models/optimized/beyblade-pegasus.glb   # expect < ~1.2 MB
-# total of what would ship (existing models + new optimized pegasus):
 node -e 'const fs=require("fs");const d="public/lobby/models";let t=0;for(const f of fs.readdirSync(d)){if(f.endsWith(".glb")&&f!=="beyblade-pegasus.glb")t+=fs.statSync(d+"/"+f).size;}t+=fs.statSync(d+"/optimized/beyblade-pegasus.glb").size;console.log("projected models total MB:",(t/1048576).toFixed(2));'
 ```
 
-Expected: projected total < 8.00 MB. **If the pegasus is still > ~1.5 MB**, re-run Step 3 with a stronger `--simplify-error 0.005` (or add `--simplify-ratio 0.1`); if textures dominate, add `--texture-size 512`.
+Expected: projected total < 8.00 MB (existing ~4.54 MB + < 0.44 MB).
 
-- [ ] **Step 5: Visually confirm the decimated model, then promote it**
+- [ ] **Step 5: Promote the optimized file**
 
-Open `public/lobby/models/optimized/beyblade-pegasus.glb` in a glTF viewer (e.g. https://gltf.report or VS Code glTF preview) and confirm the metal wheel, blue energy ring, fire face and red RF tip still read at a glance. Then promote:
+Visual confirmation happens for real when the model renders in the lobby (Task 3); the source is game-ready so no separate viewer gate is needed.
 
 ```bash
 mv public/lobby/models/optimized/beyblade-pegasus.glb \
@@ -101,11 +102,11 @@ Create `public/lobby/CREDITS.md`:
 ```markdown
 # Lobby 3D Asset Credits
 
-## Beyblade — Storm Pegasus 105 RF
-- **Author:** IcaroAndradeOliveira1 (@andradeoliveiraicaro785)
-- **Source:** https://sketchfab.com/3d-models/storm-pegasus-105-rf-versao-exclusiva-2093ae37cc624534902d7b92fee88f4e
+## Beyblade — Storm Pegasus
+- **Author:** RECZ P3D (@recz.contacto)
+- **Source:** https://sketchfab.com/3d-models/70e9b69eef4e4d529d69acce7073c2d8
 - **License:** CC Attribution 4.0 (CC-BY 4.0) — https://creativecommons.org/licenses/by/4.0/
-- **Changes:** decimated + meshopt-compressed + textures re-encoded to WebP for web delivery.
+- **Changes:** meshopt-compressed (geometry quantization) for web delivery.
 ```
 
 - [ ] **Step 7: Register the model in the manifest**
