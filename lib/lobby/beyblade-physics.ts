@@ -37,7 +37,7 @@ export interface BeybladeParams {
 
 export const DEFAULT_PARAMS: BeybladeParams = {
   maxOmega: 90,
-  friction: 3.5,
+  friction: 12,
   maxTilt: 0.5,
   precessGain: 6,
   wanderRadius: 0.03,

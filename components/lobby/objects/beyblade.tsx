@@ -28,9 +28,12 @@ import {
 } from "@/lib/lobby/beyblade-physics";
 import type { BeybladeState } from "@/lib/lobby/beyblade-physics";
 
-// Front-right pocket of the desk, clear of mouse/xbox/figures so the top has
-// room to precess (spec §Coordinate system).
-const POSITION: [number, number, number] = [0.38, 0, 0.0];
+// Lower (front) desk surface — same height as the keyboard/mouse/Xbox
+// (DESK_TOP_Y), NOT the raised back shelf where the figures sit (y=0).
+const DESK_TOP_Y = -0.602;
+// Sits behind the Xbox controller ([0.55, DESK_TOP_Y, 0.2]) so it reads as
+// "above the controller", with room to precess.
+const POSITION: [number, number, number] = [0.55, DESK_TOP_Y, 0.0];
 // Final height in metres after Box3 normalisation (~4.5cm metal bey).
 const TARGET_HEIGHT = 0.045;
 
