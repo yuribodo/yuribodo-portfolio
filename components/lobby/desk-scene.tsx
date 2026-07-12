@@ -27,6 +27,7 @@ import YugiohDeck, { type YugiohDeckHandle } from "./objects/yugioh-deck";
 import AnimeFigures, {
   type AnimeFiguresHandle,
 } from "./objects/anime-figures";
+import Beyblade from "./objects/beyblade";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -287,6 +288,8 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             }}
           />
           <AnimeFigures ref={figuresRef} onSpin={() => playCue("figure-spin")} />
+          {/* TEMP: visual bring-up — replaced with ref'd version in Task 5 */}
+          <Beyblade />
         </Suspense>
       </Canvas>
       {/* Fade-from-black overlay for the loading → idle entrance. Sits
