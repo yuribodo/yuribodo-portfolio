@@ -27,7 +27,7 @@ import YugiohDeck, { type YugiohDeckHandle } from "./objects/yugioh-deck";
 import AnimeFigures, {
   type AnimeFiguresHandle,
 } from "./objects/anime-figures";
-import Beyblade from "./objects/beyblade";
+import Beyblade, { type BeybladeHandle } from "./objects/beyblade";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 
 interface DeskSceneProps {
@@ -48,6 +48,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const pokemonRef = useRef<PokemonDeckHandle>(null);
   const yugiohRef = useRef<YugiohDeckHandle>(null);
   const figuresRef = useRef<AnimeFiguresHandle>(null);
+  const beybladeRef = useRef<BeybladeHandle>(null);
   // Black overlay that sits over the Canvas. Starts opaque so the loading
   // → idle entrance reads as a smooth power-on rather than the scene
   // snapping in fully lit. Tweened to opacity 0 once the render loop has
@@ -288,8 +289,10 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             }}
           />
           <AnimeFigures ref={figuresRef} onSpin={() => playCue("figure-spin")} />
-          {/* TEMP: visual bring-up — replaced with ref'd version in Task 5 */}
-          <Beyblade />
+          <Beyblade
+            ref={beybladeRef}
+            onLaunch={() => playCue("beyblade-launch")}
+          />
         </Suspense>
       </Canvas>
       {/* Fade-from-black overlay for the loading → idle entrance. Sits
@@ -347,6 +350,12 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           onClick={() => figuresRef.current?.activate()}
         >
           Spin anime figure trio
+        </button>
+        <button
+          type="button"
+          onClick={() => beybladeRef.current?.activate()}
+        >
+          Spin Pegasus beyblade
         </button>
       </div>
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
