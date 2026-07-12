@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test 'lib/**/*.test.ts'",
     "analyze": "ANALYZE=true next build --webpack",
     "assets:compress": "tsx scripts/compress-assets.ts"
   },
@@ -28,6 +29,7 @@
     "three": "^0.183.2"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.4.1",
     "@next/bundle-analyzer": "^16.2.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -37,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   }
 }

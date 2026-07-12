@@ -23,6 +23,7 @@ export type AudioCueId =
   | "card-fan"
   | "yugioh-thwack"
   | "figure-spin"
+  | "beyblade-launch"
   | "monitor-power"
   | "stinger";
 
@@ -32,6 +33,7 @@ const CUE_VOLUMES: Record<AudioCueId, number> = {
   "card-fan": 0.45,
   "yugioh-thwack": 0.5,
   "figure-spin": 0.35,
+  "beyblade-launch": 0.5,
   "monitor-power": 0.5,
   stinger: 0.7,
 };
@@ -42,6 +44,7 @@ const CUE_DURATIONS_S: Record<AudioCueId, number> = {
   "card-fan": 0.22,
   "yugioh-thwack": 0.35,
   "figure-spin": 0.18,
+  "beyblade-launch": 0.5,
   "monitor-power": 0.55,
   stinger: 0.45,
 };
@@ -294,6 +297,51 @@ function buildFigureSpin(ctx: OfflineAudioContext): void {
   src.start(0);
 }
 
+// Beyblade rip — a metallic launcher zip: a fast downward pitch sweep (the
+// ripcord) layered with bright bandpassed noise (metal-on-metal). Short,
+// aggressive, then gone.
+function buildBeybladeLaunch(ctx: OfflineAudioContext): void {
+  const dur = 0.5;
+
+  // Ripcord sweep: sawtooth 520Hz → 130Hz, quick attack, exponential fall.
+  const osc = ctx.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(520, 0);
+  osc.frequency.exponentialRampToValueAtTime(130, dur);
+  const oscEnv = ctx.createGain();
+  oscEnv.gain.setValueAtTime(0, 0);
+  oscEnv.gain.linearRampToValueAtTime(0.4, 0.02);
+  oscEnv.gain.exponentialRampToValueAtTime(0.001, dur);
+  const oscLp = ctx.createBiquadFilter();
+  oscLp.type = "lowpass";
+  oscLp.frequency.value = 2200;
+  osc.connect(oscLp);
+  oscLp.connect(oscEnv);
+  oscEnv.connect(ctx.destination);
+  osc.start(0);
+  osc.stop(dur + 0.02);
+
+  // Metal shimmer: bandpassed noise burst that decays fast.
+  const buf = ctx.createBuffer(1, Math.ceil(dur * ctx.sampleRate), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let j = 0; j < data.length; j++) {
+    const env = Math.exp(-j / (data.length * 0.25));
+    data[j] = (Math.random() * 2 - 1) * env * 0.5;
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 3200;
+  bp.Q.value = 1.5;
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.value = 0.35;
+  noise.connect(bp);
+  bp.connect(noiseGain);
+  noiseGain.connect(ctx.destination);
+  noise.start(0);
+}
+
 // Monitor power-on hum — rising sine sweep with a small click transient at
 // the start. CRT-style "thock then warm up" rather than a melodic chime.
 function buildMonitorPower(ctx: OfflineAudioContext): void {
@@ -405,6 +453,7 @@ const CUE_BUILDERS: Record<AudioCueId, (ctx: OfflineAudioContext) => void> = {
   "card-fan": buildCardFan,
   "yugioh-thwack": buildYugiohThwack,
   "figure-spin": buildFigureSpin,
+  "beyblade-launch": buildBeybladeLaunch,
   "monitor-power": buildMonitorPower,
   stinger: buildStinger,
 };
