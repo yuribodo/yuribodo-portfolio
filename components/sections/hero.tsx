@@ -247,12 +247,12 @@ export function Hero() {
 
   if (reducedMotion) {
     return (
-      <section className="flex h-screen w-full items-center justify-center">
+      <section className="flex h-[100dvh] w-full items-center justify-center px-6">
         <div className="text-center">
-          <h1 className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright md:text-[100px] lg:text-[140px]">
+          <h1 className="whitespace-nowrap font-sans text-[clamp(2.75rem,14vw,140px)] font-black leading-[0.95] tracking-[-0.04em] text-foreground-bright">
             YURI <span className="text-accent">BODO</span>
           </h1>
-          <p className="mt-6 font-sans text-sm font-semibold uppercase tracking-[4px] text-foreground">
+          <p className="mt-6 font-sans text-xs font-semibold uppercase tracking-[0.25em] text-foreground md:text-sm md:tracking-[4px]">
             Full Stack Engineer
           </p>
           <p className="mt-2 font-mono text-[10px] text-foreground/60 md:text-xs">
@@ -284,7 +284,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-full overflow-hidden bg-background"
+      className="relative h-[100dvh] w-full overflow-hidden bg-background"
     >
       {/* Dithered canvas background */}
       <canvas
@@ -299,9 +299,9 @@ export function Hero() {
       >
         <h1
           ref={nameRef}
-          className="font-sans text-6xl font-black tracking-[-3px] text-foreground-bright mix-blend-difference md:text-[100px] lg:text-[140px]"
+          className="whitespace-nowrap font-sans text-[clamp(2.75rem,14vw,140px)] font-black leading-[0.95] tracking-[-0.04em] text-foreground-bright mix-blend-difference"
         >
-          <span className="inline-block overflow-hidden">
+          <span className="inline-block overflow-hidden align-bottom">
             {"YURI".split("").map((char, i) => (
               <span key={`y-${i}`} data-hero-char className="inline-block">
                 {char}
@@ -309,7 +309,7 @@ export function Hero() {
             ))}
           </span>
           <span className="inline-block w-[0.2em]" />
-          <span className="inline-block overflow-hidden">
+          <span className="inline-block overflow-hidden align-bottom">
             {"BODO".split("").map((char, i) => (
               <span key={`b-${i}`} data-hero-char className="inline-block text-accent">
                 {char}
