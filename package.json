@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "tsx --test 'lib/**/*.test.ts'",
     "analyze": "ANALYZE=true next build --webpack",
-    "assets:compress": "tsx scripts/compress-assets.ts"
+    "assets:compress": "tsx scripts/compress-assets.ts",
+    "assets:world": "node scripts/build-lobby-world.mjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4",
