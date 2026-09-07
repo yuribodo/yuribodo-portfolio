@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
-import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
@@ -29,6 +29,11 @@ import AnimeFigures, {
 } from "./objects/anime-figures";
 import Beyblade, { type BeybladeHandle } from "./objects/beyblade";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
+import IsekaiWorld from "./world/isekai-world";
+import { WorldControls } from "./world/world-controls";
+import { WorldBoundary } from "./world/world-boundary";
+import { DeskInteraction, SceneReady } from "./world/scene-ready";
+import { requestWorldEntry, type WorldView } from "@/lib/lobby/world-view";
 
 interface DeskSceneProps {
   state: LobbyState;
@@ -56,6 +61,13 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
   const hasEnteredRef = useRef(false);
   const [diveProgress, setDiveProgress] = useState(0);
+  const [view, setView] = useState<WorldView>("desk");
+  const [floorY, setFloorY] = useState(-1.5);
+  const pendingEntry = useRef(false);
+  const restoreLookFocus = useRef(false);
+  const lookButton = useRef<HTMLButtonElement>(null);
+  const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
+  const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
   // Live monitor paint is deferred until after the entrance fade so the
   // heavy per-pixel Bayer dither (~10ms / paint) doesn't compete with the
   // fade tween. Monitor paints once on state change as a fallback.
@@ -83,14 +95,14 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   useEffect(() => {
     if (state !== "loading") return;
     const timer = window.setTimeout(() => {
-      dispatch({ type: "ASSETS_READY" });
-    }, 600);
+      dispatch({ type: "SKIP" });
+    }, 20000);
     return () => window.clearTimeout(timer);
   }, [state, dispatch]);
 
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
-  useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
+  useFirstPointermoveSweep({ enabled: view === "desk" && (state === "idle" || state === "exploring") });
 
   // Ambient bed (issue #15) — boots on the user's first gesture so browser
   // autoplay policy doesn't block the AudioContext. Listens for any input
@@ -223,31 +235,58 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
+    if (pendingEntry.current) return;
+    if (requestWorldEntry(view) === "return-first") {
+      pendingEntry.current = true;
+      setView("returning");
+      return;
+    }
     playCue("monitor-power");
     monitorRef.current?.flashComplete();
     dispatch({ type: "ENTER_CLICKED" });
   };
+
+  const handleReturned = () => {
+    setView("desk");
+    if (pendingEntry.current) {
+      pendingEntry.current = false;
+      playCue("monitor-power");
+      monitorRef.current?.flashComplete();
+      dispatch({ type: "ENTER_CLICKED" });
+    } else {
+      restoreLookFocus.current = true;
+    }
+  };
+
+  useEffect(() => {
+    if (view === "desk" && restoreLookFocus.current) {
+      restoreLookFocus.current = false;
+      lookButton.current?.focus({ preventScroll: true });
+    }
+  }, [view]);
 
   const handleSkip = () => {
     if (state === "done") return;
     dispatch({ type: "SKIP" });
   };
 
-  // Esc anywhere in the lobby skips straight to the site. Listener lives on
-  // the window so it works regardless of which surrogate button (if any)
-  // has focus. Suppressed during the dive — once the transition starts the
-  // user can't change their mind.
+  // Escape returns from looking around; at the desk it skips the lobby.
+  // Once entry starts, the return and monitor dive run to completion.
   useEffect(() => {
     if (state === "booting" || state === "done") return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.preventDefault();
+        if (view !== "desk") {
+          if (!pendingEntry.current) setView("returning");
+          return;
+        }
         dispatch({ type: "SKIP" });
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state, dispatch]);
+  }, [state, view, dispatch]);
 
   return (
     <div
@@ -255,13 +294,33 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       role="application"
       aria-label="Interactive desk lobby"
       data-lobby-active="true"
-      className="fixed inset-0 z-50 bg-background"
+      data-world-view={view}
+      data-lobby-state={state}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"))
+          .filter((button) => !button.closest("[inert]"));
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
+      className="fixed inset-0 z-[60] bg-background"
     >
-      <Canvas dpr={[1, 2]} shadows="soft">
-        <CameraRig ref={cameraRigRef} state={state} />
+      <Canvas dpr={[1, 1.5]} shadows="soft" scene={{ environmentIntensity: 0.35 }}>
+        <CameraRig ref={cameraRigRef} state={state} view={view} onReturned={handleReturned} />
+        <DeskInteraction enabled={view === "desk" && state !== "loading" && state !== "booting"} />
+        <DeskEnvironment ref={environmentRef} />
+        <IsekaiWorld floorY={floorY} active={state !== "booting" && state !== "loading"} />
+        <WorldBoundary onError={skipScene}>
         <Suspense fallback={null}>
-          <DeskEnvironment ref={environmentRef} />
-          <Desk />
+          <Desk onFloorReady={setFloorY} />
+          <SceneReady onReady={assetsReady} />
           <Monitor
             ref={monitorRef}
             onEnter={handleEnter}
@@ -294,6 +353,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             onLaunch={() => playCue("beyblade-launch")}
           />
         </Suspense>
+        </WorldBoundary>
       </Canvas>
       {/* Fade-from-black overlay for the loading → idle entrance. Sits
           above the Canvas but pointer-events-none so hover / click still
@@ -303,17 +363,13 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         aria-hidden
         className="pointer-events-none absolute inset-0 z-10 bg-background"
       />
-      {/* Off-canvas DOM mirror. Each interactive 3D object gets a sr-only
-          surrogate so Tab cycles through them in scene-graph order and
-          Enter/Space fires the same animation as a click. The 3D outline
-          post-processing for visible focus rings is intentionally NOT
-          added — it costs ~2ms/frame for marginal benefit; this mirror
-          already satisfies screen-reader users, and the focus ring on the
-          DOM button itself is enough for sighted keyboard users. */}
+      {/* Keyboard equivalents call the same object handles as mesh clicks.
+          The focused action becomes visible above the navigation controls. */}
       <div
         role="region"
         aria-label="Interactive desk lobby"
-        className="sr-only"
+        className="lobby-keyboard-actions"
+        inert={view !== "desk" || (state !== "idle" && state !== "exploring")}
       >
         <button type="button" onClick={handleSkip}>
           Skip lobby and enter site
@@ -358,6 +414,13 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           Spin Pegasus beyblade
         </button>
       </div>
+      <WorldControls
+        view={view} loading={state === "loading"} busy={state === "booting" || view === "returning"}
+        lookButton={lookButton}
+        onLook={() => setView("looking")} onReturn={() => setView("returning")}
+        onEnter={handleEnter} onSkip={handleSkip}
+        onTurn={(yaw, pitch) => cameraRigRef.current?.turn(yaw, pitch)}
+      />
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

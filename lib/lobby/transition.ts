@@ -25,6 +25,7 @@ import { Box3, Vector3 } from "three";
 import type { Mesh, MeshStandardMaterial, PerspectiveCamera } from "three";
 
 import { startSoundtrack } from "@/lib/audio-manager";
+import { DESK_TARGET } from "./world-view";
 
 import type { DeskEnvironmentHandle } from "@/components/lobby/desk-environment";
 
@@ -73,7 +74,7 @@ const COMPLETE_AT = 2.6;
 // Used as the START of the lookAt tween so the camera smoothly rotates
 // toward the screen during the FOV pre-pull rather than snapping at the
 // moment the dolly's first onUpdate fires camera.lookAt(worldCentre).
-const RIG_LOOKAT = { x: 0, y: -0.05, z: -0.2 } as const;
+const RIG_LOOKAT = DESK_TARGET;
 
 interface TransitionDeps {
   camera: PerspectiveCamera;

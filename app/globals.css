@@ -154,3 +154,23 @@ html.lenis, html.lenis body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* World navigation owns canvas drags; desk objects still use their normal cursor. */
+[data-world-view="looking"] canvas { cursor: grab !important; touch-action: none; }
+[data-world-view="looking"] canvas[data-dragging="true"] { cursor: grabbing !important; }
+[data-lobby-active="true"] .world-button { cursor: pointer !important; }
+[data-lobby-active="true"] .world-button:disabled { cursor: wait !important; }
+
+/* A keyboard user sees the action currently focused, without a second HUD. */
+.lobby-keyboard-actions { position: absolute; bottom: 5.5rem; left: 1.5rem; z-index: 30; }
+.lobby-keyboard-actions button {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.lobby-keyboard-actions button:focus-visible {
+  position: relative; width: auto; height: auto; min-height: 44px; padding: 12px 18px;
+  clip-path: none; white-space: normal; max-width: calc(100vw - 3rem);
+  border-radius: 8px; background: #132a35; color: #f1f3e7;
+  outline: 2px solid #fff2c7; outline-offset: 4px;
+  font-family: var(--font-jetbrains), monospace; font-size: 12px;
+}
