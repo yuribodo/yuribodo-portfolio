@@ -10,7 +10,8 @@
     "test": "tsx --test 'lib/**/*.test.ts'",
     "analyze": "ANALYZE=true next build --webpack",
     "assets:compress": "tsx scripts/compress-assets.ts",
-    "assets:world": "node scripts/build-lobby-world.mjs"
+    "assets:world": "node scripts/build-lobby-world.mjs",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@gltf-transform/cli": "^4.4.1",
     "@next/bundle-analyzer": "^16.2.6",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
