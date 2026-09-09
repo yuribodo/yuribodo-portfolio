@@ -273,7 +273,7 @@ export function AuthoredNature({ floorY, active }: { floorY: number; active: boo
   });
   const placements = useMemo(() => {
     const batches: Record<string, Placement[]> = {
-      F1_Tree1: [{ position: [-8.5, floorY + terrainHeight(-8.5, -12) - 0.08, -12], scale: 0.7, yaw: 0.8 }],
+      F1_Tree1: [{ position: [-12, floorY + terrainHeight(-12, -12) - 0.08, -12], scale: 0.7, yaw: 0.8 }],
       F1_Tree2: [{ position: [10, floorY + terrainHeight(10, -18) - 0.08, -18], scale: 0.75, yaw: -0.8 }, { position: [-9, floorY + terrainHeight(-9, 12) - 0.08, 12], scale: 0.7, yaw: 2.3 }],
       F1_BushLow: [], F1_BushMid: [], F1_LowGrass: [], F1_Foliage1Patch: [], F1_Flower2Patch: [],
     };

@@ -34,6 +34,7 @@ License links:
 - Midground cliffs: **Rob Tuytel**, [Coastal Cliff 02](https://polyhaven.com/a/coastal_cliff_02), [CC0](https://polyhaven.com/license). Decimated, compressed and recolored in the scene shader while retaining source UVs and surface maps.
 - Terrace paving material: **Amal Kumar**, [Monastery Stone Floor](https://polyhaven.com/a/monastery_stone_floor), [CC0](https://polyhaven.com/license). Diffuse, OpenGL normal, roughness and AO maps resized/compressed; relief and material intensity adjusted for the scene.
 - Legacy blockout rock/grass meshes: **Kenney**, [Nature Kit](https://kenney.nl/assets/nature-kit), CC0. Retained in source/generator; the old terrace GLB is no longer used by the runtime.
+- Chess sculptures: **Riley Queen**, [Chess Set](https://polyhaven.com/a/chess_set), [CC0](https://polyhaven.com/license). Selected knight and pawn retain sculpted geometry, UVs and marble maps; resized and tinted for the monumental island. The geological island reuses the credited Coastal Cliff 02 and FreeStylized trees.
 - Floating citadel, monument court, academy and slime: locally authored geometry referencing Sword Art Online, No Game No Life, Mushoku Tensei and That Time I Got Reincarnated as a Slime. These are not official franchise assets.
 - Sky, front/rear valley, limestone paint, cloud and earlier foliage sprite: generated artwork for this portfolio. Original PNGs, prompts and asset processing are documented in `assets/lobby-world/README.md`. The earlier foliage sprite is retained as a study, not used for the new 3D vegetation.
 

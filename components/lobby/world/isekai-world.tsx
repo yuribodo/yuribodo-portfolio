@@ -5,6 +5,8 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import {
   Color,
+  DoubleSide,
+  PlaneGeometry,
   BackSide,
   DataTexture,
   EquirectangularReflectionMapping,
@@ -168,6 +170,99 @@ function PaintedModel({
   return <primitive object={model} position={position} rotation={rotation} scale={scale} dispose={null} />;
 }
 
+function ArchitecturalModel({ url, position, scale = 1, rotation = [0, 0, 0] }: {
+  url: string; position: [number, number, number]; scale?: number; rotation?: [number, number, number];
+}) {
+  const { scene } = useGLTF(url);
+  const { model, materials } = useMemo(() => {
+    const model = scene.clone(true);
+    const materials = new Map<MeshStandardMaterial, MeshStandardMaterial>();
+    model.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      object.raycast = () => {};
+      object.castShadow = object.receiveShadow = false;
+      const adapt = (source: MeshStandardMaterial) => {
+        if (materials.has(source)) return materials.get(source)!;
+        const material = source.clone();
+        material.envMapIntensity = 0.55;
+        if (source.name === "Chess marble") {
+          material.color.set("#b49bcf"); material.roughness = 0.4; material.metalness = 0.12;
+        }
+        if (source.name === "Tree_Leaves") {
+          material.color.set("#648747"); material.transparent = false; material.depthWrite = true;
+          material.alphaTest = 0.4; material.alphaToCoverage = true; material.side = DoubleSide;
+        }
+        if (source.name === "Island rock") {
+          material.color.set("#b6bab4"); material.normalScale.setScalar(0.55);
+          material.onBeforeCompile = (shader) => {
+            shader.fragmentShader = shader.fragmentShader.replace("#include <map_fragment>", `
+              #ifdef USE_MAP
+                vec3 rock = texture2D(map, vMapUv).rgb;
+                float value = dot(rock, vec3(0.2126, 0.7152, 0.0722));
+                vec3 pigment = mix(vec3(0.18, 0.23, 0.24), vec3(0.53, 0.57, 0.49), smoothstep(0.01, 0.6, value));
+                diffuseColor.rgb *= pigment;
+              #endif
+            `);
+          };
+          material.customProgramCacheKey = () => "geological-island-paint-v1";
+        }
+        materials.set(source, material);
+        return material;
+      };
+      object.material = Array.isArray(object.material) ? object.material.map(adapt) : adapt(object.material as MeshStandardMaterial);
+    });
+    return { model, materials };
+  }, [scene]);
+  useEffect(() => () => { for (const material of materials.values()) material.dispose(); }, [materials]);
+  return <primitive object={model} position={position} scale={scale} rotation={rotation} dispose={null} />;
+}
+
+function Waterfall({ position, width, height, active }: {
+  position: [number, number, number]; width: number; height: number; active: boolean;
+}) {
+  const time = useRef(0);
+  const { geometry, material, updateFlow } = useMemo(() => {
+    const geometry = new PlaneGeometry(width, height, 8, 32);
+    const vertex = geometry.attributes.position;
+    for (let i = 0; i < vertex.count; i++) {
+      const fall = (height / 2 - vertex.getY(i)) / height;
+      vertex.setX(i, vertex.getX(i) * (0.75 + fall * 0.65));
+      vertex.setZ(i, 0.12 * Math.sin(fall * 7) + fall * fall * 0.5);
+    }
+    const flow = { value: 0 };
+    const material = new MeshBasicMaterial({ color: "#b5e3eb", transparent: true, side: DoubleSide, depthWrite: false });
+    material.userData.worldBaseColor = new Color("#b5e3eb");
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.fallTime = flow;
+      shader.vertexShader = "varying vec2 vFallUv;\n" + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n vFallUv = uv;");
+      shader.fragmentShader = "varying vec2 vFallUv; uniform float fallTime;\n" + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `
+        #include <color_fragment>
+        float strand = pow(0.5 + 0.5 * sin(vFallUv.x * 75.0 + sin(vFallUv.y * 9.0 + fallTime * 2.0)), 3.0);
+        float streak = 0.5 + 0.5 * sin(vFallUv.y * 90.0 + fallTime * 10.0 + vFallUv.x * 20.0);
+        float edges = smoothstep(0.0, 0.15, vFallUv.x) * smoothstep(0.0, 0.15, 1.0 - vFallUv.x);
+        diffuseColor.rgb *= 0.7 + strand * 0.3;
+        diffuseColor.a = edges * smoothstep(0.0, 0.12, vFallUv.y) * (0.36 + strand * 0.42 + streak * 0.12);
+      `);
+    };
+    material.customProgramCacheKey = () => "skybound-waterfall-v1";
+    return { geometry, material, updateFlow: (time: number) => { flow.value = time; } };
+  }, [width, height]);
+  useFrame((_, delta) => { if (active) { time.current += Math.min(delta, 0.1); updateFlow(time.current); } });
+  useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
+  return <mesh geometry={geometry} material={material} position={position} raycast={() => {}} />;
+}
+
+function ChessMonuments({ active }: { active: boolean }) {
+  return <group position={[49, -7, -170]} rotation={[0, -0.18, 0]} scale={1.8}>
+    <ArchitecturalModel url={WORLD_ASSETS.chess} position={[0, 0, 0]} />
+    <Waterfall position={[-6.8, -6.2, 5.3]} width={0.9} height={12.5} active={active} />
+    <Waterfall position={[3.5, -4.5, 8.1]} width={0.48} height={9.2} active={active} />
+  </group>;
+}
+
+
 function OptionalModel(props: Parameters<typeof PaintedModel>[0]) {
   return <WorldBoundary><Suspense fallback={null}><PaintedModel {...props} /></Suspense></WorldBoundary>;
 }
@@ -256,10 +351,12 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       <WorldBoundary><Suspense fallback={null}><AuthoredRuins floorY={floorY} /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><AuthoredNature floorY={floorY} active={active} /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><ValleyCliffs floorY={floorY} /></Suspense></WorldBoundary>
-      <OptionalModel url={WORLD_ASSETS.aincrad} position={[-35, -7, -110]} scale={1.15} distant />
-      <OptionalModel url={WORLD_ASSETS.chess} position={[49, -10, -180]} scale={2.5} rotation={[0, -0.12, 0]} distant />
+      <WorldBoundary><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[-43, -7, -125]} scale={1.15} rotation={[0, 0.12, 0]} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><ChessMonuments active={active} /></Suspense></WorldBoundary>
       <OptionalModel url={WORLD_ASSETS.academy} position={[-12, -15, 130]} scale={1.7} rotation={[0, Math.PI, 0]} distant />
-      <OptionalModel url={WORLD_ASSETS.islands} distant />
+      {[[-67, 3, -145, 0.5], [24, 5, -140, 0.38], [-6, 11, -165, 0.24], [65, 12, 90, 0.4], [-60, 7, 120, 0.5]].map(([x, y, z, scale], i) => (
+        <WorldBoundary key={i}><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.islands} position={[x, y, z]} scale={scale} rotation={[0, i * 1.6, 0]} /></Suspense></WorldBoundary>
+      ))}
       <Slime floorY={floorY} active={active} />
       <WorldBoundary><Suspense fallback={null}><CloudWisps active={active} /></Suspense></WorldBoundary>
     </group>
