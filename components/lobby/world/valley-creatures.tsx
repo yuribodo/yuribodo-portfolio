@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useMemo} from 'react';
+import {useEffect,useRef} from 'react';
 import {useGLTF} from '@react-three/drei';
 import {useFrame} from '@react-three/fiber';
 import {AnimationMixer,Box3,Frustum,Matrix4,Sphere,Group,Mesh,MeshStandardMaterial,SkinnedMesh,Vector3,type AnimationClip,type Camera} from 'three';
@@ -38,7 +38,9 @@ export function createValleyDragon(source:Group,clip:AnimationClip,light:Outdoor
 }
 export function ValleyCreatures(){
  const light=useOutdoorLight(),asset=useGLTF('/lobby/world/dragon-flying.glb');
- const life=useMemo(()=>{
+ const container=useRef<Group>(null),life=useRef<{update:(time:number,camera?:Camera)=>void}|null>(null);
+ useEffect(()=>{
+  const parent=container.current;if(!parent)return;
   const clip=asset.animations[0];if(!clip)throw new Error('Dragon flight animation is missing');
   const dragon=createValleyDragon(asset.scene,clip,light,25);dragon.root.name='valley-dragon-rider';
   const frustum=new Frustum(),projection=new Matrix4(),envelope=new Sphere(new Vector3(),27);
@@ -49,8 +51,11 @@ export function ValleyCreatures(){
    if(camera){camera.updateMatrixWorld();frustum.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));envelope.center.copy(dragon.root.position);dragon.root.visible=frustum.intersectsSphere(envelope);}
    if(dragon.root.visible)dragon.animate(time);
   };
-  update(light.time.value);return {group:dragon.root,update,dispose:dragon.dispose};
+  parent.add(dragon.root);life.current={update};update(light.time.value);
+  // Setup owns the mixer as well as its cleanup: React StrictMode's replay
+  // must create a fresh playing action, never reuse an uncached/stopped mixer.
+  return ()=>{life.current=null;parent.remove(dragon.root);dragon.dispose();};
  },[asset,light]);
- useFrame(({camera})=>life.update(light.time.value,camera));useEffect(()=>()=>life.dispose(),[life]);
- return <primitive object={life.group} dispose={null}/>;
+ useFrame(({camera})=>life.current?.update(light.time.value,camera));
+ return <group ref={container} name="dragon-flight-container"/>;
 }
