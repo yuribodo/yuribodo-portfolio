@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-14T03:06:17.725Z",
+  "capturedAt": "2026-09-14T02:49:31.448Z",
   "url": "http://localhost:3002/",
   "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
   "viewport": {
@@ -10,21 +10,21 @@
   "caveat": "Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement, cold-load or a universal FPS guarantee. Other desktop applications may be running.",
   "desk": {
     "samples": 180,
-    "meanFrameMs": 32.6838888888889,
-    "medianFrameMs": 33.30000000000291,
-    "p95FrameMs": 50,
-    "approximateRafFps": 30.596114293484714,
-    "meanDrawCallsPerFrame": 616.5888888888888,
-    "meanSubmittedTrianglesPerFrame": 14492494.8
+    "meanFrameMs": 64.90444444444447,
+    "medianFrameMs": 66.69999999999709,
+    "p95FrameMs": 83.40000000000146,
+    "approximateRafFps": 15.407265381586601,
+    "meanDrawCallsPerFrame": 609.7777777777778,
+    "meanSubmittedTrianglesPerFrame": 13528146
   },
   "rear": {
     "samples": 180,
-    "meanFrameMs": 22.777222222222232,
-    "medianFrameMs": 16.700000000004366,
-    "p95FrameMs": 33.400000000001455,
-    "approximateRafFps": 43.90350984170344,
-    "meanDrawCallsPerFrame": 222.72222222222223,
-    "meanSubmittedTrianglesPerFrame": 7114030.533333333
+    "meanFrameMs": 49.25722222222224,
+    "medianFrameMs": 50,
+    "p95FrameMs": 83.30000000000291,
+    "approximateRafFps": 20.30159141919402,
+    "meanDrawCallsPerFrame": 240.94444444444446,
+    "meanSubmittedTrianglesPerFrame": 6156970.066666666
   },
   "errors": []
 }

@@ -32,7 +32,7 @@ import fs from 'node:fs/promises';
     });
     await page.goto(process.env.WORLD_PROFILE_URL || 'http://localhost:3000', { waitUntil: 'networkidle', timeout: 120000 });
     await page.locator('[data-lobby-state=idle]').waitFor({ timeout: 90000 });
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(20000);
     const renderer = await page.evaluate(() => {
       const gl = document.querySelector('canvas').getContext('webgl2');
       const extension = gl.getExtension('WEBGL_debug_renderer_info');

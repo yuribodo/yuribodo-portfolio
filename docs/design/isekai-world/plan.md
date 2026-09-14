@@ -1,3 +1,5 @@
+> Current implementation update (September 12): the user's subsequent review supersedes this plan's panorama-based background. The runtime now uses a connected 3D valley, authored village assets and procedural volumetric atmosphere. See [the current art/rendering pass](atmosphere-village-polish.md). Historical plan decisions below remain for context.
+
 # Skybound: an anime world around the desk
 
 Date: 2026-09-07
@@ -38,7 +40,15 @@ The Mushoku still inspected during research establishes palette and scenic archi
 
 The additional franchises should not displace the user's four favorites. Re:Zero and KonoSuba are research inputs, not assumed personal favorites.
 
-## Latest art correction
+## Current direction: a continuous valley
+
+The user approved the revised terrace and near environment, then requested that the distant view feel like reachable places in one world. The latest implementation replaces the flat landscape backdrops with connected 3D terrain, river, roads, bridges and settlements; see [continuous valley implementation and evidence](continuous-valley.md). Preserve the now-approved foreground. The camera remains seated; walking gameplay has not been requested or implemented.
+
+## September 12 correction
+
+The user rejected the rendered environment's mixed asset styles and corrected the floor direction again: the previous approval of the rocky paving is superseded. The current pass returns to the approved concept's quiet, pale cut-stone terrace with narrow joints, shared limestone pigment on floor and architecture, a planted perimeter and consistent matte landmark materials. Stone is the working floor assumption; an optional question offering stone, wood or natural ground has not been answered. See [September 12 implementation review](implementation-2026-09-12.md). Visual acceptance is still open.
+
+## Earlier art correction
 
 The user explicitly rejected basic geometry as final art and found the paving too cartoon-like. Near materials should be more grounded: flatter stone, smaller joints, subtle relief and authored silhouettes. Anime direction comes from composition, architecture, palette and atmospheric depth; it does not require exaggerated toy-like surfaces. See [production research and asset intake](../../../assets/lobby-world/research/asset-sources.md). The original targets below are historical where they conflict with this correction.
 
@@ -212,3 +222,22 @@ Sources were browsed on 2026-09-07. Reference interpretations above are design j
 - Exact generation prompts and reference-input record: [prompts.md](prompts.md).
 
 The user endorsed the anime art and reference balance and asked to move the spectacular rear vista into the initial desk view. The latest concept and this plan incorporate that correction. The user subsequently authorized implementation and public-use asset research. Seated look-around, return-before-entry, staged readiness and fallback are now implemented. See [implementation.md](implementation.md) for actual scope, verification and remaining art/performance work; the performance targets above still require real-hardware measurement.
+
+A revisão de iluminação e resposta dos materiais está documentada em [lighting-and-shaders.md](reviews/lighting-and-shaders.md), com [antes/depois e vídeo](reviews/lighting-comparison.html). O trabalho mantém o terreno e a câmera existentes; varia a luz incidente, amplia as sombras próximas e melhora a resposta da vegetação e água.
+
+A passagem seguinte acrescenta [atividade no mundo](reviews/ambient-life.md): rajadas coerentes, sombras de copas animadas, pássaros, borboletas, pás dos moinhos funcionando e fumaça das chaminés. O vídeo mostra o resultado nas vistas da mesa e do vale.
+
+A composição inicial foi revisada em 13 de setembro: apoio baixo dos colecionáveis, abertura das muretas, canteiros laterais, vale mais profundo com quedas conectadas ao rio, distritos na cidadela e ilhas vegetadas. O [comparador da vista principal](reviews/main-vista.html) coloca o resultado ao lado do conceito aprovado; [as notas](reviews/main-vista.md) registram alterações, desempenho e a diferença de detalhe ainda existente.
+
+O usuário rejeitou a mudança da mesa. Ela foi restaurada à versão original, incluindo colecionáveis e pose da câmera; preservá-la passa a ser uma restrição explícita. A [correção de escala e material](reviews/depth-correction.html) amplia o cenário frontal e melhora a superfície rochosa, com [notas técnicas e limites](reviews/depth-correction.md).
+
+### Revisão de fauna e base dos assets
+
+A paisagem aprovada foi povoada com bandos adicionais, cervos em clareiras e dragões em voo. O feedback durante a implementação ampliou o critério de qualidade para a ambientação: seleção de modelos detalhados, materiais e silhuetas devem vir antes da otimização. Os testes iniciais com cervos de cores chapadas foram substituídos por fontes Blender texturizadas; a vegetação principal usa Poly Haven. [Comparativo, fontes e limitações](reviews/living-world.md). A mesa e a pose inicial permanecem restrições explícitas.
+
+
+A fauna real foi substituída por habitantes de fantasia; a composição, o voo e as quedas foram revisados em [Habitantes de fantasia](reviews/fantasy-life.md).
+
+### Current implementation review: mountain shoulders
+
+The living valley now includes the approved fantasy inhabitants, authored dragon flight, riparian planting and landings, plus grouped woodland climbing both mountain shoulders. The current captures are in `implementation/`; before/after comparison and validation for the latest pass are in [the hillside review](reviews/hillsides.md). Earlier review captures are retained as historical iterations.
