@@ -157,7 +157,7 @@ const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig
     camera.lookAt(target);
   });
 
-  return <PerspectiveCamera ref={cameraRef} makeDefault position={base} fov={fov} near={0.05} far={600} />;
+  return <PerspectiveCamera ref={cameraRef} makeDefault position={base} fov={fov} near={0.05} far={3200} />;
 });
 
 export default CameraRig;

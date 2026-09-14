@@ -1,178 +1,51 @@
 "use client";
 
-import { useGLTF, useTexture } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import {RiverLandings} from './river-landings';
+import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import {
   Color,
   DoubleSide,
   PlaneGeometry,
-  BackSide,
-  DataTexture,
-  EquirectangularReflectionMapping,
-  LinearFilter,
   Mesh,
   MeshBasicMaterial,
-  MeshToonMaterial,
-  NearestFilter,
-  RedFormat,
-  RepeatWrapping,
-  SphereGeometry,
-  SRGBColorSpace,
-  TextureLoader,
   type Group,
   type MeshStandardMaterial,
 } from "three";
 import { WORLD_ASSETS } from "@/lib/lobby/world-assets";
 import { WorldBoundary } from "./world-boundary";
-import { AuthoredNature, AuthoredRuins, TerracePaving, TerraceTerrain, ValleyCliffs } from "./art-directed-terrace";
+import { TerraceTerrain, ValleyCliffs } from "./art-directed-terrace";
+
+import { SkyIsland, SkyGarden } from "./sky-islands";
+import { VistaStreams } from "./vista-streams";
+import { CitadelDistricts } from "./citadel-districts";
+import { FlowerColonies } from "./flower-colonies";
+import { DistantCanopies } from "./distant-canopies";
+import { OrganicVegetation } from "./organic-vegetation";
+import { AncientTrees,EnchantedGroves } from "./fantasy-landmarks";
+import { FantasyResidents } from "./fantasy-residents";
+import { ValleyCreatures } from "./valley-creatures";
+import { ValleyWildlife } from "./valley-wildlife";
+import { MeadowLife } from "./meadow-life";
+import { NaturalVegetation } from "./natural-vegetation";
+import { LivingValley } from "./living-valley";
+import { worldHeight } from "@/lib/lobby/world-geography";
+import { OutdoorLighting, applyOutdoorLight, useOutdoorLight } from "./outdoor-lighting";
+import { Atmosphere } from "./atmosphere";
+import { ValleyVillage } from "./valley-village";
+import { TerraceGarden } from "./terrace-garden";
+import { TerraceArchitecture } from "./terrace-architecture";
 
 interface WorldProps {
   floorY: number;
   active: boolean;
 }
 
-function PaintedSky() {
-  const scene = useThree((s) => s.scene);
-  const material = useRef<MeshBasicMaterial>(null);
-  const geometry = useMemo(() => {
-    const geometry = new SphereGeometry(450, 96, 48);
-    // The terrace overlooks the valley from above: raise the painted land
-    // band uniformly at every longitude, keeping both poles continuous.
-    const uv = geometry.attributes.uv;
-    for (let i = 0; i < uv.count; i++) {
-      const v = uv.getY(i);
-      uv.setY(i, v - 0.035 * Math.sin(v * Math.PI));
-    }
-    return geometry;
-  }, []);
-
-  useEffect(() => {
-    let disposed = false;
-    const previousEnvironment = scene.environment;
-    // A failed panorama leaves the base sky color and all 3D scenery usable.
-    const texture = new TextureLoader().load(
-      WORLD_ASSETS.panorama,
-      (loaded) => {
-        if (disposed) return;
-        loaded.colorSpace = SRGBColorSpace;
-        loaded.mapping = EquirectangularReflectionMapping;
-        loaded.minFilter = LinearFilter;
-        loaded.generateMipmaps = false;
-        scene.environment = loaded;
-        if (material.current) {
-          material.current.map = loaded;
-          material.current.color.set("white").multiplyScalar(scene.userData.worldDimmer ?? 1);
-          material.current.userData.worldBaseColor = new Color("white");
-          material.current.needsUpdate = true;
-        }
-      },
-      undefined,
-      () => console.warn("[lobby] Panorama unavailable; using the base sky."),
-    );
-    return () => {
-      disposed = true;
-      if (scene.environment === texture) scene.environment = previousEnvironment;
-      texture.dispose();
-    };
-  }, [scene]);
-
-  useEffect(() => () => geometry.dispose(), [geometry]);
-  return (
-    <mesh geometry={geometry} renderOrder={-10} raycast={() => {}}>
-      <meshBasicMaterial ref={material} side={BackSide} color="#85bed8" fog={false} depthWrite={false} toneMapped={false} />
-    </mesh>
-  );
-}
-
-/** A higher-detail forward painting sits inside the complete sky sphere.
- * Its feathered edges blend into the panorama when turning to the sides. */
-function PaintedLandscape({ rear = false }: { rear?: boolean }) {
-  const texture = useTexture(rear ? WORLD_ASSETS.rearLandscape : WORLD_ASSETS.frontLandscape, (loaded) => {
-    for (const texture of Array.isArray(loaded) ? loaded : [loaded]) texture.colorSpace = SRGBColorSpace;
-  });
-  const scene = useThree((s) => s.scene);
-  const material = useMemo(() => {
-    const material = new MeshBasicMaterial({ map: texture, transparent: true, fog: false, depthWrite: false, toneMapped: false });
-    material.userData.worldBaseColor = new Color("white");
-    material.color.multiplyScalar(scene.userData.worldDimmer ?? 1);
-    material.onBeforeCompile = (shader) => {
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <map_fragment>",
-        "#include <map_fragment>\n diffuseColor.a *= smoothstep(0.0, 0.06, vMapUv.x) * smoothstep(0.0, 0.06, 1.0 - vMapUv.x) * smoothstep(0.0, 0.05, vMapUv.y) * smoothstep(0.0, 0.05, 1.0 - vMapUv.y);",
-      );
-    };
-    material.customProgramCacheKey = () => "world-feathered-matte-v1";
-    return material;
-  }, [texture, scene]);
-  useEffect(() => () => material.dispose(), [material]);
-  return (
-    <mesh position={[0, -20, rear ? 250 : -250]} rotation={[0, rear ? Math.PI : 0, 0]} material={material} renderOrder={-5} raycast={() => {}}>
-      <planeGeometry args={[540, 304]} />
-    </mesh>
-  );
-}
-
-function PaintedModel({
-  url,
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  scale = 1,
-  distant = false,
-}: {
-  url: string;
-  position?: [number, number, number];
-  rotation?: [number, number, number];
-  scale?: number;
-  distant?: boolean;
-}) {
-  const { scene } = useGLTF(url);
-  const { model, material, ramp } = useMemo(() => {
-    const ramp = new DataTexture(new Uint8Array([115, 185, 255]), 3, 1, RedFormat);
-    ramp.minFilter = NearestFilter;
-    ramp.magFilter = NearestFilter;
-    ramp.needsUpdate = true;
-    const material = new MeshToonMaterial({
-      vertexColors: true,
-      gradientMap: ramp,
-      // Small painted fill keeps shadow bands colored, never black.
-      emissive: new Color(distant ? "#34475a" : "#252d22"),
-      emissiveIntensity: distant ? 0.24 : 0.12,
-    });
-    material.userData.worldEmissive = material.emissiveIntensity;
-    const model = scene.clone(true);
-    model.traverse((object) => {
-      if (!(object instanceof Mesh)) return;
-      object.material = material;
-      object.castShadow = !distant;
-      object.receiveShadow = !distant;
-      object.raycast = () => {}; // Decorative scenery never intercepts the desk.
-    });
-    return { model, material, ramp };
-  }, [scene, distant]);
-
-  useEffect(() => () => { material.dispose(); ramp.dispose(); }, [material, ramp]);
-
-  useEffect(() => {
-    if (distant) return;
-    let disposed = false;
-    const texture = new TextureLoader().load("/lobby/world/limestone.webp", (loaded) => {
-      if (disposed) return;
-      loaded.colorSpace = SRGBColorSpace;
-      loaded.wrapS = loaded.wrapT = RepeatWrapping;
-      loaded.repeat.set(0.7, 0.7);
-      material.map = loaded;
-      material.needsUpdate = true;
-    }, undefined, () => {});
-    return () => { disposed = true; texture.dispose(); };
-  }, [material, distant]);
-
-  return <primitive object={model} position={position} rotation={rotation} scale={scale} dispose={null} />;
-}
-
 function ArchitecturalModel({ url, position, scale = 1, rotation = [0, 0, 0] }: {
   url: string; position: [number, number, number]; scale?: number; rotation?: [number, number, number];
 }) {
+  const light = useOutdoorLight();
   const { scene } = useGLTF(url);
   const { model, materials } = useMemo(() => {
     const model = scene.clone(true);
@@ -180,39 +53,52 @@ function ArchitecturalModel({ url, position, scale = 1, rotation = [0, 0, 0] }: 
     model.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.raycast = () => {};
+      if(url===WORLD_ASSETS.chess&&/Eroded.island.shell|Island.crown|Island.tree/.test(object.name))object.visible=false;
       object.castShadow = object.receiveShadow = false;
       const adapt = (source: MeshStandardMaterial) => {
         if (materials.has(source)) return materials.get(source)!;
         const material = source.clone();
-        material.envMapIntensity = 0.55;
+        material.envMapIntensity = 0.12;
+        material.metalness = 0;
+        material.roughness = 1;
+        // All distant architecture shares matte pigments and colored recesses.
+        const palette: Record<string, string> = {
+          "Citadel limestone": "#c1c5b1", "Cut silver edges": "#a1b3ae",
+          "Blue patinated metal": "#648797", "Gallery shadows": "#455f6b",
+          "Aged brass details": "#a9ada0", "Window glass": "#658894",
+          "Terrace gardens": "#668b49",
+        };
+        if (palette[source.name]) material.color.set(palette[source.name]);
         if (source.name === "Chess marble") {
-          material.color.set("#b49bcf"); material.roughness = 0.4; material.metalness = 0.12;
+          material.color.set("#9385b5"); material.roughness = 1; material.metalness = 0;
+          material.roughnessMap = null; material.metalnessMap = null;
         }
         if (source.name === "Tree_Leaves") {
           material.color.set("#648747"); material.transparent = false; material.depthWrite = true;
           material.alphaTest = 0.4; material.alphaToCoverage = true; material.side = DoubleSide;
         }
         if (source.name === "Island rock") {
-          material.color.set("#b6bab4"); material.normalScale.setScalar(0.55);
+          material.color.set("#b7c4c4"); material.normalScale.setScalar(0.12);
           material.onBeforeCompile = (shader) => {
             shader.fragmentShader = shader.fragmentShader.replace("#include <map_fragment>", `
               #ifdef USE_MAP
                 vec3 rock = texture2D(map, vMapUv).rgb;
                 float value = dot(rock, vec3(0.2126, 0.7152, 0.0722));
-                vec3 pigment = mix(vec3(0.18, 0.23, 0.24), vec3(0.53, 0.57, 0.49), smoothstep(0.01, 0.6, value));
+                vec3 pigment = mix(vec3(0.34, 0.41, 0.45), vec3(0.58, 0.63, 0.60), smoothstep(0.01, 0.6, value));
                 diffuseColor.rgb *= pigment;
               #endif
             `);
           };
           material.customProgramCacheKey = () => "geological-island-paint-v1";
         }
+        applyOutdoorLight(material, light);
         materials.set(source, material);
         return material;
       };
       object.material = Array.isArray(object.material) ? object.material.map(adapt) : adapt(object.material as MeshStandardMaterial);
     });
     return { model, materials };
-  }, [scene]);
+  }, [scene, light, url]);
   useEffect(() => () => { for (const material of materials.values()) material.dispose(); }, [materials]);
   return <primitive object={model} position={position} scale={scale} rotation={rotation} dispose={null} />;
 }
@@ -254,18 +140,13 @@ function Waterfall({ position, width, height, active }: {
   return <mesh geometry={geometry} material={material} position={position} raycast={() => {}} />;
 }
 
-function ChessMonuments({ active }: { active: boolean }) {
-  return <group position={[49, -7, -170]} rotation={[0, -0.18, 0]} scale={1.8}>
+function ChessMonuments() {
+  return <group position={[270, worldHeight(90,-320)-1.2, -960]} rotation={[0, -0.67, 0]} scale={7.5}>
     <ArchitecturalModel url={WORLD_ASSETS.chess} position={[0, 0, 0]} />
-    <Waterfall position={[-6.8, -6.2, 5.3]} width={0.9} height={12.5} active={active} />
-    <Waterfall position={[3.5, -4.5, 8.1]} width={0.48} height={9.2} active={active} />
+
   </group>;
 }
 
-
-function OptionalModel(props: Parameters<typeof PaintedModel>[0]) {
-  return <WorldBoundary><Suspense fallback={null}><PaintedModel {...props} /></Suspense></WorldBoundary>;
-}
 
 function Slime({ floorY, active }: WorldProps) {
   const ref = useRef<Group>(null);
@@ -275,11 +156,11 @@ function Slime({ floorY, active }: WorldProps) {
     ref.current.scale.set(1 - breathe * 0.4, 1 + breathe, 1 - breathe * 0.4);
   });
   return (
-    <group position={[2.5, floorY + 0.17, -2.3]} rotation={[0, -0.35, 0]} scale={0.88}>
+    <group position={[3.0, floorY + 0.17, -3.5]} rotation={[0, -0.35, 0]} scale={0.88}>
       <group ref={ref}>
         <mesh castShadow scale={[0.34, 0.24, 0.3]}>
           <sphereGeometry args={[1, 48, 32]} />
-          <meshPhysicalMaterial color="#61c4ed" roughness={0.28} clearcoat={1} clearcoatRoughness={0.18} />
+          <meshStandardMaterial color="#68c7dc" roughness={0.72} envMapIntensity={0.15} />
         </mesh>
         {[-1, 1].map((side) => (
           <mesh key={side} position={[side * 0.115, 0.015, 0.274]} rotation={[0, 0, Math.PI / 2 + side * -0.18]}>
@@ -296,34 +177,13 @@ function Slime({ floorY, active }: WorldProps) {
   );
 }
 
-function CloudWisps({ active }: { active: boolean }) {
-  const ref = useRef<Group>(null);
-  const texture = useTexture("/lobby/world/cloud.webp", (loaded) => {
-    for (const texture of Array.isArray(loaded) ? loaded : [loaded]) texture.colorSpace = SRGBColorSpace;
-  });
-  useFrame(({ clock }) => {
-    if (ref.current && active) ref.current.position.x = Math.sin(clock.elapsedTime * 0.035) * 2;
-  });
-  return (
-    <group ref={ref}>
-      {[
-        [-33, -9, -95, 26], [-47, -10, -110, 18], [43, -5, -132, 28], [9, 5, -154, 19],
-      ].map(([x, y, z, size], i) => (
-        <mesh key={i} position={[x, y, z]} scale={[size, size / 3, 1]}>
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={texture} transparent opacity={0.75} depthWrite={false} toneMapped={false} userData={{ worldBaseColor: new Color("white") }} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 /** Used by the shared transition dimmer, including non-light-driven paint. */
 export function dimWorldMaterials(group: Group, ratio: number) {
   group.traverse((object) => {
     if (!(object instanceof Mesh)) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
+      material.userData.setWorldDimmer?.(ratio);
       const painted = material as MeshStandardMaterial;
       if (typeof material.userData.worldEmissive === "number") {
         painted.emissiveIntensity = material.userData.worldEmissive * ratio;
@@ -337,28 +197,40 @@ export function dimWorldMaterials(group: Group, ratio: number) {
 
 export default function IsekaiWorld({ floorY, active }: WorldProps) {
   return (
-    <group name="isekai-world">
-      <PaintedSky />
-      <WorldBoundary><Suspense fallback={null}><PaintedLandscape /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PaintedLandscape rear /></Suspense></WorldBoundary>
+    <OutdoorLighting active={active}><group name="isekai-world">
+      <Atmosphere active={active} />
+      <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><ValleyCreatures /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><AncientTrees floorY={floorY}/></Suspense></WorldBoundary>
+      <WorldBoundary><EnchantedGroves floorY={floorY}/></WorldBoundary>
+      <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
+      <WorldBoundary><VistaStreams floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><RiverLandings floorY={floorY}/></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><ValleyVillage floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><LivingValley floorY={floorY} active={active} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><NaturalVegetation floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><OrganicVegetation floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><DistantCanopies floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><FlowerColonies floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><MeadowLife floorY={floorY} /></WorldBoundary>
       {/* Always-available ground makes missing optional assets graceful. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY - 0.2, 0.5]} receiveShadow>
         <planeGeometry args={[6, 6]} />
         <meshToonMaterial color="#849265" />
       </mesh>
       <WorldBoundary><Suspense fallback={null}><TerraceTerrain floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><TerracePaving floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><AuthoredRuins floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><AuthoredNature floorY={floorY} active={active} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><TerraceArchitecture floorY={floorY} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><TerraceGarden floorY={floorY} /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><ValleyCliffs floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[-43, -7, -125]} scale={1.15} rotation={[0, 0.12, 0]} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ChessMonuments active={active} /></Suspense></WorldBoundary>
-      <OptionalModel url={WORLD_ASSETS.academy} position={[-12, -15, 130]} scale={1.7} rotation={[0, Math.PI, 0]} distant />
-      {[[-67, 3, -145, 0.5], [24, 5, -140, 0.38], [-6, 11, -165, 0.24], [65, 12, 90, 0.4], [-60, 7, 120, 0.5]].map(([x, y, z, scale], i) => (
-        <WorldBoundary key={i}><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.islands} position={[x, y, z]} scale={scale} rotation={[0, i * 1.6, 0]} /></Suspense></WorldBoundary>
-      ))}
+      <WorldBoundary><Suspense fallback={null}><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><ChessMonuments /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.academy} position={[-12, floorY + worldHeight(-12, 160), 160]} scale={1.45} rotation={[0, Math.PI + 0.3, 0]} /></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}>
+        <group position={[150,55,-850]} scale={1.7} rotation={[0,-.5,0]}><SkyIsland /><SkyGarden /></group>
+        <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
+        <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
+      </Suspense></WorldBoundary>
       <Slime floorY={floorY} active={active} />
-      <WorldBoundary><Suspense fallback={null}><CloudWisps active={active} /></Suspense></WorldBoundary>
-    </group>
+    </group></OutdoorLighting>
   );
 }

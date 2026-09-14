@@ -3,16 +3,17 @@
 import { useThree } from "@react-three/fiber";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { Color, type DirectionalLight, type HemisphereLight, type PointLight, type Group } from "three";
+import { SUN_POSITION } from "./world/outdoor-lighting";
 import { dimWorldMaterials } from "./world/isekai-world";
 
 export interface DeskEnvironmentHandle {
   setLightingDimmer: (ratio: number) => void;
 }
 
-const SUN = 2.5;
-const SKY_FILL = 1.1;
-const DESK_FILL = 0.7;
-const FOG_COLOR = new Color("#a5cbd4");
+const SUN = 3.6;
+const SKY_FILL = 0.55;
+const DESK_FILL = 0.18;
+const FOG_COLOR = new Color("#afcadf");
 
 const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(function DeskEnvironment(_, ref) {
   const scene = useThree((s) => s.scene);
@@ -40,15 +41,15 @@ const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(function DeskEnvironme
   return (
     <>
       <color attach="background" args={["#85bed8"]} />
-      <fog attach="fog" args={["#a5cbd4", 75, 340]} />
+      <fog attach="fog" args={["#afcadf", 100, 2200]} />
       <hemisphereLight ref={sky} args={["#c0e3ef", "#9a8c67", SKY_FILL]} />
       <directionalLight
-        ref={sun} position={[5, 9, 3]} color="#ffe7bf" intensity={SUN} castShadow
-        shadow-mapSize={[1024, 1024]} shadow-camera-near={0.5} shadow-camera-far={25}
-        shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6}
-        shadow-normalBias={0.035} shadow-bias={-0.0002}
+        ref={sun} position={SUN_POSITION} color="#ffe4b5" intensity={SUN} castShadow
+        shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={160}
+        shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20}
+        shadow-normalBias={0.015} shadow-bias={-0.0002}
       />
-      <directionalLight ref={fill} position={[-2, 3, 4]} color="#b5d6eb" intensity={DESK_FILL} />
+      <directionalLight ref={fill} position={[4, 3, -6]} color="#b5d6eb" intensity={DESK_FILL} />
       <pointLight ref={lamp} position={[1.8, 1.5, 0.5]} color="#ffcb97" intensity={4.5} distance={6} decay={2} />
     </>
   );

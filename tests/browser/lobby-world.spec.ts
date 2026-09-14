@@ -24,6 +24,7 @@ async function openDesk(page: Page) {
 test("look around with keyboard and drag, return focus, and enter from the rear", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   await openDesk(page);
   const lobby = page.locator("[data-lobby-active]");
   await page.getByRole("button", { name: "Look around", exact: true }).click();
@@ -102,8 +103,9 @@ test("readiness follows desk assets, while skip remains usable", async ({ page }
 });
 
 test("missing authored world assets do not block desk entry", async ({ page }) => {
-  await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|geological-island|ruins-kit|nature-kit|coastal-cliff)\.glb/, (route) => route.abort());
-  await page.route("**/lobby/world/paving-*.webp", (route) => route.abort());
+  await page.route(/\/lobby\/world\/canopy-[^/]+\.webp/, route => route.abort());
+  await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|academy-sanctuary|geological-island|ruins-kit|nature-kit|valley-nature|valley-village|organic-[a-z0-9_]+|dragon-flying|wildlife-(?:deer|stag|dragon)|living-mill|natural-vegetation|meadow-flowers|coastal-cliff)\.glb/, (route) => route.abort());
+  await page.route(/\/lobby\/world\/(limestone|foliage|earth-[a-z]+|soil-[a-z]+|meadow-[a-z]+|rock-face-(?:color|detail|normal)|paving-[a-z]+)\.webp/, (route) => route.abort());
   await openDesk(page);
   await page.getByRole("button", { name: "Enter portfolio", exact: true }).click();
   await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
@@ -138,4 +140,18 @@ test("mobile uses the existing portfolio without the 3D bundle", async ({ browse
   await page.addStyleTag({ content: "nextjs-portal { display: none; }" });
   await page.screenshot({ path: test.info().outputPath("mobile.png") });
   await context.close();
+});
+
+// The landscape must survive without either former flat valley painting.
+test("the procedural world does not load flat landscape or sky backdrops", async ({ page }) => {
+  const flatLandscapes: string[] = [];
+  page.on("request", request => {
+    if (/\/(front-landscape|rear-landscape|skybound-panorama|sky-only-panorama|cloud)\.webp/.test(request.url())) flatLandscapes.push(request.url());
+  });
+  await openDesk(page);
+  await page.getByRole("button", { name: "Look around", exact: true }).click();
+  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "Look right", exact: true }).click();
+  await page.getByRole("button", { name: "Back to desk", exact: true }).click();
+  await expect(page.locator("[data-world-view]")).toHaveAttribute("data-world-view", "desk");
+  expect(flatLandscapes).toEqual([]);
 });
