@@ -1,3 +1,4 @@
+import {hillsidePlants} from "./hillside-habitats";
 import {riverbankPlants} from "./riverbank-habitats";
 import {HAMLETS,ANCIENT_TREES} from "./fantasy-landmarks";
 import { FANTASY_RESIDENTS } from "./wildlife-habitats";
@@ -143,6 +144,9 @@ function buildPlantCommunities(floorY:number) {
   // Keep actual bridge approaches, landings and waterfall channels open.
   for(const {kind,...plant}of riverbankPlants(floorY)){
     const key=`${kind}:plain:riverbank`;(regions[key]??=[]).push(plant);
+  }
+  for(const {kind,...plant}of hillsidePlants(floorY)){
+    const key=`${kind}:plain:hillsides`;(regions[key]??=[]).push(plant);
   }
   return regions;
 }
