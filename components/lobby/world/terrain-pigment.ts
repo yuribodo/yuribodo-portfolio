@@ -1,3 +1,4 @@
+import {trailMask,TRAIL_MAP_SIZE,TRAIL_MAP_EXTENT,TRAIL_MAP_X,TRAIL_MAP_Z} from '@/lib/lobby/valley-trails';
 import {vistaSpread} from "@/lib/lobby/world-distance";
 import { RIVER_LEVEL_GLSL } from "@/lib/lobby/world-geography";
 import { plantCommunities } from "@/lib/lobby/plant-communities";
@@ -31,10 +32,11 @@ export function groundMaterial(textures:Texture[]){
   }
   map.colorSpace=grassMap.colorSpace=rockMap.colorSpace=SRGBColorSpace;
   const canopy=canopyOcclusion();
+  const trails=new DataTexture(trailMask(),TRAIL_MAP_SIZE,TRAIL_MAP_SIZE,RGBAFormat);trails.minFilter=trails.magFilter=LinearFilter;trails.needsUpdate=true;
   const material=new MeshStandardMaterial({map,normalMap,normalScale:new Vector2(.8,.8),roughness:1,envMapIntensity:.15});
-  material.userData.disposeGroundTextures=()=>{canopy.dispose();for(const t of [map,normalMap,grassMap,grassNormal,rockMap,rockNormal])t.dispose();};
+  material.userData.disposeGroundTextures=()=>{canopy.dispose();trails.dispose();for(const t of [map,normalMap,grassMap,grassNormal,rockMap,rockNormal])t.dispose();};
   material.onBeforeCompile=shader=>{
-    shader.uniforms.canopyMap={value:canopy};
+    shader.uniforms.canopyMap={value:canopy};shader.uniforms.trailMap={value:trails};
     shader.uniforms.rockMap={value:rockMap};shader.uniforms.rockNormal={value:rockNormal};shader.uniforms.meadowMap={value:grassMap};shader.uniforms.meadowNormal={value:grassNormal};
     shader.vertexShader='attribute vec3 landDomain;attribute vec3 landDomainNormal;varying vec3 vGeologyNormal;varying vec3 vSurfacePosition;varying vec3 vLandPosition;varying vec3 vLandNormal;varying float vLandHeight;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`
@@ -43,7 +45,7 @@ export function groundMaterial(textures:Texture[]){
       vLandPosition=(modelMatrix*vec4(landDomain,1.0)).xyz;
       vLandNormal=normalize(mat3(modelMatrix)*objectNormal);
     `);
-    shader.fragmentShader=`varying vec3 vGeologyNormal;uniform sampler2D rockNormal;varying vec3 vSurfacePosition;varying vec3 vLandPosition;varying vec3 vLandNormal;varying float vLandHeight;uniform sampler2D canopyMap;uniform sampler2D rockMap;uniform sampler2D meadowMap;uniform sampler2D meadowNormal;
+    shader.fragmentShader=`varying vec3 vGeologyNormal;uniform sampler2D rockNormal;varying vec3 vSurfacePosition;varying vec3 vLandPosition;varying vec3 vLandNormal;varying float vLandHeight;uniform sampler2D trailMap;uniform sampler2D canopyMap;uniform sampler2D rockMap;uniform sampler2D meadowMap;uniform sampler2D meadowNormal;
       float groundHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float groundNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
       return mix(mix(groundHash(i),groundHash(i+vec2(1,0)),f.x),mix(groundHash(i+vec2(0,1)),groundHash(i+vec2(1,1)),f.x),f.y);}
@@ -71,7 +73,9 @@ export function groundMaterial(textures:Texture[]){
       float pathCover=smoothstep(verge-.3,verge+.5,route+(detail-.5)*.28);
       // Broken grass in the centre of the trail, compacted wheel/foot tracks.
       float median=(1.0-smoothstep(.15,.48,route))*smoothstep(.32,.7,soilPatch)*.52;
-      float plantCover=max(pathCover,median);
+      vec2 trailUv=(p.xz-vec2(${TRAIL_MAP_X.toFixed(1)},${TRAIL_MAP_Z.toFixed(1)}))/${TRAIL_MAP_EXTENT.toFixed(1)};
+      float trail=texture2D(trailMap,trailUv).r;
+      float plantCover=max(pathCover,median)*(1.0-trail*.97);
       plantCover*=.88+.12*smoothstep(.23,.52,soilPatch+broad*.28);
       plantCover*=1.0-smoothstep(.12,.36,slope+detail*.07);
       float wetBank=1.0-smoothstep(.5,3.7,vLandHeight-${RIVER_LEVEL_GLSL});
@@ -146,5 +150,5 @@ export function groundMaterial(textures:Texture[]){
       #endif
     `);
   };
-  material.customProgramCacheKey=()=> 'geological-ground-v9';return material;
+  material.customProgramCacheKey=()=> 'geological-ground-v10-trails';return material;
 }

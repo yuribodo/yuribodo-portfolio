@@ -1,3 +1,4 @@
+import {trailEdgeDistance} from './valley-trails';
 import {hillsidePlants} from "./hillside-habitats";
 import {riverbankPlants} from "./riverbank-habitats";
 import {HAMLETS,ANCIENT_TREES} from "./fantasy-landmarks";
@@ -140,6 +141,12 @@ function buildPlantCommunities(floorY:number) {
     (regions[key]??=[]).push({position:[x,floorY+worldHeight(x,z)-scale*.28,z],scale,yaw:random()*Math.PI*2});
     add('bush',x+2/spread,z-1/spread,.9+random()*.7);
   }
+  // A small orchard frames the slime clearing rather than leaving a vacant
+  // lawn between the village and the new footpath. Crowns stay below the roofs.
+  for(const [i,[x,z]]of [[-75,-92],[-79,-90],[-83,-94],[-74,-87],[-68,-91],[-86,-98]].entries()){
+    add('tree-c',x,z,1.3+(i%3)*.18,.5*i);
+    for(let j=0;j<5;j++)add('bush',x+Math.cos(j*1.3)*1.7,z+Math.sin(j*1.3)*1.3,1.1+(j%2)*.4);
+  }
   // Riparian growth is independent of the town's broad tree exclusion zone.
   // Keep actual bridge approaches, landings and waterfall channels open.
   for(const {kind,...plant}of riverbankPlants(floorY)){
@@ -147,6 +154,10 @@ function buildPlantCommunities(floorY:number) {
   }
   for(const {kind,...plant}of hillsidePlants(floorY)){
     const key=`${kind}:plain:hillsides`;(regions[key]??=[]).push(plant);
+  }
+  for(const [key,plants]of Object.entries(regions)){
+    if(key.includes('forecourt'))continue;
+    regions[key]=plants.filter(p=>p.position[2]>-85||trailEdgeDistance(p.position[0],p.position[2])>(key.startsWith('tree')||key.startsWith('pine')?1.2:.3));
   }
   return regions;
 }

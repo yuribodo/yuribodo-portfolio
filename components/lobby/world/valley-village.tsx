@@ -59,6 +59,8 @@ function settlementPlacements(floorY: number) {
     add('house-b',x,z,1.0,side*Math.PI/2);
     add('market',x+side*1.2,z+4,.8,side*Math.PI/2);
   }
+  add('market',-77,-97,1.15,.5);
+  add('well',-71,-95,1.1);
   const squareZ=-144, squareX=roadCenter(squareZ);
   add('well',squareX-3,squareZ);
   for(let i=0;i<4;i++)add('market',squareX-5-i%2*4,squareZ-4+Math.floor(i/2)*5,1,Math.PI/2);
