@@ -62,12 +62,8 @@ import fs from 'node:fs/promises';
       }));
     }
     const desk = await sample();
-    await page.getByRole('button', { name: 'Look around', exact: true }).click();
-    for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Look right', exact: true }).click();
-    await page.waitForTimeout(1500);
-    const rear = await sample();
     const result = { capturedAt: new Date().toISOString(), url: page.url(), renderer, viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1,
-      caveat: 'Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement, cold-load or a universal FPS guarantee. Other desktop applications may be running.', desk, rear, errors };
+      caveat: 'Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement, cold-load or a universal FPS guarantee. Other desktop applications may be running.', desk, errors };
     await fs.writeFile('docs/design/isekai-world/implementation/frame-profile.json', JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
     if (errors.length) process.exitCode = 1;

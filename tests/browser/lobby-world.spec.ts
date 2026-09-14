@@ -18,51 +18,22 @@ async function openDesk(page: Page) {
   await allowSoftwareRenderer(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.locator("[data-lobby-state]" )).toHaveAttribute("data-lobby-state", "idle");
-  await expect(page.getByRole("button", { name: "Look around", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Enter portfolio", exact: true })).toBeEnabled();
 }
 
-test("look around with keyboard and drag, return focus, and enter from the rear", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  await openDesk(page);
-  const lobby = page.locator("[data-lobby-active]");
-  await page.getByRole("button", { name: "Look around", exact: true }).click();
-  await expect(lobby).toHaveAttribute("data-world-view", "looking");
-  for (let i = 0; i < 9; i++) await page.keyboard.press("ArrowRight");
-  await page.screenshot({ path: test.info().outputPath("rear-view.png") });
-  await page.keyboard.press("Escape");
-  await expect(lobby).toHaveAttribute("data-world-view", "desk");
-  await expect(page.getByRole("button", { name: "Look around", exact: true })).toBeFocused();
-  await page.getByRole("button", { name: "Look around", exact: true }).click();
-  await page.mouse.move(850, 280);
-  await page.mouse.down();
-  await page.mouse.move(350, 400, { steps: 3 });
-  await page.mouse.up();
-  await expect(lobby).toHaveAttribute("data-world-view", "looking");
-  // Observe the short return phase in-page. A slow software-rendered frame
-  // can complete it before Playwright's next cross-process locator poll.
-  await page.evaluate(() => {
-    const element = document.querySelector("[data-lobby-active]")!;
-    const history: { view: string | null; state: string | null; disabled: boolean }[] = [];
-    (window as typeof window & { lobbyEntryHistory: typeof history }).lobbyEntryHistory = history;
-    const observer = new MutationObserver(() => {
-      history.push({ view: element.getAttribute("data-world-view"), state: element.getAttribute("data-lobby-state"),
-        disabled: !!Array.from(element.querySelectorAll("button")).find((button) => button.textContent?.startsWith("Enter portfolio") && !button.textContent?.includes("main action"))?.disabled });
-    });
-    observer.observe(element, { attributes: true, subtree: true, attributeFilter: ["data-world-view", "data-lobby-state", "disabled"] });
-  });
-  await page.getByRole("button", { name: "Enter portfolio", exact: true }).click();
-  await expect(lobby).toHaveCount(0);
-  const history = await page.evaluate(() => (window as typeof window & {
-    lobbyEntryHistory: { view: string | null; state: string | null; disabled: boolean }[];
-  }).lobbyEntryHistory);
-  const returning = history.findIndex((entry) => entry.view === "returning");
-  const booting = history.findIndex((entry) => entry.state === "booting");
-  expect(returning).toBeGreaterThanOrEqual(0);
-  expect(history[returning].disabled).toBe(true);
-  expect(booting).toBeGreaterThan(returning);
-  expect(errors).toEqual([]);
+test("first release stays at the desk after arrow keys and dragging, then enters directly", async ({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await openDesk(page);
+ await expect(page.getByRole('button',{name:/Look around|Look left|Look right|Back to desk/})).toHaveCount(0);
+ await page.locator('[data-lobby-active]').focus();
+ for(let i=0;i<8;i++)await page.keyboard.press('ArrowRight');
+ await page.mouse.move(850,280);await page.mouse.down();await page.mouse.move(350,280,{steps:8});await page.mouse.up();
+ await expect(page.locator('[data-world-view]')).toHaveAttribute('data-world-view','desk');
+ await page.mouse.move(500,424);
+ await expect(page.locator('[data-lobby-active]')).toHaveAttribute('data-lobby-cursor','pointer');
+ await page.getByRole('button',{name:'Enter portfolio',exact:true}).click();
+ await expect(page.locator('[data-lobby-active]')).toHaveCount(0);
+ expect(errors).toEqual([]);
 });
 
 test("desk objects remain keyboard accessible and the actual monitor still enters", async ({ page }) => {
@@ -96,7 +67,7 @@ test("readiness follows desk assets, while skip remains usable", async ({ page }
   await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "loading");
   await page.waitForTimeout(1200); // Regression: the old 600ms timer revealed an empty scene.
   await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "loading");
-  await expect(page.getByRole("button", { name: "Look around", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Look around", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Skip to portfolio", exact: true }).click();
   await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
   release?.();
@@ -149,9 +120,5 @@ test("the procedural world does not load flat landscape or sky backdrops", async
     if (/\/(front-landscape|rear-landscape|skybound-panorama|sky-only-panorama|cloud)\.webp/.test(request.url())) flatLandscapes.push(request.url());
   });
   await openDesk(page);
-  await page.getByRole("button", { name: "Look around", exact: true }).click();
-  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "Look right", exact: true }).click();
-  await page.getByRole("button", { name: "Back to desk", exact: true }).click();
-  await expect(page.locator("[data-world-view]")).toHaveAttribute("data-world-view", "desk");
   expect(flatLandscapes).toEqual([]);
 });

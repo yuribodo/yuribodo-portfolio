@@ -33,7 +33,6 @@ import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
 import { WorldBoundary } from "./world/world-boundary";
 import { DeskInteraction, SceneReady } from "./world/scene-ready";
-import { requestWorldEntry, type WorldView } from "@/lib/lobby/world-view";
 
 interface DeskSceneProps {
   state: LobbyState;
@@ -61,11 +60,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
   const hasEnteredRef = useRef(false);
   const [diveProgress, setDiveProgress] = useState(0);
-  const [view, setView] = useState<WorldView>("desk");
   const [floorY, setFloorY] = useState(-1.5);
-  const pendingEntry = useRef(false);
-  const restoreLookFocus = useRef(false);
-  const lookButton = useRef<HTMLButtonElement>(null);
   const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
   const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
   // Live monitor paint is deferred until after the entrance fade so the
@@ -102,7 +97,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
-  useFirstPointermoveSweep({ enabled: view === "desk" && (state === "idle" || state === "exploring") });
+  useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
 
   // Ambient bed (issue #15) — boots on the user's first gesture so browser
   // autoplay policy doesn't block the AudioContext. Listens for any input
@@ -235,58 +230,28 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
 
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
-    if (pendingEntry.current) return;
-    if (requestWorldEntry(view) === "return-first") {
-      pendingEntry.current = true;
-      setView("returning");
-      return;
-    }
     playCue("monitor-power");
     monitorRef.current?.flashComplete();
     dispatch({ type: "ENTER_CLICKED" });
   };
-
-  const handleReturned = () => {
-    setView("desk");
-    if (pendingEntry.current) {
-      pendingEntry.current = false;
-      playCue("monitor-power");
-      monitorRef.current?.flashComplete();
-      dispatch({ type: "ENTER_CLICKED" });
-    } else {
-      restoreLookFocus.current = true;
-    }
-  };
-
-  useEffect(() => {
-    if (view === "desk" && restoreLookFocus.current) {
-      restoreLookFocus.current = false;
-      lookButton.current?.focus({ preventScroll: true });
-    }
-  }, [view]);
 
   const handleSkip = () => {
     if (state === "done") return;
     dispatch({ type: "SKIP" });
   };
 
-  // Escape returns from looking around; at the desk it skips the lobby.
-  // Once entry starts, the return and monitor dive run to completion.
+  // Escape skips the lobby; the monitor dive runs to completion once started.
   useEffect(() => {
     if (state === "booting" || state === "done") return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.preventDefault();
-        if (view !== "desk") {
-          if (!pendingEntry.current) setView("returning");
-          return;
-        }
         dispatch({ type: "SKIP" });
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state, view, dispatch]);
+  }, [state, dispatch]);
 
   return (
     <div
@@ -294,7 +259,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       role="application"
       aria-label="Interactive desk lobby"
       data-lobby-active="true"
-      data-world-view={view}
+      data-world-view="desk"
       data-lobby-state={state}
       onKeyDown={(event) => {
         if (event.key !== "Tab") return;
@@ -313,8 +278,8 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       className="fixed inset-0 z-[60] bg-background"
     >
       <Canvas dpr={[1, 1.5]} shadows="soft" scene={{ environmentIntensity: 0.35 }}>
-        <CameraRig ref={cameraRigRef} state={state} view={view} onReturned={handleReturned} />
-        <DeskInteraction enabled={view === "desk" && state !== "loading" && state !== "booting"} />
+        <CameraRig ref={cameraRigRef} state={state} />
+        <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
         <DeskEnvironment ref={environmentRef} />
         <IsekaiWorld floorY={floorY} active={state !== "booting" && state !== "loading"} />
         <WorldBoundary onError={skipScene}>
@@ -369,7 +334,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         role="region"
         aria-label="Interactive desk lobby"
         className="lobby-keyboard-actions"
-        inert={view !== "desk" || (state !== "idle" && state !== "exploring")}
+        inert={state !== "idle" && state !== "exploring"}
       >
         <button type="button" onClick={handleSkip}>
           Skip lobby and enter site
@@ -414,13 +379,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           Spin Pegasus beyblade
         </button>
       </div>
-      <WorldControls
-        view={view} loading={state === "loading"} busy={state === "booting" || view === "returning"}
-        lookButton={lookButton}
-        onLook={() => setView("looking")} onReturn={() => setView("returning")}
-        onEnter={handleEnter} onSkip={handleSkip}
-        onTurn={(yaw, pitch) => cameraRigRef.current?.turn(yaw, pitch)}
-      />
+      <WorldControls loading={state === "loading"} busy={state === "booting"} onEnter={handleEnter} onSkip={handleSkip}/>
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

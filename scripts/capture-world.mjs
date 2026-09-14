@@ -20,11 +20,6 @@ try {
     await page.waitForTimeout(1200);
     await page.screenshot({ path: dir + name + '.png' });
   }
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.getByRole('button', { name: 'Look around', exact: true }).click();
-  for (let i=0;i<4;i++) await page.getByRole('button', { name: 'Look right', exact: true }).click();
-  await page.waitForTimeout(1500);
-  await page.screenshot({ path: dir + 'rear.png' });
   console.log(JSON.stringify({ errors }));
   if (errors.length) process.exitCode = 1;
 } finally { await browser.close(); }
