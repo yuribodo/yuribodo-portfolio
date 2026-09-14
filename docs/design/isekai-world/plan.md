@@ -241,3 +241,7 @@ A fauna real foi substituída por habitantes de fantasia; a composição, o voo 
 ### Current implementation review: mountain shoulders
 
 The living valley now includes the approved fantasy inhabitants, authored dragon flight, riparian planting and landings, plus grouped woodland climbing both mountain shoulders. The current captures are in `implementation/`; before/after comparison and validation for the latest pass are in [the hillside review](reviews/hillsides.md). Earlier review captures are retained as historical iterations.
+
+### First-release scope: seated forward view
+
+The initial release presents only the forward-facing desk view. Look-around controls and orbit/return behavior have been removed; desk interactions and monitor entry remain. Additional village lanes and the left slime clearing are covered by [the forward-release review](reviews/front-release.md), including the corrected dragon-animation lifecycle. Older exploration descriptions and rear captures document earlier iterations, not the current release behavior.
