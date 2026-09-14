@@ -1,0 +1,54 @@
+{
+  "tree-a": {
+    "model": "QVOop92WmG",
+    "url": "https://static.poly.pizza/2c5938cb-4005-4958-829b-e191be39b3b9.glb"
+  },
+  "tree-b": {
+    "model": "YWjGDJ9F7g",
+    "url": "https://static.poly.pizza/856b5db4-21c1-406b-a800-d96843d1ec69.glb"
+  },
+  "tree-c": {
+    "model": "aVOxaHRPWe",
+    "url": "https://static.poly.pizza/7bf2aa94-cc44-40d9-a93c-9489eb09e008.glb"
+  },
+  "tree-d": {
+    "model": "qZtx0AHhcy",
+    "url": "https://static.poly.pizza/24cf9df9-435f-408e-971b-640d670ce973.glb"
+  },
+  "pine-a": {
+    "model": "rfnxJv0Rqa",
+    "url": "https://static.poly.pizza/3fc02c15-0e5e-4757-a553-2d065e3d0f44.glb"
+  },
+  "pine-b": {
+    "model": "igSu0cPoBz",
+    "url": "https://static.poly.pizza/712aaefa-ae7f-4cb3-8834-a1b8860df3b2.glb"
+  },
+  "bush": {
+    "model": "EoTERLq3z2",
+    "url": "https://static.poly.pizza/5d3066f4-58ac-46d4-899c-39d9e566e9df.glb"
+  },
+  "fern": {
+    "model": "jqcanvH7D6",
+    "url": "https://static.poly.pizza/f94d836f-4eb4-4db0-aa53-3ecdddffa527.glb"
+  },
+  "grass": {
+    "model": "vUJjrRsFp4",
+    "url": "https://static.poly.pizza/0a84d74b-eb09-4794-ad58-dd10eed6b11e.glb"
+  },
+  "grass-wispy": {
+    "model": "Msr9zx66VU",
+    "url": "https://static.poly.pizza/12298e95-47ef-4af3-bfde-1241dd5ecbb9.glb"
+  },
+  "tall-grass": {
+    "model": "JSIYtscPmP",
+    "url": "https://static.poly.pizza/83f8e6d6-fa7e-4cd8-a0ef-8c51d0ff4e88.glb"
+  },
+  "rock-a": {
+    "model": "KZdEP3uUpa",
+    "url": "https://static.poly.pizza/aaf0aaa7-c244-430a-908b-2ac57567d81c.glb"
+  },
+  "rock-b": {
+    "model": "s1OJ3bBzqc",
+    "url": "https://static.poly.pizza/be5fef3a-4fa1-4d08-b2d4-82e02284588d.glb"
+  }
+}

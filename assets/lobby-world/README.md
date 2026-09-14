@@ -4,7 +4,7 @@ Created for this repository on 2026-09-07. Runtime files live in `public/lobby/w
 
 ## Current authored environment pipeline
 
-The user rejected the initial primitive blockout and, specifically, its oversized cartoon paving. The near environment now uses authored ruins/nature assets and restrained PBR paving. [Research, licenses and object-level quality targets](research/asset-sources.md) distinguish the art references from assets actually imported. The citadel and chess landmarks now have replacement geometry; visual acceptance remains open. The academy remains provisional.
+The user rejected the initial primitive blockout and, specifically, its oversized cartoon paving. The current terrace uses original cut-stone masonry with generated limestone pigment, climbing vines and authored nature assets; the previous PBR paving was rejected in the September 12 review. [Research, licenses and object-level quality targets](research/asset-sources.md) distinguish the art references from assets actually imported. The citadel and chess landmarks now have replacement geometry; visual acceptance remains open. A more detailed academy sanctuary replaces the original academy blockout; art acceptance remains open.
 
 - Ruins / trees / plants: FreeStylized kits, custom royalty-free project-use license (not CC0).
 - Eroded cliff: Poly Haven / Rob Tuytel, CC0; simplified geometry, retained UVs/normal/AO, adapted color shader.
@@ -82,3 +82,86 @@ pnpm exec gltf-transform optimize assets/lobby-world/production/geological-islan
 ```
 
 Original third-party packs remain outside Git; only adapted runtime exports ship. `scripts/capture-world.mjs` creates real browser captures, and `scripts/profile-world.mjs` records a short warm-frame diagnostic. Both accept `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
+
+## September 12 material and spatial correction
+
+`TerraceArchitecture` builds bevelled limestone slabs, recessed masonry joints, coping, stairs and a voussoir arch as merged geometry. `paintedStone` applies the same generated limestone pigment in world space to the floor and walls, retaining standard shadows and fog. `TerraceGarden` combines original vine/leaf geometry and alpha-tested cards from the existing generated foliage sprite. No new third-party assets were added.
+
+`node scripts/build-academy-sanctuary.mjs` rebuilds `public/lobby/world/academy-sanctuary.glb` (57,004 triangles before compression) from original geometry. It replaces `academy-island.glb` at runtime. The earlier kit arch, photographic paving and small rectangular satellite islands are no longer rendered. They remain available as historical source assets.
+
+The distant landscape still uses the original painted panorama/mattes. This correction is not a replacement with a fully traversable 3D valley or a claim of AAA art completion.
+
+## Continuous valley follow-up
+
+The user subsequently approved the near environment. The distant landscape cards and land-bearing panorama are now retired from runtime. See [continuous valley](../../docs/design/isekai-world/continuous-valley.md) for geometry, asset reproduction, sky prompt, validation and limitations. The new sky-only panorama and `valley-nature.glb` are the only additional runtime assets. The academy's standalone hill has been removed; all destinations sit on the shared terrain.
+
+## Authored village and procedural atmosphere (September 12 polish)
+
+`valley-village.glb` is a 290,388-byte adaptation of eight CC0 Quaternius Medieval Village models. The exact author/model links and adaptations are listed in `public/CREDITS.md`. Rebuild with `node scripts/build-valley-village.mjs /path/to/source/glbs`; input names are `house-a`, `house-b`, `house-c`, `inn`, `mill`, `tower`, `market`, `well` (all `.glb`). The script retains roof tiles, structural framing, dormers, door surrounds and other authored geometry, merges by building, bakes the palette into vertex colors, and compresses with Draco.
+
+The old generated sky WebP/PNG are retained as design history. The runtime no longer requests them. `components/lobby/world/atmosphere.tsx` creates a 128×96×80 RGBA cloud density/light field (3.75 MiB on the GPU), bounded raymarch volumes at three distance layers, a procedural sky gradient/sun and sky-derived PMREM lighting. It shares one field/material/box geometry between cloud banks; each fragment has a maximum of 32 steps and early opacity termination.
+
+The final atmosphere uses a half-width/half-height floating-point render target for the distant sky, composited behind native-resolution opaque scenery. Two low landmark clouds remain in the main scene for depth occlusion. The target resizes with the viewport/DPR and is disposed with the scene.
+
+## Natural terrain revision
+
+Active ground maps are `soil-{color,normal}.webp` (Poly Haven Forest Ground 04) and `meadow-{color,normal}.webp` (Leafy Grass), 1024px WebP, CC0; see `public/CREDITS.md` for authors and source pages. Colour maps use sRGB, OpenGL normal maps remain linear. The shared near/far ground shader uses matching world-space UVs, offset-sample blending, macro colour variation, irregular worn paths, slope exposure and damp riverbanks. Fine relief is actual geometry in the shared height field, so model placement follows it.
+
+`natural-vegetation.glb` is built with `node scripts/build-natural-vegetation.mjs <download-directory>`. `nature-sources.json` records the Quaternius CC0 source downloads, including unused reference variants. The runtime uses regional instancing and shares meshes for small trail stones. No new vegetation pack is loaded solely for the ground detail pass.
+
+Exposed slopes additionally use `rock-face-color.webp`, Poly Haven Rock Face 03 (CC0), projected along three axes at a larger geological scale. All ground maps total about 2.3 MiB on disk.
+
+## Meadow composition
+
+`meadow-flowers.glb` adds Quaternius CC0 Flower Group and Bush with Flowers, normalized to 0.42m / 0.8m before runtime size variation. Source URLs are in `meadow-sources.json`; run `node scripts/build-meadow-flowers.mjs <directory>` with `flowers.glb` and `flower-bush.glb` to reproduce it. Local curved grass tufts and rounded daisies need no images or model downloads. Shared `lib/lobby/plant-communities.ts` supplies both tree instance placement and the ground's baked canopy occlusion, keeping their positions aligned.
+
+## Sky composition review
+
+The latest procedural sky uses three shared 128×96×80 RGBA fields: two sculpted cumulus variants and one wind-stretched filament field (11.25 MiB total). Forty-eight ray samples and a 75%-per-axis atmosphere target preserve small cloud edges. The blue gradient, asymmetric banks, thin upper clouds and aerial tint are directed against the approved concept. The visual comparison to Genshin Impact and Breath of the Wild is in `docs/design/isekai-world/reviews/open-world-and-sky.md`; reference images from those games are not runtime assets.
+
+### Iluminação e shaders — 12 de setembro de 2026
+
+A passagem de iluminação adiciona cobertura animada de nuvens compartilhada pelos materiais, transmissão aproximada nas folhas e pétalas, sombras próximas mais abrangentes e normais irregulares na água. Não adiciona assets ou dependências. Veja a [comparação visual](../../docs/design/isekai-world/reviews/lighting-comparison.html) e as [notas técnicas](../../docs/design/isekai-world/reviews/lighting-and-shaders.md).
+
+### Movimento e atividade — 12 de setembro de 2026
+
+`living-mill.glb` (50,152 bytes) preserva o rotor do moinho Quaternius separado do corpo, com a mesma escala e paleta da vila. Fonte CC0: https://poly.pizza/m/89dsFYAoX1; reconstrução: `node scripts/build-living-mill.mjs /path/to/source-mill.glb`. Pássaros, borboletas e fumaça são procedurais. O vento usa um relógio compartilhado e inclui deformação das sombras das árvores. Veja [atividade no mundo](../../docs/design/isekai-world/reviews/ambient-life.md).
+
+### Vista principal — 13 de setembro de 2026
+
+A nova composição adapta a prateleira do modelo de mesa em uma geometria privada no runtime; o asset CC BY original permanece intacto e a alteração consta em `public/CREDITS.md`. Cidadela e ilhas reutilizam os modelos CC0 já disponíveis. `sky-islands.tsx` gera a casca erodida; `vista-streams.tsx` e `world-geography.ts` compartilham o perfil dos afluentes com o terreno. Canteiros, campos e distrito ampliado da vila completam a vista frontal.
+
+A atmosfera agora tem quatro volumes próximos e cumulus intermediários adicionais. Mantém três campos volumétricos, 48 passos máximos e resolução distante de 75%; a textura distante é reutilizada entre atualizações quando a câmera está parada, com invalidação imediata por câmera, projeção, resolução e dimmer. Veja [comparação e vídeo](../../docs/design/isekai-world/reviews/main-vista.html) e [notas de validação](../../docs/design/isekai-world/reviews/main-vista.md).
+
+### Correção da mesa e da escala — 13 de setembro de 2026
+
+A alteração da prateleira foi rejeitada e revertida, junto das posições dos colecionáveis e da pose da câmera. `lib/lobby/world-distance.ts` agora expande apenas as coordenadas do cenário frontal. Terreno, rio, pontes e origens dos modelos seguem esse mapeamento; o tamanho de casas e árvores permanece constante. O terreno usa coordenadas separadas para desenho das estradas e detalhe físico da rocha.
+
+`rock-face-detail.webp` e `rock-face-normal.webp` acrescentam difuso/normal OpenGL 2K, derivados de Rock Face 03 (Poly Haven, CC0). Fontes exatas e comando de reprodução: `rock-detail-sources.json`. Veja a [correção atual](../../docs/design/isekai-world/reviews/depth-correction.html).
+
+### Living-world asset quality pass
+
+The wildlife/vegetation experiments were revised after feedback that choosing simple models for convenience was limiting the art direction. The active deer now come from CDmir/TinyWorlds Blender files, with textured fur and authored ambient clips. The dragon is the attributed na3ee1 model, refined in Blender and given a skeletal flight cycle. `wildlife-sources.json` is authoritative; the earlier Quaternius deer/dragon experiments are no longer used.
+
+The active tree/shrub/fern/moss-rock models come from Poly Haven. `organic-sources.json` records both glTF sources and original Blender files. Nearby trees retain the author's actual LOD geometry. Uniform decimation of the foliage was rejected because it destroyed crown coverage. Distant trees instead use eight-view atlases baked from each complete authored canopy, with individual world positions, depth testing, fog and wind. The terrain, water and buildings remain actual geometry.
+
+Rebuild steps:
+
+1. Download sources and their texture dependencies using the recorded manifest URLs.
+2. Export each `.blend` deer with `scripts/export-textured-wildlife.py`, then run `node scripts/compress-textured-wildlife.mjs /output-directory`.
+3. Build the dragon flight rig with `scripts/build-wildlife.mjs`, refine with `scripts/refine-dragon.py`, then Draco-compress the exported GLB.
+4. Process the fern/shrub/rock glTFs with `scripts/build-organic-assets.mjs`. Trees use the separate Blender canopy pipeline below.
+5. Use `scripts/bake-tree-canopies.py` on the original Blender tree files, then `scripts/pack-tree-canopies.mjs` to pack the near mesh and eight far views.
+
+The mesa geometry, desk geometry, collectibles and initial camera pose are preserved. The background art is still a work in progress; replacing these assets does not by itself finish the terrain or architecture at AAA quality.
+
+
+### Fantasy inhabitants revision
+
+The current world no longer requests `wildlife-deer.glb` or `wildlife-stag.glb`. Their sources remain archived. `fantasy-residents.tsx` supplies original instanced slimes and leaf spirits, using the shared clock and grounded squash/stretch. `fantasy-landmarks.tsx` combines original sculpted mushroom groves and buttress roots with the existing Poly Haven tree model at landmark scale. The Quaternius village is reused for four hamlets with slope-aware foundations.
+
+Historical fantasy-life revision: the former dragon used procedural shoulder/elbow articulation. That implementation has been replaced by the authored flight described below; its historical evidence remains in `docs/design/isekai-world/reviews/fantasy-life.md`.
+
+Waterfall ground sampling is refined only in relevant corridors through `lib/lobby/valley-terrain-grid.ts`. Plant placements are cached across species and ground shading, avoiding repeated scatter construction on the main thread. Capture the desk's current movement with `node scripts/capture-fantasy-life.mjs` (optional `WORLD_REVIEW_URL` / `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`).
+
+The active flying creature is now `dragon-flying.glb`: NORBERTO-3D's CC BY 4.0 model with its authored skeletal/morph flight and rider. The former `wildlife-dragon.glb` remains archived. See `wildlife-sources.json` for the original URL, attributed distribution, conversion and checksum. River landings and boat geometry are original procedural work; riparian planting reuses the existing licensed organic assets.
