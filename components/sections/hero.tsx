@@ -7,20 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { startSoundtrack } from "@/lib/audio-manager";
 
+import { createDither } from "@/lib/lobby/dither";
+import { observePageAnimation } from "@/lib/observe-page-animation";
+
 gsap.registerPlugin(ScrollTrigger);
-
-// 4x4 Bayer dithering matrix
-const BAYER_4X4 = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
-];
-
-// Normalize Bayer matrix to 0-1 range
-const BAYER_NORMALIZED = BAYER_4X4.map((row) =>
-  row.map((v) => v / 16)
-);
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -199,6 +189,7 @@ export function Hero() {
       offCtx.fillRect(0, 0, w, h);
     }
 
+    const dither = createDither();
     function applyDithering(strength: number) {
       if (!ctx || !canvas) return;
       const w = canvas.width;
@@ -211,22 +202,7 @@ export function Hero() {
 
       const imageData = ctx.getImageData(0, 0, w, h);
       const data = imageData.data;
-      const colorLevels = Math.max(2, Math.round(2 + (1 - strength) * 14)); // 2 colors at max dither, 16 at no dither
-
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const idx = (y * w + x) * 4;
-          const threshold = BAYER_NORMALIZED[y % 4][x % 4];
-
-          for (let c = 0; c < 3; c++) {
-            const value = data[idx + c] / 255;
-            const quantized =
-              Math.floor(value * (colorLevels - 1) + threshold * strength) /
-              (colorLevels - 1);
-            data[idx + c] = Math.min(255, Math.max(0, quantized * 255));
-          }
-        }
-      }
+      dither(data, w, h, strength);
 
       ctx.putImageData(imageData, 0, 0);
     }
@@ -236,9 +212,16 @@ export function Hero() {
       applyDithering(ditherRef.current.strength);
       animFrameRef.current = requestAnimationFrame(loop);
     }
-    animFrameRef.current = requestAnimationFrame(loop);
+    // Paint a handoff frame, then stop work while the opaque lobby covers it.
+    drawGradient(performance.now());
+    applyDithering(ditherRef.current.strength);
+    const stopObserving = observePageAnimation(sectionRef.current!, (visible) => {
+      cancelAnimationFrame(animFrameRef.current);
+      if (visible) animFrameRef.current = requestAnimationFrame(loop);
+    });
 
     return () => {
+      stopObserving();
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener("resize", resize);
     };

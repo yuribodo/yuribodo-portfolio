@@ -1,3 +1,5 @@
+import { createDither } from "./dither";
+
 // Monitor screen render — the visual "portal" that hands off to Hero.
 //
 // Three modes:
@@ -34,15 +36,7 @@ interface PaintScreenOptions {
   glitchIntensity?: number;
 }
 
-// 4x4 ordered Bayer matrix — same as Hero. Lifted into a normalised
-// table so the inner pixel loop avoids a division per channel.
-const BAYER_4X4 = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
-];
-const BAYER_NORMALIZED = BAYER_4X4.map((row) => row.map((v) => v / 16));
+const dither = createDither();
 
 const GRADIENT_TIME_SCALE = 0.0003;
 const GRADIENT_STOPS = [
@@ -155,23 +149,7 @@ function applyDither(
 ): void {
   const imageData = ctx.getImageData(0, 0, w, h);
   const data = imageData.data;
-  // Same quantisation curve as Hero's applyDithering: 2 colour levels at
-  // max strength, 16 at min — gives the visible "phosphor pixel" look.
-  const colorLevels = Math.max(2, Math.round(2 + (1 - strength) * 14));
-  const divisor = colorLevels - 1;
-
-  for (let y = 0; y < h; y++) {
-    const row = BAYER_NORMALIZED[y % 4];
-    for (let x = 0; x < w; x++) {
-      const idx = (y * w + x) * 4;
-      const threshold = row[x % 4];
-      for (let c = 0; c < 3; c++) {
-        const value = data[idx + c] / 255;
-        const quantized = Math.floor(value * divisor + threshold * strength) / divisor;
-        data[idx + c] = Math.min(255, Math.max(0, quantized * 255));
-      }
-    }
-  }
+  dither(data, w, h, strength);
 
   ctx.putImageData(imageData, 0, 0);
 }

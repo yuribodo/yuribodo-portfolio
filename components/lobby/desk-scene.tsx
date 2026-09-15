@@ -32,7 +32,7 @@ import type { LobbyAction, LobbyState } from "./use-lobby-state";
 import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
 import { WorldBoundary } from "./world/world-boundary";
-import { DeskInteraction, SceneReady } from "./world/scene-ready";
+import { DeskInteraction, SceneReady, SceneVisibility } from "./world/scene-ready";
 
 interface DeskSceneProps {
   state: LobbyState;
@@ -278,6 +278,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       className="fixed inset-0 z-[60] bg-background"
     >
       <Canvas dpr={[1, 1.5]} shadows="soft" scene={{ environmentIntensity: 0.35 }}>
+        <SceneVisibility />
         <CameraRig ref={cameraRigRef} state={state} />
         <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
         <DeskEnvironment ref={environmentRef} />

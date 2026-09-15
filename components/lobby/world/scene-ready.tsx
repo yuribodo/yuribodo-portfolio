@@ -21,3 +21,15 @@ export function DeskInteraction({ enabled }: { enabled: boolean }) {
   }, [enabled, setEvents]);
   return null;
 }
+
+/** A background tab must not keep submitting the entire animated world. */
+export function SceneVisibility() {
+  const setFrameloop = useThree((state) => state.setFrameloop);
+  useEffect(() => {
+    const update = () => setFrameloop(document.hidden ? 'never' : 'always');
+    document.addEventListener('visibilitychange', update);
+    update();
+    return () => { document.removeEventListener('visibilitychange', update); setFrameloop('always'); };
+  }, [setFrameloop]);
+  return null;
+}
