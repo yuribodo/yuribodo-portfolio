@@ -1,5 +1,6 @@
 import {trailEdgeDistance} from './valley-trails';
 import {hillsidePlants} from "./hillside-habitats";
+import {characterClearing} from "./world-characters";
 import {riverbankPlants} from "./riverbank-habitats";
 import {HAMLETS,ANCIENT_TREES} from "./fantasy-landmarks";
 import { FANTASY_RESIDENTS } from "./wildlife-habitats";
@@ -157,7 +158,7 @@ function buildPlantCommunities(floorY:number) {
   }
   for(const [key,plants]of Object.entries(regions)){
     if(key.includes('forecourt'))continue;
-    regions[key]=plants.filter(p=>p.position[2]>-85||trailEdgeDistance(p.position[0],p.position[2])>(key.startsWith('tree')||key.startsWith('pine')?1.2:.3));
+    regions[key]=plants.filter(p=>!characterClearing(p.position[0],p.position[2])&&(p.position[2]>-85||trailEdgeDistance(p.position[0],p.position[2])>(key.startsWith('tree')||key.startsWith('pine')?1.2:.3)));
   }
   return regions;
 }

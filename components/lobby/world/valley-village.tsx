@@ -1,5 +1,6 @@
 "use client";
 import {RIVER_STOPS} from '@/lib/lobby/riverbank-habitats';
+import {characterClearing} from '@/lib/lobby/world-characters';
 import {HAMLETS} from "@/lib/lobby/fantasy-landmarks";
 import {FANTASY_RESIDENTS} from "@/lib/lobby/wildlife-habitats";
 import {distantPosition,vistaSpread} from "@/lib/lobby/world-distance";
@@ -20,6 +21,7 @@ function settlementPlacements(floorY: number) {
   let seed = 8173;
   const random = () => { seed = (Math.imul(seed,1664525)+1013904223)>>>0; return seed/4294967296; };
   const add = (name: string, x: number, z: number, scale = 1, yaw = 0) => {
+    if(characterClearing(x,z))return;
     if(z<0&&VISTA_STREAMS.some((_,i)=>Array.from({length:41},(_,j)=>vistaStream(i,j/40)).some(s=>Math.hypot(x-s.x,z-s.z)<s.width*.5+2.2)))return;
     const key = `${name}:${z < 0 ? 'front' : 'rear'}`;
     (regions[key] ??= []).push({ position: [x,floorY+worldHeight(x,z)-.15,z],scale:scale*(z<0?2.1:1),yaw });

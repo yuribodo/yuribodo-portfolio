@@ -26,6 +26,7 @@ import { OrganicVegetation } from "./organic-vegetation";
 import { AncientTrees,EnchantedGroves } from "./fantasy-landmarks";
 import { FantasyResidents } from "./fantasy-residents";
 import { ValleyCreatures } from "./valley-creatures";
+import { WorldCharacters } from "./world-characters";
 import { ValleyWildlife } from "./valley-wildlife";
 import { MeadowLife } from "./meadow-life";
 import { NaturalVegetation } from "./natural-vegetation";
@@ -172,6 +173,7 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       <WorldBoundary><Suspense fallback={null}><Atmosphere active={active} /></Suspense></WorldBoundary>
       <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><ValleyCreatures /></Suspense></WorldBoundary>
+      <WorldCharacters floorY={floorY} active={active} />
       <WorldBoundary><Suspense fallback={null}><AncientTrees floorY={floorY}/></Suspense></WorldBoundary>
       <WorldBoundary><EnchantedGroves floorY={floorY}/></WorldBoundary>
       <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
