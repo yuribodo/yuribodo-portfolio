@@ -116,3 +116,30 @@ The ancient trees reuse **Poly Haven Tree Small 02**, CC0, with broader crowns, 
 - Toothless is a character from *How to Train Your Dragon*. This is an unofficial fan model; the character and franchise belong to their respective rights holders. No affiliation or endorsement is implied.
 
 The earlier NORBERTO-3D dragon remains credited above as an archived asset and is no longer loaded by the current scene.
+
+## Five franchise references — September 2026
+
+These are unofficial fan references in a personal portfolio; the franchise owners
+are not affiliated with or endorsing this site. Source archives were supplied by
+the site owner. Listing licenses and original archive hashes are recorded in
+`assets/lobby-world/character-sources.json`; uploader attribution does not imply
+ownership of the underlying franchise or game assets.
+
+| Reference | Source / uploader | License listed with the download | Adaptations |
+| --- | --- | --- | --- |
+| Going Merry — One Piece | [Anex](https://sketchfab.com/3d-models/one-piece-going-merry-0e1f16189e8b4b4d9d9c3c60893d692b) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Original OBJ and painted atlas retained; restored material, merged geometry, WebP/Meshopt compression, scale/waterline and gentle mooring motion. |
+| Snorlax — Pokémon | [VerdeAWX](https://sketchfab.com/3d-models/snorlax-sleep-2091c36f65084da582e22bd63c72aa67) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Removed the source diorama's tree/ground; retained character texture and sleeping pose, reduced geometry, added a subtle chest-breath morph, compressed textures/mesh. |
+| Lancelot Albion — Code Geass | [Leonardo Hayasida](https://sketchfab.com/3d-models/gd53-leonardo-hayasida-mod2-dbbe317f6c61481fb33ffc66d9b52c55) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Removed OBJ reference-image planes; restored base color, normal, roughness, metallic and emission maps; consolidated and compressed geometry/textures. The supplied OBJ has no skeleton or animation. |
+| Ainz Ooal Gown — Overlord | [affifuddin.y.hidayat](https://sketchfab.com/3d-models/ainz-ooal-gown-e62df306954144fbb613c6fc3b04e682) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Converted legacy Blender shaders to PBR, retained character/staff geometry and robe maps; reused the source magic-circle artwork, removed billboard aura, compressed the asset. |
+| Fishstick — Fortnite | [saturn88z](https://sketchfab.com/3d-models/fishstick-afc52bc2e68247bf8500cbe301f81528) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — noncommercial | Restored original color maps; repaired disconnected neck/headgear hierarchy; adapted the selected dance to target bone axes/proportions and compressed the skin/textures. |
+| Orange Justice — Fortnite motion | [Coldary](https://sketchfab.com/3d-models/orange-justice-31b3596641af4e238c1491c450cc6df5) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) as listed | Motion adapted from the supplied Blender animation; source NeonCat geometry/textures are not included. Preserved dance timing, target limb lengths and loop endpoints. |
+
+Fortnite character and motion content originates from **Epic Games**. Original
+Fishstick character work is credited to **Karina Bastos / Airborn Studios** on
+[the studio's project page](https://airbornstudios.artstation.com/projects/L2JNqw).
+The Sketchfab uploads are acquisition sources, not claims of original character authorship.
+
+The royal overlook, throne, stairs, columns, gold inlays and balustrades are
+original project geometry. Its stone texture reuses **Rock Face 03**, by
+**Dario Barresi / Rico Cilliers**, [Poly Haven, CC0](https://polyhaven.com/a/rock_face_03),
+already credited above. Rebuild with `scripts/build-royal-court.py`.
