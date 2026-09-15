@@ -74,6 +74,7 @@ test("readiness follows desk assets, while skip remains usable", async ({ page }
 });
 
 test("missing authored world assets do not block desk entry", async ({ page }) => {
+  await page.route("**/lobby/world/cloud-volume-*.bin.gz", route => route.abort());
   await page.route(/\/lobby\/world\/canopy-[^/]+\.webp/, route => route.abort());
   await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|academy-sanctuary|geological-island|ruins-kit|nature-kit|valley-nature|valley-village|organic-[a-z0-9_]+|dragon-flying|wildlife-(?:deer|stag|dragon)|living-mill|natural-vegetation|meadow-flowers|coastal-cliff)\.glb/, (route) => route.abort());
   await page.route(/\/lobby\/world\/(limestone|foliage|earth-[a-z]+|soil-[a-z]+|meadow-[a-z]+|rock-face-(?:color|detail|normal)|paving-[a-z]+)\.webp/, (route) => route.abort());
@@ -121,4 +122,43 @@ test("the procedural world does not load flat landscape or sky backdrops", async
   });
   await openDesk(page);
   expect(flatLandscapes).toEqual([]);
+});
+
+test('covered artwork pauses, hidden world stops rendering, and both resume', async ({ page }) => {
+  await page.addInitScript(() => {
+    const stats = { heroPaints: 0, draws: 0 };
+    Object.assign(window, { animationStats: stats });
+    const paint = CanvasRenderingContext2D.prototype.putImageData;
+    CanvasRenderingContext2D.prototype.putImageData = function (...args: [ImageData, number, number] | [ImageData, number, number, number, number, number, number]) {
+      if (this.canvas.closest('main')) stats.heroPaints++;
+      return Reflect.apply(paint, this, args);
+    };
+    const draw = WebGL2RenderingContext.prototype.drawElements;
+    WebGL2RenderingContext.prototype.drawElements = function (...args: Parameters<typeof draw>) {
+      stats.draws++;
+      return draw.apply(this, args);
+    };
+  });
+  await openDesk(page);
+  await page.waitForTimeout(1000);
+  const stats = () => page.evaluate(() => (window as unknown as { animationStats: { heroPaints: number; draws: number } }).animationStats);
+  const before = await stats();
+  await page.waitForTimeout(600);
+  expect((await stats()).heroPaints).toBe(before.heroPaints);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.waitForTimeout(200);
+  const hidden = await stats();
+  await page.waitForTimeout(600);
+  expect((await stats()).draws).toBe(hidden.draws);
+  await page.evaluate(() => {
+    Reflect.deleteProperty(document, 'hidden');
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect.poll(async () => (await stats()).draws).toBeGreaterThan(hidden.draws);
+  await page.getByRole('button', { name: 'Enter portfolio', exact: true }).click();
+  await expect(page.locator('[data-lobby-active]')).toHaveCount(0);
+  await expect.poll(async () => (await stats()).heroPaints).toBeGreaterThan(before.heroPaints);
 });

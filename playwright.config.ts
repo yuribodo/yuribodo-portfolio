@@ -7,7 +7,7 @@ export default defineConfig({
   timeout: 180_000,
   expect: { timeout: 20_000 },
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000",
     viewport: { width: 1000, height: 700 },
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
@@ -18,7 +18,7 @@ export default defineConfig({
         : ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
     },
   },
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: "pnpm dev --port 3000",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,

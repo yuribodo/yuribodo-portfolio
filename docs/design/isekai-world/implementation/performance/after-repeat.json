@@ -1,0 +1,570 @@
+{
+  "capturedAt": "2026-09-15T01:18:32.961Z",
+  "url": "http://localhost:3003/",
+  "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "networkMbps": null,
+  "caveat": "Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement or a universal FPS guarantee. Cold load uses a fresh browser context; OS and GPU-driver caches may be warm. Heap is a browser estimate. Other desktop applications may be running.",
+  "desk": {
+    "samples": 180,
+    "meanFrameMs": 20.091666666666665,
+    "medianFrameMs": 16.700000000000728,
+    "p95FrameMs": 33.400000000001455,
+    "approximateRafFps": 49.77187888842804,
+    "meanDrawCallsPerFrame": 599.8777777777777,
+    "meanSubmittedTrianglesPerFrame": 13167321.4
+  },
+  "loading": {
+    "longTasks": [
+      {
+        "start": 32.70000000298023,
+        "duration": 392
+      },
+      {
+        "start": 528,
+        "duration": 124
+      },
+      {
+        "start": 688.3999999910593,
+        "duration": 445
+      },
+      {
+        "start": 1196.2000000029802,
+        "duration": 74
+      },
+      {
+        "start": 1716.5,
+        "duration": 227
+      },
+      {
+        "start": 1959.7000000029802,
+        "duration": 630
+      },
+      {
+        "start": 2590.5,
+        "duration": 231
+      },
+      {
+        "start": 2901.2999999970198,
+        "duration": 938
+      },
+      {
+        "start": 4023.2999999970198,
+        "duration": 280
+      },
+      {
+        "start": 4589.20000000298,
+        "duration": 614
+      },
+      {
+        "start": 5204.20000000298,
+        "duration": 380
+      },
+      {
+        "start": 5594.79999999702,
+        "duration": 137
+      },
+      {
+        "start": 5772.0999999940395,
+        "duration": 117
+      },
+      {
+        "start": 5984.0999999940395,
+        "duration": 797
+      },
+      {
+        "start": 6782.5999999940395,
+        "duration": 879
+      },
+      {
+        "start": 7661.79999999702,
+        "duration": 980
+      }
+    ],
+    "idleMs": 8646.79999999702,
+    "heapUsedBytes": 394078845,
+    "resources": [
+      {
+        "url": "/lobby/models/wooden_desk.glb",
+        "bytes": 747208,
+        "durationMs": 31,
+        "startMs": 1264,
+        "endMs": 1295
+      },
+      {
+        "url": "/lobby/models/monitor.glb",
+        "bytes": 140520,
+        "durationMs": 11.199999988079071,
+        "startMs": 1264.2000000029802,
+        "endMs": 1275.3999999910593
+      },
+      {
+        "url": "/lobby/models/macbook_pro_closed.glb",
+        "bytes": 583020,
+        "durationMs": 27.799999997019768,
+        "startMs": 1264.5,
+        "endMs": 1292.2999999970198
+      },
+      {
+        "url": "/lobby/models/keyboard-razer.glb",
+        "bytes": 343512,
+        "durationMs": 18.299999997019768,
+        "startMs": 1264.5999999940395,
+        "endMs": 1282.8999999910593
+      },
+      {
+        "url": "/lobby/models/mouse-razer.glb",
+        "bytes": 368212,
+        "durationMs": 23,
+        "startMs": 1264.7999999970198,
+        "endMs": 1287.7999999970198
+      },
+      {
+        "url": "/lobby/models/minato.glb",
+        "bytes": 163804,
+        "durationMs": 14.800000011920929,
+        "startMs": 1264.8999999910593,
+        "endMs": 1279.7000000029802
+      },
+      {
+        "url": "/lobby/models/seismitoad.glb",
+        "bytes": 87472,
+        "durationMs": 21,
+        "startMs": 1265.0999999940395,
+        "endMs": 1286.0999999940395
+      },
+      {
+        "url": "/lobby/models/drago.glb",
+        "bytes": 118920,
+        "durationMs": 23.799999997019768,
+        "startMs": 1265.2999999970198,
+        "endMs": 1289.0999999940395
+      },
+      {
+        "url": "/lobby/models/nintendo-ds.glb",
+        "bytes": 1965268,
+        "durationMs": 51.20000000298023,
+        "startMs": 1265.5,
+        "endMs": 1316.7000000029802
+      },
+      {
+        "url": "/lobby/models/xbox-controller.glb",
+        "bytes": 241140,
+        "durationMs": 31.100000008940697,
+        "startMs": 1265.5999999940395,
+        "endMs": 1296.7000000029802
+      },
+      {
+        "url": "/lobby/models/beyblade-pegasus.glb",
+        "bytes": 75096,
+        "durationMs": 28.700000002980232,
+        "startMs": 1265.7999999970198,
+        "endMs": 1294.5
+      },
+      {
+        "url": "/lobby/draco/draco_wasm_wrapper.js",
+        "bytes": 58456,
+        "durationMs": 3.5999999940395355,
+        "startMs": 1393,
+        "endMs": 1396.5999999940395
+      },
+      {
+        "url": "/lobby/draco/draco_decoder.wasm",
+        "bytes": 192420,
+        "durationMs": 4.9000000059604645,
+        "startMs": 1393.0999999940395,
+        "endMs": 1398
+      },
+      {
+        "url": "/lobby/world/cloud-volume-0.bin.gz",
+        "bytes": 205876,
+        "durationMs": 6.5999999940395355,
+        "startMs": 1965.2999999970198,
+        "endMs": 1971.8999999910593
+      },
+      {
+        "url": "/lobby/world/cloud-volume-1.bin.gz",
+        "bytes": 208815,
+        "durationMs": 5.899999991059303,
+        "startMs": 1965.5,
+        "endMs": 1971.3999999910593
+      },
+      {
+        "url": "/lobby/world/cloud-volume-2.bin.gz",
+        "bytes": 484019,
+        "durationMs": 7.600000008940697,
+        "startMs": 1965.5999999940395,
+        "endMs": 1973.2000000029802
+      },
+      {
+        "url": "/lobby/world/dragon-flying.glb",
+        "bytes": 2583116,
+        "durationMs": 902,
+        "startMs": 1972.3999999910593,
+        "endMs": 2874.3999999910593
+      },
+      {
+        "url": "/lobby/world/organic-tree_small_02.glb",
+        "bytes": 7879308,
+        "durationMs": 1885.7999999970198,
+        "startMs": 1972.7000000029802,
+        "endMs": 3858.5
+      },
+      {
+        "url": "/lobby/world/valley-village.glb",
+        "bytes": 290388,
+        "durationMs": 10.200000002980232,
+        "startMs": 2008,
+        "endMs": 2018.2000000029802
+      },
+      {
+        "url": "/lobby/world/natural-vegetation.glb",
+        "bytes": 462328,
+        "durationMs": 13.599999994039536,
+        "startMs": 2009.5,
+        "endMs": 2023.0999999940395
+      },
+      {
+        "url": "/lobby/world/organic-shrub_02.glb",
+        "bytes": 650664,
+        "durationMs": 17.30000001192093,
+        "startMs": 2274.3999999910593,
+        "endMs": 2291.7000000029802
+      },
+      {
+        "url": "/lobby/world/organic-fern_02.glb",
+        "bytes": 427872,
+        "durationMs": 13.400000005960464,
+        "startMs": 2274.5999999940395,
+        "endMs": 2288
+      },
+      {
+        "url": "/lobby/world/organic-rock_moss_set_01.glb",
+        "bytes": 1052516,
+        "durationMs": 25.200000002980232,
+        "startMs": 2274.7999999970198,
+        "endMs": 2300
+      },
+      {
+        "url": "/lobby/world/meadow-flowers.glb",
+        "bytes": 172588,
+        "durationMs": 9.299999997019768,
+        "startMs": 2275.5,
+        "endMs": 2284.7999999970198
+      },
+      {
+        "url": "/lobby/world/coastal-cliff.glb",
+        "bytes": 718944,
+        "durationMs": 25.5,
+        "startMs": 2580.5999999940395,
+        "endMs": 2606.0999999940395
+      },
+      {
+        "url": "/lobby/world/sky-citadel-v2.glb",
+        "bytes": 1561464,
+        "durationMs": 30,
+        "startMs": 2581,
+        "endMs": 2611
+      },
+      {
+        "url": "/lobby/world/chess-monuments.glb",
+        "bytes": 2158536,
+        "durationMs": 316.8999999910593,
+        "startMs": 2581.2000000029802,
+        "endMs": 2898.0999999940395
+      },
+      {
+        "url": "/lobby/world/soil-color.webp",
+        "bytes": 460360,
+        "durationMs": 9.099999994039536,
+        "startMs": 2589.2000000029802,
+        "endMs": 2598.2999999970198
+      },
+      {
+        "url": "/lobby/world/soil-normal.webp",
+        "bytes": 523530,
+        "durationMs": 19,
+        "startMs": 2589.2999999970198,
+        "endMs": 2608.2999999970198
+      },
+      {
+        "url": "/lobby/world/meadow-color.webp",
+        "bytes": 485202,
+        "durationMs": 27.399999991059303,
+        "startMs": 2589.5,
+        "endMs": 2616.8999999910593
+      },
+      {
+        "url": "/lobby/world/meadow-normal.webp",
+        "bytes": 604416,
+        "durationMs": 32.29999999701977,
+        "startMs": 2589.5,
+        "endMs": 2621.7999999970198
+      },
+      {
+        "url": "/lobby/world/rock-face-detail.webp",
+        "bytes": 1430482,
+        "durationMs": 44.29999999701977,
+        "startMs": 2589.5999999940395,
+        "endMs": 2633.8999999910593
+      },
+      {
+        "url": "/lobby/world/rock-face-normal.webp",
+        "bytes": 1956924,
+        "durationMs": 52.19999998807907,
+        "startMs": 2589.7000000029802,
+        "endMs": 2641.8999999910593
+      },
+      {
+        "url": "/lobby/world/canopy-tree_small_02.webp",
+        "bytes": 553350,
+        "durationMs": 42.400000005960464,
+        "startMs": 2589.7999999970198,
+        "endMs": 2632.2000000029802
+      },
+      {
+        "url": "/lobby/world/limestone.webp",
+        "bytes": 29984,
+        "durationMs": 47.20000000298023,
+        "startMs": 2589.7999999970198,
+        "endMs": 2637
+      },
+      {
+        "url": "/lobby/world/foliage.webp",
+        "bytes": 218268,
+        "durationMs": 50.70000000298023,
+        "startMs": 2589.8999999910593,
+        "endMs": 2640.5999999940395
+      },
+      {
+        "url": "/lobby/world/rock-face-color.webp",
+        "bytes": 353040,
+        "durationMs": 54.20000000298023,
+        "startMs": 2590,
+        "endMs": 2644.2000000029802
+      },
+      {
+        "url": "/lobby/textures/pokemon-front-charizard.webp",
+        "bytes": 79590,
+        "durationMs": 54.6000000089407,
+        "startMs": 2590.0999999940395,
+        "endMs": 2644.7000000029802
+      },
+      {
+        "url": "/lobby/textures/pokemon-back.webp",
+        "bytes": 46642,
+        "durationMs": 56.5,
+        "startMs": 2590.0999999940395,
+        "endMs": 2646.5999999940395
+      },
+      {
+        "url": "/lobby/world/canopy-pine_tree_01.webp",
+        "bytes": 394362,
+        "durationMs": 4.0999999940395355,
+        "startMs": 4303.5,
+        "endMs": 4307.5999999940395
+      },
+      {
+        "url": "/lobby/textures/yugioh-front-mago-negro.webp",
+        "bytes": 66090,
+        "durationMs": 4.299999997019768,
+        "startMs": 4586,
+        "endMs": 4590.29999999702
+      },
+      {
+        "url": "/lobby/textures/yugioh-back.webp",
+        "bytes": 30870,
+        "durationMs": 4.5,
+        "startMs": 4586,
+        "endMs": 4590.5
+      },
+      {
+        "url": "/lobby/world/living-mill.glb",
+        "bytes": 50152,
+        "durationMs": 4,
+        "startMs": 5757.5999999940395,
+        "endMs": 5761.5999999940395
+      }
+    ]
+  },
+  "responses": [
+    {
+      "url": "/lobby/models/wooden_desk.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/monitor.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/macbook_pro_closed.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/keyboard-razer.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/mouse-razer.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/minato.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/seismitoad.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/drago.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/nintendo-ds.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/xbox-controller.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/models/beyblade-pegasus.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/draco/draco_wasm_wrapper.js",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/draco/draco_decoder.wasm",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/soil-color.webp",
+      "bytes": 460360
+    },
+    {
+      "url": "/lobby/world/soil-normal.webp",
+      "bytes": 523530
+    },
+    {
+      "url": "/lobby/world/meadow-color.webp",
+      "bytes": 485202
+    },
+    {
+      "url": "/lobby/world/meadow-normal.webp",
+      "bytes": 604416
+    },
+    {
+      "url": "/lobby/world/rock-face-detail.webp",
+      "bytes": 1430482
+    },
+    {
+      "url": "/lobby/world/rock-face-normal.webp",
+      "bytes": 1956924
+    },
+    {
+      "url": "/lobby/world/canopy-tree_small_02.webp",
+      "bytes": 553350
+    },
+    {
+      "url": "/lobby/world/limestone.webp",
+      "bytes": 29984
+    },
+    {
+      "url": "/lobby/world/foliage.webp",
+      "bytes": 218268
+    },
+    {
+      "url": "/lobby/world/rock-face-color.webp",
+      "bytes": 353040
+    },
+    {
+      "url": "/lobby/textures/pokemon-front-charizard.webp",
+      "bytes": 79590
+    },
+    {
+      "url": "/lobby/textures/pokemon-back.webp",
+      "bytes": 46642
+    },
+    {
+      "url": "/lobby/world/cloud-volume-0.bin.gz",
+      "bytes": 205876
+    },
+    {
+      "url": "/lobby/world/cloud-volume-1.bin.gz",
+      "bytes": 208815
+    },
+    {
+      "url": "/lobby/world/cloud-volume-2.bin.gz",
+      "bytes": 484019
+    },
+    {
+      "url": "/lobby/world/organic-tree_small_02.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/dragon-flying.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/valley-village.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/natural-vegetation.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/organic-shrub_02.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/organic-fern_02.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/organic-rock_moss_set_01.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/meadow-flowers.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/sky-citadel-v2.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/coastal-cliff.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/chess-monuments.glb",
+      "bytes": 0
+    },
+    {
+      "url": "/lobby/world/canopy-pine_tree_01.webp",
+      "bytes": 394362
+    },
+    {
+      "url": "/lobby/textures/yugioh-front-mago-negro.webp",
+      "bytes": 66090
+    },
+    {
+      "url": "/lobby/textures/yugioh-back.webp",
+      "bytes": 30870
+    },
+    {
+      "url": "/lobby/world/living-mill.glb",
+      "bytes": 0
+    }
+  ],
+  "elapsedMs": 32850,
+  "errors": []
+}
