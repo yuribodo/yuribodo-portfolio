@@ -148,35 +148,6 @@ function ChessMonuments() {
 }
 
 
-function Slime({ floorY, active }: WorldProps) {
-  const ref = useRef<Group>(null);
-  useFrame(({ clock }) => {
-    if (!ref.current || !active) return;
-    const breathe = Math.sin(clock.elapsedTime * 1.35) * 0.025;
-    ref.current.scale.set(1 - breathe * 0.4, 1 + breathe, 1 - breathe * 0.4);
-  });
-  return (
-    <group position={[3.0, floorY + 0.17, -3.5]} rotation={[0, -0.35, 0]} scale={0.88}>
-      <group ref={ref}>
-        <mesh castShadow scale={[0.34, 0.24, 0.3]}>
-          <sphereGeometry args={[1, 48, 32]} />
-          <meshStandardMaterial color="#68c7dc" roughness={0.72} envMapIntensity={0.15} />
-        </mesh>
-        {[-1, 1].map((side) => (
-          <mesh key={side} position={[side * 0.115, 0.015, 0.274]} rotation={[0, 0, Math.PI / 2 + side * -0.18]}>
-            <capsuleGeometry args={[0.007, 0.065, 3, 6]} />
-            <meshToonMaterial color="#275d7f" />
-          </mesh>
-        ))}
-        <mesh position={[-0.085, 0.158, 0.192]} rotation={[-0.55, -0.2, -0.4]} scale={[0.075, 0.023, 0.006]}>
-          <sphereGeometry args={[1, 16, 8]} />
-          <meshToonMaterial color="#e6fbff" />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
 /** Used by the shared transition dimmer, including non-light-driven paint. */
 export function dimWorldMaterials(group: Group, ratio: number) {
   group.traverse((object) => {
@@ -229,7 +200,6 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
         <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
       </Suspense></WorldBoundary>
-      <Slime floorY={floorY} active={active} />
     </group></OutdoorLighting>
   );
 }

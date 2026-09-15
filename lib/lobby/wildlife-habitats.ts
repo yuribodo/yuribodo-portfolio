@@ -2,18 +2,13 @@ import { distantPosition } from './world-distance';
 import { worldHeight } from './world-geography';
 
 export type FantasyResident={kind:'slime'|'spirit';x:number;z:number;height:number;phase:number;perch?:number};
-/** Little encounters in the meadow; larger colonies remain legible across the valley. */
+/** Keep the single hopping terrace slime; leaf spirits still inhabit the valley. */
 export const FANTASY_RESIDENTS:readonly FantasyResident[]=[
  {kind:'slime',x:-3.51,z:-4.65,height:.58,phase:0,perch:.255},
- {kind:'slime',x:-10,z:-21,height:1.05,phase:3.8},
  {kind:'spirit',x:-12,z:-22,height:1.15,phase:7},
  {kind:'spirit',x:9,z:-23,height:1.5,phase:4},
- ...[[-67,-101],[-59,-111],[-68,-131],[66,-145],[-52,-204]].flatMap(([x,z],i)=>[
-  {kind:'slime' as const,x,z,height:3.1,phase:i*3.7+2},
-  {kind:'slime' as const,x:x+2.1,z:z-2,height:1.9,phase:i*2.3+5},
-  {kind:'spirit' as const,x:x-2.3,z:z-1.8,height:2.5,phase:i*1.7+8},
-  {kind:'slime' as const,x:x+.7,z:z-4.2,height:2.3,phase:i*2.9+4},
- ]),
+ ...[[-67,-101],[-59,-111],[-68,-131],[66,-145],[-52,-204]].map(([x,z],i)=>
+  ({kind:'spirit' as const,x:x-2.3,z:z-1.8,height:2.5,phase:i*1.7+8})),
 ];
 export function residentPose(resident:FantasyResident,time:number,floorY=0){
  const phase=time+resident.phase,cycle=((phase%6.4)+6.4)%6.4;
