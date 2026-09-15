@@ -1,6 +1,8 @@
 # Recognizable dragon candidates — 2026-09-14
 
-The user wants a recognizable character from an anime, film or series, and will choose the replacement. Do not replace the existing dragon until that choice arrives. Generic original dragon candidates were superseded by this preference.
+The user selected **Toothless / Banguela**, specifically the Stuck On Saturn candidate presented below. Generic original dragon candidates were superseded by this preference.
+
+Acquisition status: the user supplied the original `toothless-rigged-httyd.zip` download. The FBX skeleton and textures have been converted, a flight cycle authored and baked, and the optimized model integrated. See [integration and validation](toothless.md). No alternate Toothless model was substituted.
 
 The previews and metadata below were inspected using Sketchfab's public model API. They are candidate fan models, not confirmed official franchise licenses. Each listing declares CC BY 4.0 for the uploaded asset; this does not establish permission from the character's rights holder. Keep creator attribution and resolve the chosen asset's permissions before publishing it.
 
@@ -12,6 +14,6 @@ The previews and metadata below were inspected using Sketchfab's public model AP
 
 Alternative Toothless: [Night Fury by NORBERTO-3D](https://sketchfab.com/3d-models/night-fury-c0297044342642bebdb8cf077bb8b240), 10,856 triangles, one animation listed, CC BY 4.0. Its preview has a much simpler silhouette/surface than the Stuck On Saturn model. The actual clip has not been tested in our renderer.
 
-No candidate model has been purchased, imported, optimized or tested in the site. Source thumbnails are previews of the creators' renders, not renders of these models integrated into the portfolio. Current performance measurements do not predict the performance of a replacement.
+The table records the original candidate evaluation before integration. Only the selected Toothless model was imported. Source thumbnails are previews of the creators' renders; integration captures are documented separately.
 
 Separately, the requested slime cleanup retains the hopping foreground slime at x=-3.51, z=-4.65 with its existing motion. All other slime instances, including the separate right terrace slime, were removed; leaf spirits remain.

@@ -12,7 +12,7 @@ const records:Window['flightProbe']=[];let last=-1;
 function Probe(){
  const light=useOutdoorLight();
  useFrame(({scene})=>{
-  const root=scene.getObjectByName('valley-dragon-rider');
+  const root=scene.getObjectByName('valley-toothless');
   if(!root||light.time.value-last<.3)return;
   last=light.time.value;const values:number[]=[];
   root.traverse(o=>{if(o instanceof Bone)values.push(...o.quaternion.toArray());if(o instanceof Mesh&&o.morphTargetInfluences)values.push(...o.morphTargetInfluences);});
