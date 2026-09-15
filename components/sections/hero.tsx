@@ -29,71 +29,47 @@ export function Hero() {
   useGSAP(() => {
     if (reducedMotion) return;
 
-    // Start fully dithered
-    ditherRef.current.strength = 0.8;
+    ditherRef.current.strength = 0.55;
+    const tl = gsap.timeline({ paused: true });
 
-    const tl = gsap.timeline({ delay: 2.2 });
-
-    // Phase 1: Dissolve dither
     tl.to(ditherRef.current, {
       strength: 0.4,
-      duration: 1.5,
+      duration: 0.75,
       ease: "power2.out",
-    });
+    }, 0);
+    tl.from("[data-hero-char]", {
+      yPercent: 20,
+      opacity: 0,
+      duration: 0.65,
+      stagger: 0.025,
+      ease: "power3.out",
+    }, 0);
+    tl.from(subtitleRef.current, {
+      y: 10,
+      opacity: 0,
+      duration: 0.5,
+      ease: "power3.out",
+    }, 0.12);
+    tl.from(linksRef.current, {
+      y: 8,
+      opacity: 0,
+      duration: 0.45,
+      ease: "power3.out",
+    }, 0.2);
+    tl.from(scrollRef.current, {
+      opacity: 0,
+      duration: 0.4,
+      ease: "power2.out",
+    }, 0.3);
+    tl.call(() => startSoundtrack("/audio/soundtrack.mp3"));
 
-    // Phase 2: Characters drop in with overshoot bounce
-    tl.from(
-      "[data-hero-char]",
-      {
-        y: -120,
-        opacity: 0,
-        scale: 1.3,
-        rotation: () => gsap.utils.random(-15, 15),
-        duration: 1,
-        stagger: 0.06,
-        ease: "back.out(1.7)",
-      },
-      "-=1.2"
-    );
-
-    // Phase 3: Subtitle
-    tl.from(
-      subtitleRef.current,
-      {
-        y: 20,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      },
-      "-=0.4"
-    );
-
-    // Links
-    tl.from(
-      linksRef.current,
-      {
-        y: 15,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out",
-      },
-      "-=0.3"
-    );
-
-    // Scroll indicator
-    tl.from(
-      scrollRef.current,
-      {
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out",
-      },
-      "-=0.2"
-    );
-
-    // Start soundtrack after entrance
-    tl.call(() => {
-      startSoundtrack("/audio/soundtrack.mp3");
+    // The entrance belongs to the reveal, regardless of how long someone
+    // explores the desk. It also works for mobile, skip, and GPU fallback.
+    let entered = false;
+    const stopObserving = observePageAnimation(sectionRef.current!, (visible) => {
+      if (!visible || entered) return;
+      entered = true;
+      tl.play();
     });
 
     // Exit: gentle fade-out on scroll
@@ -122,7 +98,8 @@ export function Hero() {
       duration: 0.7,
       ease: "power1.in",
     }, 0.3);
-  }, [reducedMotion]);
+    return stopObserving;
+  }, { dependencies: [reducedMotion], scope: sectionRef, revertOnUpdate: true });
 
   // Dithering canvas render loop
   useEffect(() => {

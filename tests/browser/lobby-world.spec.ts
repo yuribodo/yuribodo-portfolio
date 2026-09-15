@@ -21,6 +21,68 @@ async function openDesk(page: Page) {
   await expect(page.getByRole("button", { name: "Enter portfolio", exact: true })).toBeEnabled();
 }
 
+test("the monitor reveals a waiting Hero and releases the page after the crossfade", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await openDesk(page);
+  const characters = page.locator("[data-hero-char]");
+  const firstCharacter = characters.first();
+  await expect(firstCharacter).toHaveCSS("opacity", "0");
+  // The former entrance finished behind the desk on a mount-time delay.
+  await page.waitForTimeout(3000);
+  await expect(firstCharacter).toHaveCSS("opacity", "0");
+  await page.mouse.move(500, 424);
+  await expect(page.locator("[data-lobby-active]")).toHaveAttribute("data-lobby-cursor", "pointer");
+  // Observe the actual reveal, including whether it happens while covered.
+  await page.evaluate(() => {
+    const samples: { revealing: boolean; opacity: number; characterOpacity: number }[] = [];
+    Object.assign(window, { handoffSamples: samples });
+    const sample = () => {
+      const lobby = document.querySelector<HTMLElement>("[data-lobby-active]");
+      if (!lobby) return;
+      samples.push({
+        revealing: lobby.dataset.lobbyRevealing === "true",
+        opacity: Number(getComputedStyle(lobby).opacity),
+        characterOpacity: Number(getComputedStyle(document.querySelector("[data-hero-char]")!).opacity),
+      });
+      requestAnimationFrame(sample);
+    };
+    sample();
+  });
+  await page.mouse.click(500, 424);
+  await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
+  await expect(characters.last()).toHaveCSS("opacity", "1");
+  const samples = await page.evaluate(() => (window as unknown as {
+    handoffSamples: { revealing: boolean; opacity: number; characterOpacity: number }[];
+  }).handoffSamples);
+  expect(samples.some(sample => sample.revealing && sample.opacity > 0 && sample.opacity < 1)).toBe(true);
+  expect(samples.filter(sample => !sample.revealing).every(sample => sample.characterOpacity === 0)).toBe(true);
+  expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+  await page.getByRole("link", { name: "GitHub ↗", exact: true }).first().focus();
+  await expect(page.getByRole("link", { name: "GitHub ↗", exact: true }).first()).toBeFocused();
+  expect(errors).toEqual([]);
+});
+
+test("keyboard entry opens the portfolio without a camera dive", async ({ page }) => {
+  await openDesk(page);
+  await page.evaluate(() => {
+    const states: string[] = [];
+    Object.assign(window, { keyboardEntryStates: states });
+    const lobby = document.querySelector("[data-lobby-active]")!;
+    new MutationObserver(records => {
+      states.push(...records.map(record => record.oldValue ?? ""));
+      states.push(lobby.getAttribute("data-lobby-state") ?? "");
+    }).observe(lobby, { attributes: true, attributeFilter: ["data-lobby-state"], attributeOldValue: true });
+  });
+  await page.getByRole("button", { name: "Enter portfolio", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
+  expect(await page.evaluate(() => (window as unknown as {
+    keyboardEntryStates: string[];
+  }).keyboardEntryStates)).not.toContain("booting");
+  await expect(page.locator("[data-hero-char]").last()).toHaveCSS("opacity", "1");
+});
+
 test("first release stays at the desk after arrow keys and dragging, then enters directly", async ({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await openDesk(page);

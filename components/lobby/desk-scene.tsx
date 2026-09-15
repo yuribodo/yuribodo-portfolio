@@ -53,7 +53,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const yugiohRef = useRef<YugiohDeckHandle>(null);
   const figuresRef = useRef<AnimeFiguresHandle>(null);
   const beybladeRef = useRef<BeybladeHandle>(null);
-  const [diveProgress, setDiveProgress] = useState(0);
   const [floorY, setFloorY] = useState(-1.5);
   const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
   const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
@@ -128,7 +127,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       screenMaterial,
       environment: environmentRef.current,
       container: containerRef.current,
-      onDiveProgress: setDiveProgress,
+      onDiveProgress: (progress) => monitorRef.current?.setDiveProgress(progress),
       onDiveComplete: () => dispatch({ type: "BOOT_COMPLETE" }),
       onHandoff: () => {
         playCue("stinger");
@@ -148,7 +147,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const handleEnter = () => {
     if (state !== "idle" && state !== "exploring") return;
     playCue("monitor-power");
-    monitorRef.current?.flashComplete();
+    monitorRef.current?.pulseScreen();
     dispatch({ type: "ENTER_CLICKED" });
   };
 
@@ -208,7 +207,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             ref={monitorRef}
             onEnter={handleEnter}
             state={state}
-            diveProgress={diveProgress}
             livePaint={state !== "loading"}
           />
           <RazerPeripherals />
@@ -252,7 +250,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         <button type="button" onClick={handleSkip}>
           Skip lobby and enter site
         </button>
-        <button type="button" onClick={handleEnter}>
+        <button type="button" onClick={handleSkip}>
           Enter portfolio (main action)
         </button>
         <button
