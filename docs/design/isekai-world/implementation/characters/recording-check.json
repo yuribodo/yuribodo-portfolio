@@ -1,0 +1,20 @@
+{
+  "segments": [
+    "12 seconds: actual desk scene",
+    "7 seconds: isolated shipped Fishstick animation"
+  ],
+  "fish": {
+    "animations": [
+      {
+        "name": "Orange_Justice",
+        "duration": 6.5
+      }
+    ],
+    "size": [
+      0.9842991263082174,
+      2.6,
+      0.6943700180601484
+    ]
+  },
+  "errors": []
+}
