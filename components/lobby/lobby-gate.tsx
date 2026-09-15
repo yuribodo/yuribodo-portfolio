@@ -59,5 +59,18 @@ export function LobbyGate({ isMobile }: LobbyGateProps) {
   if (gpuCapable === null) return <LobbyLoading />;
   if (reducedMotion || !gpuCapable) return null;
 
-  return <DeskScene state={state} dispatch={dispatch} />;
+  return <>
+    <DeskScene state={state} dispatch={dispatch} />
+    {(state === "idle" || state === "exploring") && (
+      <a
+        href="/CREDITS.md"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-lobby-chrome
+        className="fixed bottom-6 left-6 z-[61] inline-flex min-h-11 items-center rounded-full border border-white/25 bg-[#132a35]/90 px-4 font-mono text-[10px] text-[#f1f3e7] shadow-lg hover:bg-[#274450] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#fff2c7]"
+      >
+        3D credits ↗
+      </a>
+    )}
+  </>;
 }

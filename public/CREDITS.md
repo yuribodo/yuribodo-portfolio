@@ -104,3 +104,15 @@ The ancient trees reuse **Poly Haven Tree Small 02**, CC0, with broader crowns, 
 ### Dragon flying
 
 “Dragon flying” by [NORBERTO-3D](https://sketchfab.com/norberto3d), [original model](https://sketchfab.com/3d-models/dragon-flying-78f809b98bbe426e94d4024dc894b206), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Retrieved from the attributed [Gamehook distribution](https://github.com/RobertTownley/gamehook/tree/0393225db7/public/resources/dragon). Converted to Draco/WebP GLB; material lighting, scale, flight path and playback speed adjusted. Original skeletal and morph animation and rider preserved.
+
+### Toothless / Banguela — current flying dragon
+
+**“Toothless (Rigged) - HTTYD”** by **[Stuck On Saturn](https://sketchfab.com/stuckonsaturn)**.
+
+- [Original model on Sketchfab](https://sketchfab.com/3d-models/toothless-rigged-httyd-91d8197bf907439daa1bd78ad6a775cc).
+- Model license: **[Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)**.
+- Original FBX and textures supplied through the author's Sketchfab download. The artist's mesh, skin weights, UVs and painted textures are retained.
+- Portfolio adaptations: newly authored and baked skeletal flight animation (wing flex, body motion, tucked legs and trailing tail), material conversion to glTF PBR, coordinate/scale normalization, texture resizing to at most 2K, WebP and Meshopt compression, and scene lighting/flight path. Runtime file: `lobby/world/toothless-flight.glb`.
+- Toothless is a character from *How to Train Your Dragon*. This is an unofficial fan model; the character and franchise belong to their respective rights holders. No affiliation or endorsement is implied.
+
+The earlier NORBERTO-3D dragon remains credited above as an archived asset and is no longer loaded by the current scene.
