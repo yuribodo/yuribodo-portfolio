@@ -73,6 +73,37 @@ test("readiness follows desk assets, while skip remains usable", async ({ page }
   release?.();
 });
 
+test("loading stays visible until the rendered desk replaces it directly", async ({ page }) => {
+  await allowSoftwareRenderer(page);
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/lobby/models/wooden_desk.glb", async route => {
+    await pending;
+    await route.continue();
+  });
+  try {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const loading = page.locator("[data-lobby-loading]");
+    await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "loading");
+    await expect(loading).toBeVisible();
+    await expect(loading).toContainText("Preparing your world");
+    // Past the former fake 1.5s progress timer: no unlabelled black screen.
+    await page.waitForTimeout(2500);
+    await expect(loading).toBeVisible();
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe("hidden");
+    await page.screenshot({ path: test.info().outputPath("loading-models.png") });
+    release();
+    await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "idle");
+    // The indicator and its opaque cover leave in the same readiness commit.
+    expect(await loading.count()).toBe(0);
+    await expect(page.locator("[data-lobby-active] > .bg-background")).toHaveCount(0);
+    await page.screenshot({ path: test.info().outputPath("desk-ready.png") });
+    await page.getByRole("button", { name: "Enter portfolio", exact: true }).click();
+    await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+  } finally { release(); }
+});
+
 test("missing authored world assets do not block desk entry", async ({ page }) => {
   await page.route("**/lobby/world/cloud-volume-*.bin.gz", route => route.abort());
   await page.route(/\/lobby\/world\/canopy-[^/]+\.webp/, route => route.abort());

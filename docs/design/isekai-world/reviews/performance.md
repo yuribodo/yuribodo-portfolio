@@ -29,7 +29,7 @@ See `../implementation/performance/before.json`, `after.json` and `after-repeat.
 | Submitted triangles/frame (million) | 14.5 | 13.2–13.2 |
 
 
-“Desk ready” is navigation to the `idle` state after the loaded desk renders two frames. The existing entrance fade follows it. Asset bytes count decoded HTTP resource bodies under `/lobby/`, including local decoders and cloud volumes; they exclude app JavaScript, fonts and HTML. They are not total network transfer bytes. Heap is Chromium's JavaScript estimate, sampled after warmup, without forcing garbage collection. Submitted triangles include shadow passes.
+“Desk ready” is navigation to the `idle` state after the loaded desk renders two frames. At the time of these measurements, an entrance fade followed it. The subsequent [loading handoff fix](loading-handoff.md) removes that extra delay. Asset bytes count decoded HTTP resource bodies under `/lobby/`, including local decoders and cloud volumes; they exclude app JavaScript, fonts and HTML. They are not total network transfer bytes. Heap is Chromium's JavaScript estimate, sampled after warmup, without forcing garbage collection. Submitted triangles include shadow passes.
 
 The intermediate `after-initial.json` and `after-clouds.json` document incremental measurements. Moving cloud generation alone did not improve the full load in that run; texture preparation remained expensive. The final measurements include the auxiliary texture optimization.
 
