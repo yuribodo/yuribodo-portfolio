@@ -7,12 +7,14 @@ import { useGLTF, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import {
-  Color, DoubleSide, Float32BufferAttribute, InstancedMesh,
+  Color, DoubleSide, Float32BufferAttribute, InstancedMesh, Frustum, Matrix4, Sphere,
   Mesh, MeshStandardMaterial, Object3D, PlaneGeometry,
   type BufferGeometry, type Group, type Material,
 } from "three";
 
 import { worldHeight as terrainHeight } from "@/lib/lobby/world-geography";
+
+import { visibleInstances } from "@/lib/lobby/instance-visibility";
 
 import { groundMaterial, GROUND_TEXTURES } from "./terrain-pigment";
 
@@ -29,7 +31,7 @@ export function useBakedGeometry(scene: Group) {
       // Integer-normalized attributes cannot hold a baked world-space position.
       for (const name of ["position", "normal", "tangent"]) {
         const attribute = geometry.getAttribute(name);
-        if (!attribute) continue;
+        if (!attribute || attribute.array instanceof Float32Array) continue;
         const values = [];
         for (let i = 0; i < attribute.count; i++) {
           values.push(attribute.getX(i), attribute.getY(i), attribute.getZ(i));
@@ -95,21 +97,51 @@ export function InstanceBatch({ geometry, material, placements, shadows = false,
   geometry: BufferGeometry; material: MeshStandardMaterial; placements: Placement[]; shadows?: boolean; depthMaterial?: Material;
 }) {
   const ref = useRef<InstancedMesh>(null);
-  useLayoutEffect(() => {
-    if (!ref.current) return;
+  const data = useMemo(() => {
+    if (!geometry.boundingSphere) geometry.computeBoundingSphere();
     const transform = new Object3D();
-    for (let i = 0; i < placements.length; i++) {
-      const { position, scale = 1, yaw = 0 } = placements[i];
+    const matrices = placements.map(({ position, scale = 1, yaw = 0 }) => {
       transform.position.set(...distantPosition(position));
       if (typeof scale === "number") transform.scale.setScalar(scale); else transform.scale.set(...scale);
       transform.rotation.set(0, yaw, 0);
       transform.updateMatrix();
-      ref.current.setMatrixAt(i, transform.matrix);
+      return transform.matrix.clone();
+    });
+    return { matrices, bounds: matrices.map(matrix => geometry.boundingSphere!.clone().applyMatrix4(matrix)) };
+  }, [geometry, placements]);
+  const visibility = useRef({ frustum: new Frustum(), projection: new Matrix4(), previousProjection: new Matrix4(),
+      previousWorld: new Matrix4(), scratch: new Sphere(), indices: [] as number[], initialized: false });
+  useLayoutEffect(() => {
+    const mesh = ref.current!;
+    data.matrices.forEach((matrix, i) => mesh.setMatrixAt(i, matrix));
+    mesh.count = data.matrices.length;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    visibility.current.initialized = false;
+    // InstancedMesh owns its instance buffers; geometry/material stay shared.
+    return () => { mesh.dispose(); };
+  }, [data]);
+  useFrame(({ camera }) => {
+    const mesh = ref.current;
+    // Keep off-camera casters: they can still cast visible terrace shadows.
+    if (!mesh || shadows) return;
+    const cache = visibility.current;
+    camera.updateMatrixWorld();
+    mesh.updateWorldMatrix(true, false);
+    cache.projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    if (cache.initialized && cache.projection.equals(cache.previousProjection) && mesh.matrixWorld.equals(cache.previousWorld)) return;
+    cache.previousProjection.copy(cache.projection); cache.previousWorld.copy(mesh.matrixWorld);
+    cache.frustum.setFromProjectionMatrix(cache.projection);
+    const indices = visibleInstances(data.bounds, cache.frustum, mesh.matrixWorld, cache.scratch);
+    if (!cache.initialized || indices.length !== cache.indices.length || indices.some((index, i) => index !== cache.indices[i])) {
+      indices.forEach((index, i) => mesh.setMatrixAt(i, data.matrices[index]));
+      mesh.count = indices.length;
+      mesh.instanceMatrix.needsUpdate = true;
+      cache.indices = indices;
     }
-    ref.current.instanceMatrix.needsUpdate = true;
-    ref.current.computeBoundingSphere();
-  }, [placements]);
-  return <instancedMesh ref={ref} args={[geometry, material, placements.length]} castShadow={shadows} customDepthMaterial={depthMaterial} receiveShadow raycast={() => {}} dispose={null} />;
+    cache.initialized = true;
+  });
+  return <instancedMesh ref={ref} args={[geometry, material, placements.length]} frustumCulled={shadows} castShadow={shadows} customDepthMaterial={depthMaterial} receiveShadow raycast={() => {}} dispose={null} />;
 }
 
 export function AuthoredNature({ floorY, active }: { floorY: number; active: boolean }) {
