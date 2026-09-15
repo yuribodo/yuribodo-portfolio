@@ -22,6 +22,9 @@ export const LOBBY_MODELS = {
   beybladePegasus: "/lobby/models/beyblade-pegasus.glb",
 } as const;
 
+// Keep Draco decoding on our origin: no external CDN round trip or dependency.
+useGLTF.setDecoderPath("/lobby/draco/");
+
 for (const path of Object.values(LOBBY_MODELS)) {
   useGLTF.preload(path);
 }

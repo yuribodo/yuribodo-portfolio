@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree, useLoader } from "@react-three/fiber";
 import {
-  BackSide, BoxGeometry, Color, Data3DTexture, LinearFilter, Mesh,
-  PMREMGenerator, RGBAFormat, Scene, ShaderMaterial, SphereGeometry, Vector3, Matrix4, type WebGLRenderer,
+  BackSide, BoxGeometry, Color, Mesh,
+  PMREMGenerator, Scene, ShaderMaterial, SphereGeometry, Vector3, Matrix4, type WebGLRenderer,
   HalfFloatType, PlaneGeometry, WebGLRenderTarget, type Camera,
 } from "three";
 import { SUN_GLSL } from "./outdoor-lighting";
-import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
+import { CloudVolumeLoader, CLOUD_VOLUMES } from "@/lib/lobby/cloud-volume-loader";
 
 const skyVertex = `varying vec3 vDirection;
 void main() { vDirection = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
@@ -27,61 +27,6 @@ void main() {
   #include <colorspace_fragment>
 }`;
 
-// A reusable density field, not a cloud picture. Green stores precomputed light
-// transmittance, saving multiple shadow-ray samples at every raymarch step.
-function cumulusField(variant: number) {
-  const nx = 128, ny = 96, nz = 80, noise = new ImprovedNoise();
-  const density = new Float32Array(nx * ny * nz);
-  // Sculpted cumulus towers: narrow upward growth, low spreading bases and
-  // smaller satellite billows. Variants avoid repeating one pancake silhouette.
-  const lobes = variant === 0 ? [
-    [-.27,-.23,0,.19,.12,.22],[-.05,-.21,0,.25,.15,.27],[.23,-.24,.01,.20,.12,.21],
-    [-.16,-.06,.02,.22,.22,.24],[.10,-.04,-.04,.22,.20,.25],
-    [-.10,.12,0,.18,.21,.21],[-.17,.27,-.01,.13,.14,.15],
-    [.15,.10,.04,.14,.16,.16],[.30,-.11,.03,.12,.13,.16],
-    [-.34,-.10,.02,.11,.12,.16],[.01,.24,.01,.12,.13,.13],
-  ] : [
-    [-.29,-.25,0,.16,.11,.22],[-.08,-.23,0,.24,.14,.25],[.18,-.23,.02,.23,.13,.24],
-    [.12,-.04,0,.22,.23,.25],[.20,.14,.02,.17,.22,.19],
-    [.12,.29,0,.12,.13,.14],[-.15,-.06,0,.18,.19,.23],
-    [-.22,.08,.02,.13,.14,.17],[.33,-.08,.02,.10,.14,.15],
-  ];
-  const index = (x: number, y: number, z: number) => (z * ny + y) * nx + x;
-  for (let z = 0; z < nz; z++) for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) {
-    const px = x / (nx - 1) - .5, py = y / (ny - 1) - .5, pz = z / (nz - 1) - .5;
-    if (variant === 2) {
-      // Wind-stretched, broken filaments rather than a flattened cumulus blob.
-      const envelope=Math.max(0,1-Math.pow(px/.47,4))*Math.max(0,1-Math.pow(pz/.42,4));
-      const fibre=noise.noise(px*5+41,py*9,pz*19)+.35*noise.noise(px*14,py*17,pz*37);
-      density[index(x,y,z)]=Math.max(0,Math.min(1,(fibre-.02)*2))*envelope*Math.exp(-py*py*28);
-      continue;
-    }
-    let shape = -1;
-    for (const [cx,cy,cz,rx,ry,rz] of lobes) {
-      shape = Math.max(shape, 1 - Math.hypot((px-cx)/rx, (py-cy)/ry, (pz-cz)/rz));
-    }
-    const detail = noise.noise(px*11+13+variant*31,py*11+5,pz*11)*.19
-      + noise.noise(px*27+variant*17,py*27,pz*27)*.065
-      + noise.noise(px*57,py*57,pz*57)*.018;
-    density[index(x,y,z)] = Math.max(0, Math.min(1, (shape + detail) * 7.0)) * Math.min(1, Math.max(0, (py+.37)*22));
-  }
-  const data = new Uint8Array(nx * ny * nz * 4);
-  for (let z = 0; z < nz; z++) for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) {
-    const i = index(x,y,z); let opticalDepth = 0;
-    for (let step = 1; step <= 8; step++) {
-      const xx = x-step*2, yy = y+step*3, zz = z+step;
-      if (xx >= 0 && yy < ny && zz < nz) opticalDepth += density[index(xx,yy,zz)] * .38;
-    }
-    data[i*4] = density[i] * 255;
-    data[i*4+1] = Math.exp(-opticalDepth) * 255;
-    data[i*4+2] = y / ny * 255;
-    data[i*4+3] = 255;
-  }
-  const texture = new Data3DTexture(data, nx, ny, nz);
-  texture.format = RGBAFormat; texture.minFilter = texture.magFilter = LinearFilter;
-  texture.unpackAlignment = 1; texture.needsUpdate = true;
-  return texture;
-}
 const cloudVertex = `varying vec3 vOrigin; varying vec3 vDirection; varying float vCloudDistance;
 void main() {
   vCloudDistance = length((modelMatrix * vec4(0.0,0.0,0.0,1.0)).xyz-cameraPosition);
@@ -175,18 +120,19 @@ export function Atmosphere({ active }: { active: boolean }) {
   const size = useThree(s => s.size);
   const dpr = useThree(s => s.viewport.dpr);
   const elapsed = useRef(0);
+  const fields = useLoader(CloudVolumeLoader, CLOUD_VOLUMES);
   const { dome, sky, cloud, cloudVariant, wisps, volume, field, fieldVariant, wispField, setDimmer, backdrop, target, screen, composite, updateClouds } = useMemo(() => {
-    const dimmer = { value: 1 }, field = cumulusField(0);
+    const dimmer = { value: 1 }, [field, fieldVariant, wispField] = fields.map(field => field.clone());
     const sky = new ShaderMaterial({ vertexShader: skyVertex, fragmentShader: skyFragment,
       uniforms: { worldDimmer: dimmer }, side: BackSide, depthWrite: false, toneMapped: false });
     const cloud = new ShaderMaterial({ vertexShader: cloudVertex, fragmentShader: cloudFragment,
       uniforms: { worldDimmer: dimmer, densityMap: { value: field }, cloudExtinction: { value: 40 },
         cloudShade: { value: new Color("#a0bce8") }, cloudLight: { value: new Color("#fffdf5") } },
       side: BackSide, transparent: true, depthWrite: false, toneMapped: false });
-    const fieldVariant = cumulusField(1), cloudVariant = cloud.clone();
+    const cloudVariant = cloud.clone();
     cloudVariant.uniforms.densityMap.value = fieldVariant;
     cloudVariant.uniforms.worldDimmer = dimmer;
-    const wispField=cumulusField(2),wisps=cloud.clone();
+    const wisps=cloud.clone();
     wisps.uniforms.densityMap.value=wispField;wisps.uniforms.cloudExtinction.value=18;
     wisps.uniforms.worldDimmer=dimmer;wisps.uniforms.cloudShade.value=new Color('#d4e3f5');
     const setDimmer = (ratio: number) => { dimmer.value = ratio; };
@@ -212,7 +158,7 @@ export function Atmosphere({ active }: { active: boolean }) {
     composite.userData.setWorldDimmer=setDimmer;
     return {dome,sky,cloud,cloudVariant,wisps,volume,field,fieldVariant,wispField,setDimmer,backdrop,target,screen:new PlaneGeometry(2,2),composite,
       updateClouds:(time:number)=>distantClouds.forEach((mesh,i)=>{mesh.position.x=banks[i+NEAR_CLOUD_COUNT].p[0]+Math.sin(time*.008+i+2)*7;})};
-  }, []);
+  }, [fields]);
   useEffect(() => installSkyLighting(gl, scene, backdrop, setDimmer), [gl, scene, backdrop, setDimmer]);
   useEffect(() => { target.setSize(Math.max(1,Math.ceil(size.width*dpr*.75)),Math.max(1,Math.ceil(size.height*dpr*.75))); }, [target,size.width,size.height,dpr]);
   const cloudRefs = useRef<(Mesh | null)[]>([]);

@@ -198,7 +198,7 @@ export function dimWorldMaterials(group: Group, ratio: number) {
 export default function IsekaiWorld({ floorY, active }: WorldProps) {
   return (
     <OutdoorLighting active={active}><group name="isekai-world">
-      <Atmosphere active={active} />
+      <WorldBoundary><Suspense fallback={null}><Atmosphere active={active} /></Suspense></WorldBoundary>
       <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><ValleyCreatures /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><AncientTrees floorY={floorY}/></Suspense></WorldBoundary>
@@ -224,7 +224,6 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       <WorldBoundary><Suspense fallback={null}><ValleyCliffs floorY={floorY} /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><ChessMonuments /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ArchitecturalModel url={WORLD_ASSETS.academy} position={[-12, floorY + worldHeight(-12, 160), 160]} scale={1.45} rotation={[0, Math.PI + 0.3, 0]} /></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}>
         <group position={[150,55,-850]} scale={1.7} rotation={[0,-.5,0]}><SkyIsland /><SkyGarden /></group>
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
