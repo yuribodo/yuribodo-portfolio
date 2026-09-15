@@ -46,11 +46,18 @@ export function LobbyGate({ isMobile }: LobbyGateProps) {
     if (state === "done") markVisited();
   }, [state, markVisited]);
 
-  if (isMobile || reducedMotion) return null;
-  if (state === "done") return null;
-  // null = probing — render nothing so the lobby doesn't briefly appear
-  // before the blocklist check completes. false = blocklisted GPU.
-  if (gpuCapable !== true) return null;
+  const blocksPage = !isMobile && !reducedMotion && state !== "done" && gpuCapable !== false;
+  useEffect(() => {
+    if (!blocksPage) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [blocksPage]);
+
+  if (isMobile || state === "done") return null;
+  // Keep server and hydration markup identical while browser capabilities resolve.
+  if (gpuCapable === null) return <LobbyLoading />;
+  if (reducedMotion || !gpuCapable) return null;
 
   return <DeskScene state={state} dispatch={dispatch} />;
 }

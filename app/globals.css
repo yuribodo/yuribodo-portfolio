@@ -174,3 +174,12 @@ html.lenis, html.lenis body {
   outline: 2px solid #fff2c7; outline-offset: 4px;
   font-family: var(--font-jetbrains), monospace; font-size: 12px;
 }
+
+/* Indeterminate progress: this never claims completion before the scene renders. */
+@keyframes lobby-loading-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+.lobby-loading-indicator {
+  animation: lobby-loading-sweep 1.1s ease-in-out infinite;
+}

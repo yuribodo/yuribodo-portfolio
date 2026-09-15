@@ -1,8 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import gsap from "gsap";
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
@@ -14,6 +13,7 @@ import Desk from "./desk";
 import DeskEnvironment, {
   type DeskEnvironmentHandle,
 } from "./desk-environment";
+import { LobbyLoading } from "./lobby-loading";
 import { MuteToggle } from "./mute-toggle";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
@@ -53,20 +53,10 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const yugiohRef = useRef<YugiohDeckHandle>(null);
   const figuresRef = useRef<AnimeFiguresHandle>(null);
   const beybladeRef = useRef<BeybladeHandle>(null);
-  // Black overlay that sits over the Canvas. Starts opaque so the loading
-  // → idle entrance reads as a smooth power-on rather than the scene
-  // snapping in fully lit. Tweened to opacity 0 once the render loop has
-  // stabilised (first frames hitch on shader compile + texture upload).
-  const fadeOverlayRef = useRef<HTMLDivElement>(null);
-  const hasEnteredRef = useRef(false);
   const [diveProgress, setDiveProgress] = useState(0);
   const [floorY, setFloorY] = useState(-1.5);
   const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
   const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
-  // Live monitor paint is deferred until after the entrance fade so the
-  // heavy per-pixel Bayer dither (~10ms / paint) doesn't compete with the
-  // fade tween. Monitor paints once on state change as a fallback.
-  const [livePaintEnabled, setLivePaintEnabled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   // Destructure to capture the stable useCallback identities. Re-using
   // `audio` as a whole would invalidate every dep array on each mute flip
@@ -78,14 +68,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     isMuted,
     toggleMuted,
   } = useLobbyAudio();
-
-  // Snap the fade overlay opaque before paint so nobody sees a flash of the
-  // unanimated scene between mount and the entrance tween starting.
-  useLayoutEffect(() => {
-    if (fadeOverlayRef.current) {
-      fadeOverlayRef.current.style.opacity = "1";
-    }
-  }, []);
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -122,71 +104,6 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       window.removeEventListener("keydown", handleGesture);
     };
   }, [state, startAmbient]);
-
-  // Lobby entrance: fade the overlay from black on the first loading → idle
-  // transition. Everything else (camera, lights, screen emissive) snaps
-  // into place behind the opaque overlay so the fade itself is the ONLY
-  // thing animating on the main thread → no jank competing with the tween.
-  //
-  // The fade waits until rAF has produced N consecutive stable frames
-  // (delta < 22ms ≈ >45fps) — gives the first-frame stalls (shader compile,
-  // texture upload) time to clear before the user sees motion.
-  useEffect(() => {
-    if (state !== "idle" || hasEnteredRef.current) return;
-    hasEnteredRef.current = true;
-
-    const overlay: HTMLDivElement | null = fadeOverlayRef.current;
-    if (!overlay) return;
-    const el = overlay;
-
-    if (prefersReducedMotion) {
-      el.style.opacity = "0";
-      el.style.display = "none";
-      setLivePaintEnabled(true);
-      return;
-    }
-
-    let stableFrames = 0;
-    const startTime = performance.now();
-    let lastTime = startTime;
-    let raf = 0;
-    let started = false;
-
-    function tick(now: number) {
-      const delta = now - lastTime;
-      lastTime = now;
-      if (delta < 22) stableFrames++;
-      else stableFrames = 0;
-
-      // Hard cap — if rAF never stabilises (low-end device under load) we
-      // still start the fade after ~600ms so the user isn't stuck on black.
-      const elapsed = now - startTime;
-      if (stableFrames >= 4 || elapsed > 600) {
-        started = true;
-        gsap.to(el, {
-          opacity: 0,
-          duration: 1.2,
-          ease: "power2.out",
-          onComplete: () => {
-            el.style.display = "none";
-            // Activate the live paint loop now that nothing else is
-            // animating — the heavy dither has the main thread to itself.
-            setLivePaintEnabled(true);
-          },
-        });
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    }
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      if (!started) {
-        gsap.killTweensOf(el);
-      }
-    };
-  }, [state, prefersReducedMotion]);
 
   // The dive transition (#10). Fires exactly once when the state machine
   // crosses into "booting" (the reducer guards against re-entry — a second
@@ -292,7 +209,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             onEnter={handleEnter}
             state={state}
             diveProgress={diveProgress}
-            livePaint={livePaintEnabled}
+            livePaint={state !== "loading"}
           />
           <RazerPeripherals />
           <Macbook />
@@ -321,14 +238,9 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         </Suspense>
         </WorldBoundary>
       </Canvas>
-      {/* Fade-from-black overlay for the loading → idle entrance. Sits
-          above the Canvas but pointer-events-none so hover / click still
-          land on the screen mesh. */}
-      <div
-        ref={fadeOverlayRef}
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-10 bg-background"
-      />
+      {/* The same indicator as the bundle fallback remains until SceneReady
+          has observed real rendered frames. No timed black entrance layer. */}
+      {state === "loading" && <LobbyLoading contained />}
       {/* Keyboard equivalents call the same object handles as mesh clicks.
           The focused action becomes visible above the navigation controls. */}
       <div
