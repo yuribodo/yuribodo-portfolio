@@ -1,4 +1,6 @@
-import { useGLTF } from "@react-three/drei";
+import { DefaultLoadingManager } from "three";
+import { lobbyAssetUrl } from "./asset-url";
+import { useGLTF, useTexture } from "@react-three/drei";
 
 // Single source of truth for every GLB the lobby loads. Adding a new model:
 // 1. drop the compressed GLB at public/lobby/models/<name>.glb
@@ -8,20 +10,18 @@ import { useGLTF } from "@react-three/drei";
 // useGLTF.preload runs at module load — by the time DeskScene mounts, the
 // browser has already kicked off the fetches in parallel.
 
-export const LOBBY_MODELS = {
-  desk: "/lobby/models/wooden_desk.glb",
-  monitor: "/lobby/models/monitor.glb",
-  macbook: "/lobby/models/macbook_pro_closed.glb",
-  keyboard: "/lobby/models/keyboard-razer.glb",
-  mouse: "/lobby/models/mouse-razer.glb",
-  figureMinato: "/lobby/models/minato.glb",
-  figureSeismitoad: "/lobby/models/seismitoad.glb",
-  figureDrago: "/lobby/models/drago.glb",
-  nintendoDs: "/lobby/models/nintendo-ds.glb",
-  xboxController: "/lobby/models/xbox-controller.glb",
-  beybladePegasus: "/lobby/models/beyblade-pegasus.glb",
-} as const;
+import { LOBBY_MODELS } from "./asset-manifest";
+export { LOBBY_MODELS } from "./asset-manifest";
+
+DefaultLoadingManager.setURLModifier(lobbyAssetUrl);
+
+// Keep Draco decoding on our origin: no external CDN round trip or dependency.
+useGLTF.setDecoderPath("/lobby/draco/");
 
 for (const path of Object.values(LOBBY_MODELS)) {
   useGLTF.preload(path);
+}
+
+for (const file of ["pokemon-front-charizard", "pokemon-back", "yugioh-front-mago-negro", "yugioh-back"]) {
+  useTexture.preload(`/lobby/textures/${file}.webp`);
 }

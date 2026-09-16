@@ -5,7 +5,6 @@ import { Contact } from "@/components/sections/contact";
 import { Header } from "@/components/ui/header";
 import { AudioToggle } from "@/components/ui/audio-toggle";
 import { AsciiNoise } from "@/components/ui/ascii-noise";
-import { LoadingScreen } from "@/components/ui/loading-screen";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { KonamiCode } from "@/components/easter-eggs/konami-code";
 import { LobbyGate } from "@/components/lobby/lobby-gate";
@@ -18,7 +17,6 @@ export default async function Home() {
   return (
     <>
       {!isMobile && <LobbyGate isMobile={false} />}
-      <LoadingScreen />
       <CustomCursor />
       <AsciiNoise />
       <Header />

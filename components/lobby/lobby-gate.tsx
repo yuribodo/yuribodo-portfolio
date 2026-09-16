@@ -1,6 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { lobbyAssetUrl } from "@/lib/lobby/asset-url";
+import { preload } from "react-dom";
+import { LOBBY_MODELS } from "@/lib/lobby/asset-manifest";
+import { TERRAIN_DATA_URL } from "@/lib/lobby/terrain-data-manifest";
 import { useEffect, useState } from "react";
 import { isGpuCapable } from "@/lib/lobby/gpu-detect";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -33,6 +37,11 @@ export function LobbyGate({ isMobile }: LobbyGateProps) {
     // bundle from loading. The alternative (lazy useState initializer)
     // would run during SSR where `window` is undefined.
     const capable = isGpuCapable();
+    if (capable && !isMobile && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      for (const url of [LOBBY_MODELS.desk, LOBBY_MODELS.monitor, TERRAIN_DATA_URL]) {
+        preload(lobbyAssetUrl(url), { as: "fetch", crossOrigin: "anonymous" });
+      }
+    }
     if (!capable) {
       // Surfaced as info (not warn) so it shows in normal devtools without
       // dirtying the console for end users.
@@ -40,17 +49,37 @@ export function LobbyGate({ isMobile }: LobbyGateProps) {
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setGpuCapable(capable);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     if (state === "done") markVisited();
   }, [state, markVisited]);
 
-  if (isMobile || reducedMotion) return null;
-  if (state === "done") return null;
-  // null = probing — render nothing so the lobby doesn't briefly appear
-  // before the blocklist check completes. false = blocklisted GPU.
-  if (gpuCapable !== true) return null;
+  const blocksPage = !isMobile && !reducedMotion && state !== "done" && gpuCapable !== false;
+  useEffect(() => {
+    if (!blocksPage) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [blocksPage]);
 
-  return <DeskScene state={state} dispatch={dispatch} />;
+  if (isMobile || state === "done") return null;
+  // Keep server and hydration markup identical while browser capabilities resolve.
+  if (gpuCapable === null) return <LobbyLoading />;
+  if (reducedMotion || !gpuCapable) return null;
+
+  return <>
+    <DeskScene state={state} dispatch={dispatch} />
+    {(state === "idle" || state === "exploring") && (
+      <a
+        href="/CREDITS.md"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-lobby-chrome
+        className="fixed bottom-6 left-6 z-[61] inline-flex min-h-11 items-center rounded-full border border-white/25 bg-[#132a35]/90 px-4 font-mono text-[10px] text-[#f1f3e7] shadow-lg hover:bg-[#274450] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#fff2c7]"
+      >
+        3D credits ↗
+      </a>
+    )}
+  </>;
 }

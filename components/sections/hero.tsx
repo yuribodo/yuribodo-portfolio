@@ -7,20 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { startSoundtrack } from "@/lib/audio-manager";
 
+import { createDither } from "@/lib/lobby/dither";
+import { observePageAnimation } from "@/lib/observe-page-animation";
+
 gsap.registerPlugin(ScrollTrigger);
-
-// 4x4 Bayer dithering matrix
-const BAYER_4X4 = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
-];
-
-// Normalize Bayer matrix to 0-1 range
-const BAYER_NORMALIZED = BAYER_4X4.map((row) =>
-  row.map((v) => v / 16)
-);
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -39,71 +29,47 @@ export function Hero() {
   useGSAP(() => {
     if (reducedMotion) return;
 
-    // Start fully dithered
-    ditherRef.current.strength = 0.8;
+    ditherRef.current.strength = 0.55;
+    const tl = gsap.timeline({ paused: true });
 
-    const tl = gsap.timeline({ delay: 2.2 });
-
-    // Phase 1: Dissolve dither
     tl.to(ditherRef.current, {
       strength: 0.4,
-      duration: 1.5,
+      duration: 0.75,
       ease: "power2.out",
-    });
+    }, 0);
+    tl.from("[data-hero-char]", {
+      yPercent: 20,
+      opacity: 0,
+      duration: 0.65,
+      stagger: 0.025,
+      ease: "power3.out",
+    }, 0);
+    tl.from(subtitleRef.current, {
+      y: 10,
+      opacity: 0,
+      duration: 0.5,
+      ease: "power3.out",
+    }, 0.12);
+    tl.from(linksRef.current, {
+      y: 8,
+      opacity: 0,
+      duration: 0.45,
+      ease: "power3.out",
+    }, 0.2);
+    tl.from(scrollRef.current, {
+      opacity: 0,
+      duration: 0.4,
+      ease: "power2.out",
+    }, 0.3);
+    tl.call(() => startSoundtrack("/audio/soundtrack.mp3"));
 
-    // Phase 2: Characters drop in with overshoot bounce
-    tl.from(
-      "[data-hero-char]",
-      {
-        y: -120,
-        opacity: 0,
-        scale: 1.3,
-        rotation: () => gsap.utils.random(-15, 15),
-        duration: 1,
-        stagger: 0.06,
-        ease: "back.out(1.7)",
-      },
-      "-=1.2"
-    );
-
-    // Phase 3: Subtitle
-    tl.from(
-      subtitleRef.current,
-      {
-        y: 20,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      },
-      "-=0.4"
-    );
-
-    // Links
-    tl.from(
-      linksRef.current,
-      {
-        y: 15,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out",
-      },
-      "-=0.3"
-    );
-
-    // Scroll indicator
-    tl.from(
-      scrollRef.current,
-      {
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out",
-      },
-      "-=0.2"
-    );
-
-    // Start soundtrack after entrance
-    tl.call(() => {
-      startSoundtrack("/audio/soundtrack.mp3");
+    // The entrance belongs to the reveal, regardless of how long someone
+    // explores the desk. It also works for mobile, skip, and GPU fallback.
+    let entered = false;
+    const stopObserving = observePageAnimation(sectionRef.current!, (visible) => {
+      if (!visible || entered) return;
+      entered = true;
+      tl.play();
     });
 
     // Exit: gentle fade-out on scroll
@@ -132,7 +98,8 @@ export function Hero() {
       duration: 0.7,
       ease: "power1.in",
     }, 0.3);
-  }, [reducedMotion]);
+    return stopObserving;
+  }, { dependencies: [reducedMotion], scope: sectionRef, revertOnUpdate: true });
 
   // Dithering canvas render loop
   useEffect(() => {
@@ -199,6 +166,7 @@ export function Hero() {
       offCtx.fillRect(0, 0, w, h);
     }
 
+    const dither = createDither();
     function applyDithering(strength: number) {
       if (!ctx || !canvas) return;
       const w = canvas.width;
@@ -211,22 +179,7 @@ export function Hero() {
 
       const imageData = ctx.getImageData(0, 0, w, h);
       const data = imageData.data;
-      const colorLevels = Math.max(2, Math.round(2 + (1 - strength) * 14)); // 2 colors at max dither, 16 at no dither
-
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const idx = (y * w + x) * 4;
-          const threshold = BAYER_NORMALIZED[y % 4][x % 4];
-
-          for (let c = 0; c < 3; c++) {
-            const value = data[idx + c] / 255;
-            const quantized =
-              Math.floor(value * (colorLevels - 1) + threshold * strength) /
-              (colorLevels - 1);
-            data[idx + c] = Math.min(255, Math.max(0, quantized * 255));
-          }
-        }
-      }
+      dither(data, w, h, strength);
 
       ctx.putImageData(imageData, 0, 0);
     }
@@ -236,9 +189,16 @@ export function Hero() {
       applyDithering(ditherRef.current.strength);
       animFrameRef.current = requestAnimationFrame(loop);
     }
-    animFrameRef.current = requestAnimationFrame(loop);
+    // Paint a handoff frame, then stop work while the opaque lobby covers it.
+    drawGradient(performance.now());
+    applyDithering(ditherRef.current.strength);
+    const stopObserving = observePageAnimation(sectionRef.current!, (visible) => {
+      cancelAnimationFrame(animFrameRef.current);
+      if (visible) animFrameRef.current = requestAnimationFrame(loop);
+    });
 
     return () => {
+      stopObserving();
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener("resize", resize);
     };

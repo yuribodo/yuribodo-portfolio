@@ -72,7 +72,8 @@ function fadeSoundtrackTo(target: number, durationMs: number): void {
 
   function step(now: number) {
     const elapsed = now - startTime;
-    const progress = Math.min(elapsed / durationMs, 1);
+    // A callback queued during a frame can receive that frame's earlier timestamp.
+    const progress = Math.max(0, Math.min(elapsed / durationMs, 1));
     audio.volume = start + (target - start) * progress;
     if (progress < 1) requestAnimationFrame(step);
   }

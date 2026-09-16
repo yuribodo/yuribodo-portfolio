@@ -1,0 +1,42 @@
+{
+  "going-merry": {
+    "bytes": 1790720,
+    "triangles": 86767,
+    "draws": 1,
+    "animations": []
+  },
+  "ainz": {
+    "bytes": 439536,
+    "triangles": 84833,
+    "draws": 17,
+    "animations": []
+  },
+  "lancelot": {
+    "bytes": 974568,
+    "triangles": 44918,
+    "draws": 2,
+    "animations": []
+  },
+  "snorlax": {
+    "bytes": 456564,
+    "triangles": 57784,
+    "draws": 1,
+    "animations": [
+      "Snorlax_Breath"
+    ]
+  },
+  "fishstick": {
+    "bytes": 454328,
+    "triangles": 16134,
+    "draws": 3,
+    "animations": [
+      "Orange_Justice"
+    ]
+  },
+  "royal-court": {
+    "bytes": 911124,
+    "triangles": 47276,
+    "draws": 4,
+    "animations": []
+  }
+}

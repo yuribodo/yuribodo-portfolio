@@ -21,20 +21,13 @@ export interface UseLobbyAudioResult {
 // only the mute flag is React state because the toggle button needs to
 // re-render on flip. Cleanup disposes the AudioContext on unmount so the
 // lobby doesn't leak loops into Hero's soundtrack.
-export function useLobbyAudio(): UseLobbyAudioResult {
+export function useLobbyAudio(ready = true): UseLobbyAudioResult {
   const [isMuted, setIsMuted] = useState<boolean>(() => readInitialMute());
   const audioRef = useRef<LobbyAudio | null>(null);
 
   useEffect(() => {
     const audio = new LobbyAudio(isMuted);
     audioRef.current = audio;
-    // OfflineAudioContext doesn't require a user gesture — kick off the
-    // synthesis immediately so cues are ready when the user starts
-    // clicking. Errors are swallowed: a browser without Web Audio support
-    // shouldn't break the lobby, just play it silent.
-    audio.preload().catch(() => {
-      // Synthesis failed; subsequent play() calls will no-op.
-    });
     return () => {
       audio.dispose();
       audioRef.current = null;
@@ -43,6 +36,10 @@ export function useLobbyAudio(): UseLobbyAudioResult {
     // pushed through audio.setMuted(), not by re-creating the controller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (ready) audioRef.current?.preload().catch(() => {});
+  }, [ready]);
 
   const play = useCallback((id: AudioCueId) => {
     audioRef.current?.play(id);

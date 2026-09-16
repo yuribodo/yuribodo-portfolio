@@ -1,0 +1,11 @@
+{
+  "errors": [],
+  "realAnimalRequests": [],
+  "recordingSeconds": 18,
+  "url": "http://localhost:3002",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "mode": "forward-facing desk"
+}

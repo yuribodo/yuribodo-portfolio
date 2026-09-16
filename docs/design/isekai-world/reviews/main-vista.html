@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skybound — a vista da mesa</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5f2;color:#223844;font:16px/1.6 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:28px 20px}h1{font-size:32px;line-height:1.2}h2{font-size:22px;margin-top:32px}p{max-width:85ch}a{color:#17668b}.comparison{position:relative;aspect-ratio:8/5;background:#183444;overflow:hidden}.comparison img{position:absolute;width:100%;height:100%;object-fit:contain}.after{clip-path:inset(0 50% 0 0)}.divider{position:absolute;left:50%;height:100%;border-left:2px solid white;pointer-events:none}.tag{position:absolute;top:12px;padding:5px 12px;background:#183444ed;color:white;border-radius:4px}.old{right:12px}.new{left:12px}input{width:100%;accent-color:#17668b}video,.reference{width:100%;display:block;background:#183444}.note{font-size:14px;color:#4c606b}li{margin-block:6px}label{display:block;margin-top:12px}
+</style>
+<main>
+<h1>O mundo visto da mesa — registro anterior</h1>
+<p>A alteração da mesa desta passagem foi rejeitada e revertida. Veja a <a href="depth-correction.html">correção atual</a>.</p>
+<p>A prateleira alta virou um apoio baixo para os colecionáveis. Acima do monitor, a paisagem passa a ter uma leitura contínua: terraços com quedas-d’água, vila e campos no vale, montanhas ao fundo e ilhas habitadas entre os monumentos.</p>
+<div class="comparison"><img src="../implementation/before-main-vista.png" alt="Vista anterior, com a prateleira alta atravessando a paisagem"><img class="after" src="../implementation/before-depth-correction.png" alt="Vista atual da mesa, com apoio baixo, vale mais profundo e ilhas com vegetação"><div class="divider"></div><span class="tag new">Atual</span><span class="tag old">Anterior</span></div>
+<label for="reveal">Arraste para comparar: <output id="percentage">50</output>% da versão atual</label><input id="reveal" type="range" min="0" max="100" value="50">
+<p class="note">Capturas reais em 1440×900. O enquadramento mudou intencionalmente. As animações de nuvens, luz e vegetação estão em instantes diferentes.</p>
+<p><a href="../implementation/before-depth-correction.png">Abrir print completo</a></p>
+<h2>Em movimento</h2>
+<video controls playsinline preload="metadata" poster="../implementation/before-depth-correction.png"><source src="../implementation/main-vista.mp4" type="video/mp4"></video>
+<p class="note">Produção local: vista inicial, giro para o vale traseiro e retorno à mesa. Sem reprodução automática.</p>
+<h2>A referência aprovada</h2>
+<img class="reference" src="../concepts/05-skybound-at-the-desk.png" alt="Conceito Skybound: mesa diante de uma cidade suspensa, campos, grandes quedas-d’água e monumentos de xadrez">
+<p>O conceito orienta o enquadramento, a hierarquia das silhuetas e a separação entre planos. A implementação ainda tem menos variedade arquitetônica, erosão e detalhe pictórico que a referência; o comparativo registra essa diferença.</p>
+<p><a href="main-vista.md">Mudanças, validação e desempenho</a></p>
+</main>
+<script>
+const range=document.querySelector('#reveal');
+range.addEventListener('input',()=>{document.querySelector('.after').style.clipPath=`inset(0 ${100-range.value}% 0 0)`;document.querySelector('.divider').style.left=range.value+'%';document.querySelector('#percentage').value=range.value;});
+</script>
+</html>

@@ -1,155 +1,58 @@
 "use client";
 
-import { ContactShadows, Environment } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import type {
-  AmbientLight,
-  DirectionalLight,
-  PointLight,
-} from "three";
+import { Color, type DirectionalLight, type HemisphereLight, type PointLight, type Group } from "three";
+import { SUN_POSITION } from "./world/outdoor-lighting";
+import { dimWorldMaterials } from "./world/isekai-world";
 
 export interface DeskEnvironmentHandle {
-  /** Multiplies every light's resting intensity. Called by the dive
-   *  transition (#10) at t=0.00s to drop to 0.2 — collapses the warm/cool
-   *  beat so the screen's emissive pops as we dolly in. */
   setLightingDimmer: (ratio: number) => void;
 }
 
-// Resting intensities — sourced from the previous tuned values. Kept as
-// module constants so the imperative dimmer has something to multiply
-// against and can be reset back to 1.0 cleanly.
-const KEY_INTENSITY = 4.0;
-const FILL_INTENSITY = 0.25;
-const RIM_INTENSITY = 2.2;
-const LAMP_INTENSITY = 6.0;
-const WINDOW_INTENSITY = 3.0;
-const ACCENT_INTENSITY = 1.2;
-const AMBIENT_INTENSITY = 0.06;
+const SUN = 3.6;
+const SKY_FILL = 0.55;
+const DESK_FILL = 0.18;
+const FOG_COLOR = new Color("#afcadf");
 
-const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(
-  function DeskEnvironment(_props, ref) {
-    const keyRef = useRef<DirectionalLight>(null);
-    const fillRef = useRef<DirectionalLight>(null);
-    const rimRef = useRef<DirectionalLight>(null);
-    const lampRef = useRef<PointLight>(null);
-    const windowRef = useRef<PointLight>(null);
-    const accentRef = useRef<PointLight>(null);
-    const ambientRef = useRef<AmbientLight>(null);
+const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(function DeskEnvironment(_, ref) {
+  const scene = useThree((s) => s.scene);
+  const sun = useRef<DirectionalLight>(null);
+  const fill = useRef<DirectionalLight>(null);
+  const sky = useRef<HemisphereLight>(null);
+  const lamp = useRef<PointLight>(null);
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        setLightingDimmer: (ratio: number) => {
-          const r = Math.max(0, Math.min(1, ratio));
-          if (keyRef.current) keyRef.current.intensity = KEY_INTENSITY * r;
-          if (fillRef.current) fillRef.current.intensity = FILL_INTENSITY * r;
-          if (rimRef.current) rimRef.current.intensity = RIM_INTENSITY * r;
-          if (lampRef.current) lampRef.current.intensity = LAMP_INTENSITY * r;
-          if (windowRef.current) windowRef.current.intensity = WINDOW_INTENSITY * r;
-          if (accentRef.current) accentRef.current.intensity = ACCENT_INTENSITY * r;
-          if (ambientRef.current) ambientRef.current.intensity = AMBIENT_INTENSITY * r;
-        },
-      }),
-      [],
-    );
+  useImperativeHandle(ref, () => ({
+    setLightingDimmer(ratio) {
+      const r = Math.max(0, Math.min(1, ratio));
+      scene.userData.worldDimmer = r;
+      if (sun.current) sun.current.intensity = SUN * r;
+      if (fill.current) fill.current.intensity = DESK_FILL * r;
+      if (sky.current) sky.current.intensity = SKY_FILL * r;
+      if (lamp.current) lamp.current.intensity = 4.5 * r;
+      scene.backgroundIntensity = r;
+      scene.environmentIntensity = 0.35 * r;
+      scene.fog?.color.copy(FOG_COLOR).multiplyScalar(r);
+      const world = scene.getObjectByName("isekai-world") as Group | undefined;
+      if (world) dimWorldMaterials(world, r);
+    },
+  }), [scene]);
 
-    return (
-      <>
-        {/* Looser fog so the lights have room to breathe at near distances. */}
-        <fogExp2 attach="fog" args={["#0a0a0f", 0.055]} />
-
-        {/* IBL only — warehouse gives directional highlights on fumed oak.
-            Dialed back so the discrete lights below own the look. */}
-        <Environment
-          preset="warehouse"
-          background={false}
-          environmentIntensity={0.55}
-        />
-
-        {/* KEY — warm overhead, the hero light. Strong enough to throw a
-            legible shadow once peripherals land in #7/#8/#9. */}
-        <directionalLight
-          ref={keyRef}
-          position={[3.5, 6, 2]}
-          color="#ffcc88"
-          intensity={KEY_INTENSITY}
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-near={0.1}
-          shadow-camera-far={20}
-          shadow-camera-left={-3}
-          shadow-camera-right={3}
-          shadow-camera-top={3}
-          shadow-camera-bottom={-3}
-          shadow-bias={-0.0005}
-        />
-
-        {/* FILL — barely-there cool. Most cool reading comes from the window
-            point below; this just keeps the left side from going crushed. */}
-        <directionalLight
-          ref={fillRef}
-          position={[-2.5, 2, 1]}
-          color="#5577aa"
-          intensity={FILL_INTENSITY}
-        />
-
-        {/* RIM — hot saturated orange from low-back. Lights up the rear chamfer
-            edge and the front-right corner where the chamfer wraps. The drama. */}
-        <directionalLight
-          ref={rimRef}
-          position={[0, 1.6, -4]}
-          color="#ff7a3a"
-          intensity={RIM_INTENSITY}
-        />
-
-        {/* Implied warm desk-lamp — closer + stronger than v1, so it actually
-            contributes a visible specular pop on the right side of the surface. */}
-        <pointLight
-          ref={lampRef}
-          position={[1.8, 1.5, 0.5]}
-          color="#ffb87a"
-          intensity={LAMP_INTENSITY}
-          distance={6}
-          decay={2}
-        />
-
-        {/* Implied window cool leak — broader, gentler, deeper in the scene */}
-        <pointLight
-          ref={windowRef}
-          position={[-3, 3, -2]}
-          color="#7090b0"
-          intensity={WINDOW_INTENSITY}
-          distance={10}
-          decay={2}
-        />
-
-        {/* Accent — saturated cyan kicker from below-front. Adds a third colour
-            beat so the scene isn't just warm/cool. Subtle but present. */}
-        <pointLight
-          ref={accentRef}
-          position={[0, -0.8, 2.5]}
-          color="#3aa0ff"
-          intensity={ACCENT_INTENSITY}
-          distance={3.5}
-          decay={2}
-        />
-
-        {/* Minimal ambient — shadows must read as DEEP, not washed. */}
-        <ambientLight ref={ambientRef} intensity={AMBIENT_INTENSITY} />
-
-        {/* Soft grounding shadow — punchier opacity than v1 (was 0.5) so the
-            desk feels seated, not floating in a void. */}
-        <ContactShadows
-          position={[0, -0.4, 0]}
-          opacity={0.7}
-          scale={5}
-          blur={3}
-          far={2}
-        />
-      </>
-    );
-  },
-);
+  return (
+    <>
+      <color attach="background" args={["#85bed8"]} />
+      <fog attach="fog" args={["#afcadf", 100, 2200]} />
+      <hemisphereLight ref={sky} args={["#c0e3ef", "#9a8c67", SKY_FILL]} />
+      <directionalLight
+        ref={sun} position={SUN_POSITION} color="#ffe4b5" intensity={SUN} castShadow
+        shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={160}
+        shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20}
+        shadow-normalBias={0.015} shadow-bias={-0.0002}
+      />
+      <directionalLight ref={fill} position={[4, 3, -6]} color="#b5d6eb" intensity={DESK_FILL} />
+      <pointLight ref={lamp} position={[1.8, 1.5, 0.5]} color="#ffcb97" intensity={4.5} distance={6} decay={2} />
+    </>
+  );
+});
 
 export default DeskEnvironment;
