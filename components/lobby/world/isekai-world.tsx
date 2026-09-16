@@ -1,5 +1,8 @@
 "use client";
 
+import { CoreWorld } from "./core-world";
+import { WorldDetails } from "./world-details";
+import { PreparedGroup } from "./prepared-group";
 import {RiverLandings} from './river-landings';
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -170,38 +173,40 @@ export function dimWorldMaterials(group: Group, ratio: number) {
 export default function IsekaiWorld({ floorY, active }: WorldProps) {
   return (
     <OutdoorLighting active={active}><group name="isekai-world">
-      <WorldBoundary><Suspense fallback={null}><Atmosphere active={active} /></Suspense></WorldBoundary>
-      <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ValleyCreatures /></Suspense></WorldBoundary>
-      <WorldCharacters floorY={floorY} active={active} />
-      <WorldBoundary><Suspense fallback={null}><AncientTrees floorY={floorY}/></Suspense></WorldBoundary>
-      <WorldBoundary><EnchantedGroves floorY={floorY}/></WorldBoundary>
-      <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
+      <CoreWorld id="sky"><Atmosphere active={active} /></CoreWorld>
       <WorldBoundary><VistaStreams floorY={floorY} /></WorldBoundary>
       <WorldBoundary><RiverLandings floorY={floorY}/></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ValleyVillage floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><LivingValley floorY={floorY} active={active} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><NaturalVegetation floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><OrganicVegetation floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><DistantCanopies floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><FlowerColonies floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><MeadowLife floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyVillage floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <CoreWorld id="valley"><LivingValley floorY={floorY} active={active} /></CoreWorld>
+      <CoreWorld id="canopies"><DistantCanopies floorY={floorY} /></CoreWorld>
       {/* Always-available ground makes missing optional assets graceful. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY - 0.2, 0.5]} receiveShadow>
         <planeGeometry args={[6, 6]} />
         <meshToonMaterial color="#849265" />
       </mesh>
-      <WorldBoundary><Suspense fallback={null}><TerraceTerrain floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><TerraceArchitecture floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><TerraceGarden floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ValleyCliffs floorY={floorY} /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><ChessMonuments /></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}>
+      <CoreWorld id="near-ground"><TerraceTerrain floorY={floorY} active={active} /></CoreWorld>
+      <CoreWorld id="terrace"><TerraceArchitecture floorY={floorY} /></CoreWorld>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCliffs floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ChessMonuments /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup>
         <group position={[150,55,-850]} scale={1.7} rotation={[0,-.5,0]}><SkyIsland /><SkyGarden /></group>
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
         <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
-      </Suspense></WorldBoundary>
+      </PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><TerraceGarden floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
+      <WorldDetails enabled={active}>
+      <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCreatures /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldCharacters floorY={floorY} active={active} />
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><AncientTrees floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><EnchantedGroves floorY={floorY}/></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><NaturalVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><OrganicVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><FlowerColonies floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><MeadowLife floorY={floorY} /></WorldBoundary>
+      </WorldDetails>
     </group></OutdoorLighting>
   );
 }

@@ -3,8 +3,8 @@ import {distantPosition} from "@/lib/lobby/world-distance";
 import {spreadLandscape} from "./landscape-distance";
 import { applyOutdoorLight, useOutdoorLight } from "./outdoor-lighting";
 
-import { useGLTF, useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import {
   Color, DoubleSide, Float32BufferAttribute, InstancedMesh, Frustum, Matrix4, Sphere,
@@ -16,7 +16,10 @@ import { worldHeight as terrainHeight } from "@/lib/lobby/world-geography";
 
 import { visibleInstances } from "@/lib/lobby/instance-visibility";
 
-import { groundMaterial, GROUND_TEXTURES } from "./terrain-pigment";
+import { TerrainDataLoader } from "@/lib/lobby/terrain-data-loader";
+import { TERRAIN_DATA_URL } from "@/lib/lobby/terrain-data-manifest";
+import { useGroundTextures } from "./ground-textures";
+import { groundMaterial } from "./terrain-pigment";
 
 // meshopt quantization may place a decode transform on each glTF node.
 // Bake it into a private geometry before supplying our own instance matrices.
@@ -74,19 +77,20 @@ export function useBakedGeometry(scene: Group) {
 
 export { worldHeight as terrainHeight } from "@/lib/lobby/world-geography";
 
-export function TerraceTerrain({ floorY }: { floorY: number }) {
+export function TerraceTerrain({ floorY, active }: { floorY: number; active: boolean }) {
   const light=useOutdoorLight();
-  const textures = useTexture(GROUND_TEXTURES);
+  const baked = useLoader(TerrainDataLoader, TERRAIN_DATA_URL);
+  const textures = useGroundTextures(active);
   const geometry = useMemo(() => {
     const geometry = new PlaneGeometry(170, 170, 288, 288);
     geometry.rotateX(-Math.PI / 2);
     const position = geometry.attributes.position;
     for (let i = 0; i < position.count; i++) {
-      position.setY(i, terrainHeight(position.getX(i), position.getZ(i)));
+      position.setY(i, baked.near[i]);
     }
     return spreadLandscape(geometry,true);
-  }, []);
-  const material = useMemo(() => applyOutdoorLight(groundMaterial(textures),light), [textures,light]);
+  }, [baked]);
+  const material = useMemo(() => applyOutdoorLight(groundMaterial(textures,baked),light), [textures,light,baked]);
   useEffect(() => () => { geometry.dispose(); material.userData.disposeGroundTextures?.(); material.dispose(); }, [geometry, material]);
   return <mesh position={[0, floorY, 0]} geometry={geometry} material={material} receiveShadow raycast={() => {}} />;
 }

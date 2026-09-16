@@ -31,6 +31,7 @@ import Beyblade, { type BeybladeHandle } from "./objects/beyblade";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
+import { PreparedGroup } from "./world/prepared-group";
 import { WorldBoundary } from "./world/world-boundary";
 import { DeskInteraction, SceneReady, SceneVisibility } from "./world/scene-ready";
 
@@ -66,7 +67,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
     stopAmbient,
     isMuted,
     toggleMuted,
-  } = useLobbyAudio();
+  } = useLobbyAudio(state !== "loading");
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -200,7 +201,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
         <DeskEnvironment ref={environmentRef} />
         <IsekaiWorld floorY={floorY} active={state !== "booting" && state !== "loading"} />
         <WorldBoundary onError={skipScene}>
-        <Suspense fallback={null}>
+        <Suspense fallback={null}><PreparedGroup priority={0}>
           <Desk onFloorReady={setFloorY} />
           <SceneReady onReady={assetsReady} />
           <Monitor
@@ -233,7 +234,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
             ref={beybladeRef}
             onLaunch={() => playCue("beyblade-launch")}
           />
-        </Suspense>
+        </PreparedGroup></Suspense>
         </WorldBoundary>
       </Canvas>
       {/* The same indicator as the bundle fallback remains until SceneReady

@@ -121,7 +121,7 @@ test("readiness follows desk assets, while skip remains usable", async ({ page }
   await allowSoftwareRenderer(page);
   let release: (() => void) | undefined;
   const pending = new Promise<void>((resolve) => { release = resolve; });
-  await page.route("**/lobby/models/wooden_desk.glb", async (route) => {
+  await page.route("**/lobby/models/wooden_desk.glb*", async (route) => {
     await pending;
     await route.continue();
   });
@@ -139,7 +139,7 @@ test("loading stays visible until the rendered desk replaces it directly", async
   await allowSoftwareRenderer(page);
   let release!: () => void;
   const pending = new Promise<void>(resolve => { release = resolve; });
-  await page.route("**/lobby/models/wooden_desk.glb", async route => {
+  await page.route("**/lobby/models/wooden_desk.glb*", async route => {
     await pending;
     await route.continue();
   });
@@ -167,13 +167,35 @@ test("loading stays visible until the rendered desk replaces it directly", async
 });
 
 test("missing authored world assets do not block desk entry", async ({ page }) => {
-  await page.route("**/lobby/world/cloud-volume-*.bin.gz", route => route.abort());
+  await page.route("**/lobby/baked/terrain-*.bin.gz*", route => route.abort());
+  await page.route("**/lobby/world/cloud-volume-*.bin.gz*", route => route.abort());
   await page.route(/\/lobby\/world\/canopy-[^/]+\.webp/, route => route.abort());
   await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|academy-sanctuary|geological-island|ruins-kit|nature-kit|valley-nature|valley-village|organic-[a-z0-9_]+|dragon-flying|wildlife-(?:deer|stag|dragon)|living-mill|natural-vegetation|meadow-flowers|coastal-cliff)\.glb/, (route) => route.abort());
   await page.route(/\/lobby\/world\/(limestone|foliage|earth-[a-z]+|soil-[a-z]+|meadow-[a-z]+|rock-face-(?:color|detail|normal)|paving-[a-z]+)\.webp/, (route) => route.abort());
   await openDesk(page);
   await page.getByRole("button", { name: "Enter portfolio", exact: true }).click();
   await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
+});
+
+test("the loading cover waits for terrain instead of revealing floating scenery", async ({ page }) => {
+  await allowSoftwareRenderer(page);
+  let release!: () => void;
+  let requested!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const terrainRequested = new Promise<void>(resolve => { requested = resolve; });
+  await page.route('**/lobby/baked/terrain-*.bin.gz*', async route => {
+    requested(); await held; await route.continue();
+  });
+  try {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await terrainRequested;
+    await page.waitForTimeout(3500);
+    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'loading');
+    await expect(page.locator('[data-lobby-loading]')).toBeVisible();
+    release();
+    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle');
+    await expect(page.locator('[data-lobby-loading]')).toHaveCount(0);
+  } finally { release(); }
 });
 
 test("reduced motion bypasses world assets", async ({ page }) => {
@@ -196,7 +218,7 @@ test("mobile uses the existing portfolio without the 3D bundle", async ({ browse
   const page = await context.newPage();
   const worldRequests: string[] = [];
   page.on("request", (request) => { if (request.url().includes("/lobby/world/")) worldRequests.push(request.url()); });
-  await page.goto("http://localhost:3000", { waitUntil: "domcontentloaded" });
+  await page.goto(process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000", { waitUntil: "domcontentloaded" });
   await expect(page.locator("main")).toBeVisible();
   // Let the existing 2D loading/hero entrance finish before its visual capture.
   await page.waitForTimeout(6000);

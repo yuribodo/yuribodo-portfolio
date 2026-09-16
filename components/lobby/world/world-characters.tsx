@@ -7,6 +7,7 @@ import { AdditiveBlending, Group, Mesh, MeshStandardMaterial } from 'three';
 import { createCharacterInstance } from '@/lib/lobby/character-instance';
 import { WORLD_CHARACTERS, type WorldCharacterAsset } from '@/lib/lobby/world-characters';
 import { applyOutdoorLight, useOutdoorLight } from './outdoor-lighting';
+import { PreparedGroup } from "./prepared-group";
 import { WorldBoundary } from './world-boundary';
 
 /** A raised court and throne give the king a place in the landscape. */
@@ -86,7 +87,7 @@ function Character({ asset, floorY, active }: {
 export function WorldCharacters({ floorY, active }: { floorY: number; active: boolean }) {
   return <group name="selected-world-characters">
     {WORLD_CHARACTERS.map(asset => <WorldBoundary key={asset.id}>
-      <Suspense fallback={null}><Character asset={asset} floorY={floorY} active={active} /></Suspense>
+      <Suspense fallback={null}><PreparedGroup><Character asset={asset} floorY={floorY} active={active} /></PreparedGroup></Suspense>
     </WorldBoundary>)}
   </group>;
 }

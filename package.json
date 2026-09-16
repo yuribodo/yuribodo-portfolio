@@ -11,7 +11,10 @@
     "analyze": "ANALYZE=true next build --webpack",
     "assets:compress": "tsx scripts/compress-assets.ts",
     "assets:world": "node scripts/build-lobby-world.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "prebuild": "tsx scripts/bake-terrain.ts && node scripts/bake-ground-preview.mjs && tsx scripts/version-lobby-assets.ts",
+    "assets:terrain": "tsx scripts/bake-terrain.ts",
+    "assets:version": "tsx scripts/version-lobby-assets.ts"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4",

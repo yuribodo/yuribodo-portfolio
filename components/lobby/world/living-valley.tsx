@@ -4,8 +4,11 @@ import {spreadLandscape} from "./landscape-distance";
 import { applyOutdoorLight, useOutdoorLight, type OutdoorLight } from "./outdoor-lighting";
 
 import { useEffect, useMemo } from "react";
-import { useTexture } from "@react-three/drei";
-import { groundMaterial, GROUND_TEXTURES } from "./terrain-pigment";
+import { useLoader } from "@react-three/fiber";
+import { TerrainDataLoader } from "@/lib/lobby/terrain-data-loader";
+import { TERRAIN_DATA_URL } from "@/lib/lobby/terrain-data-manifest";
+import { useGroundTextures } from "./ground-textures";
+import { groundMaterial } from "./terrain-pigment";
 import { RiverWater } from "./river-water";
 import {
   BoxGeometry, BufferGeometry, Color, Float32BufferAttribute, Group,
@@ -15,11 +18,12 @@ import {
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { riverCenter, riverWidth, riverLevel, roadCenter, worldHeight } from "@/lib/lobby/world-geography";
 
-function landGeometry() {
+function landGeometry(heights: Float32Array) {
   const axis=VALLEY_AXIS;
   const positions: number[] = [], indices: number[] = [], uv: number[] = [];
+  let sample = 0;
   for (const z of axis) for (const x of axis) {
-    const y = worldHeight(x, z);
+    const y = heights[sample++];
     positions.push(x, y, z); uv.push((x + 85) / 170, (85 - z) / 170);
   }
   const n = axis.length;
@@ -124,12 +128,16 @@ function buildSettlement(light: OutdoorLight) {
 
 export function LivingValley({ floorY, active }: { floorY: number; active: boolean }) {
   const light=useOutdoorLight();
-  const textures = useTexture(GROUND_TEXTURES);
-  const {land,landMaterial,settlement}=useMemo(()=>({land:landGeometry(),landMaterial:applyOutdoorLight(groundMaterial(textures),light),settlement:buildSettlement(light)}),[textures,light]);
+  const baked = useLoader(TerrainDataLoader, TERRAIN_DATA_URL);
+  const textures = useGroundTextures(active);
+  const land = useMemo(() => landGeometry(baked.far), [baked]);
+  const landMaterial = useMemo(() => applyOutdoorLight(groundMaterial(textures,baked),light), [textures,light,baked]);
+  const settlement = useMemo(() => buildSettlement(light), [light]);
+  useEffect(() => () => land.dispose(), [land]);
+  useEffect(() => () => { landMaterial.userData.disposeGroundTextures?.(); landMaterial.dispose(); }, [landMaterial]);
   useEffect(() => () => {
-    land.dispose(); landMaterial.userData.disposeGroundTextures?.(); landMaterial.dispose();
     settlement.traverse(o => { if (o instanceof Mesh) { o.geometry.dispose(); (o.material as Material).dispose(); } });
-  }, [land, landMaterial, settlement]);
+  }, [settlement]);
   return <group position={[0, floorY, 0]} name="continuous-valley">
     <mesh geometry={land} material={landMaterial} raycast={() => {}} />
     <primitive object={settlement} dispose={null} />

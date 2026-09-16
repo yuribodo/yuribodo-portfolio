@@ -1,39 +1,15 @@
-import {trailMask,TRAIL_MAP_SIZE,TRAIL_MAP_EXTENT,TRAIL_MAP_X,TRAIL_MAP_Z} from '@/lib/lobby/valley-trails';
-import {vistaSpread} from "@/lib/lobby/world-distance";
+import {TRAIL_MAP_SIZE,TRAIL_MAP_EXTENT,TRAIL_MAP_X,TRAIL_MAP_Z} from '@/lib/lobby/valley-trails';
 import { RIVER_LEVEL_GLSL } from "@/lib/lobby/world-geography";
-import { plantCommunities } from "@/lib/lobby/plant-communities";
-import {DataTexture,LinearFilter,RGBAFormat,MeshStandardMaterial,RepeatWrapping,SRGBColorSpace,Vector2,type Texture} from 'three';
-export const GROUND_TEXTURES=['/lobby/world/soil-color.webp','/lobby/world/soil-normal.webp','/lobby/world/meadow-color.webp','/lobby/world/meadow-normal.webp','/lobby/world/rock-face-detail.webp','/lobby/world/rock-face-normal.webp'];
-// Soft canopy occlusion is baked from the actual tree placements once per material.
+import type { TerrainData } from "@/lib/lobby/terrain-data-format";
+import {DataTexture,LinearFilter,RGBAFormat,MeshStandardMaterial,Vector2,type Texture} from 'three';
+// Soft canopy occlusion is baked from the actual tree placements at build time.
 // It follows the terrain in world space and avoids an additional shadow render pass.
-function canopyOcclusion() {
-  const size=512, extent=800, density=new Float32Array(size*size);
-  for(const [key,plants] of Object.entries(plantCommunities(0))){
-    if(!key.startsWith('tree')&&!key.startsWith('pine'))continue;
-    for(const plant of plants){
-      const [x,,z]=plant.position;
-      const radius=(key.startsWith('pine')?3.1:4.2)*plant.scale/vistaSpread(z);
-      const cx=(x+extent/2+1.3)/extent*size,cz=(z+extent/2-1.8)/extent*size,rr=radius/extent*size;
-      for(let j=Math.max(0,Math.floor(cz-rr*2));j<Math.min(size,cz+rr*2);j++)
-        for(let i=Math.max(0,Math.floor(cx-rr*2));i<Math.min(size,cx+rr*2);i++){
-          const d=((i-cx)**2+(j-cz)**2)/(rr*rr);
-          density[j*size+i]+=Math.exp(-d*1.8)*.65;
-        }
-    }
-  }
-  const data=new Uint8Array(size*size*4);
-  for(let i=0;i<density.length;i++){const value=Math.round(255*(1-Math.min(.58,density[i])));data.set([value,value,value,255],i*4);}
-  const texture=new DataTexture(data,size,size,RGBAFormat);texture.minFilter=texture.magFilter=LinearFilter;texture.needsUpdate=true;return texture;
-}
-export function groundMaterial(textures:Texture[]){
-  const [map,normalMap,grassMap,grassNormal,rockMap,rockNormal]=textures.map(t=>t.clone());
-  for(const texture of [map,normalMap,grassMap,grassNormal,rockMap,rockNormal]){
-    texture.wrapS=texture.wrapT=RepeatWrapping;texture.repeat.setScalar(170/3.2);texture.anisotropy=8;texture.needsUpdate=true;
-  }
-  map.colorSpace=grassMap.colorSpace=rockMap.colorSpace=SRGBColorSpace;
-  const canopy=canopyOcclusion();
-  const trails=new DataTexture(trailMask(),TRAIL_MAP_SIZE,TRAIL_MAP_SIZE,RGBAFormat);trails.minFilter=trails.magFilter=LinearFilter;trails.needsUpdate=true;
+export function groundMaterial(textures:Texture[], baked:TerrainData){
+  const [map,normalMap,grassMap,grassNormal,rockMap,rockNormal]=textures;
+  const canopy=new DataTexture(baked.canopy,512,512,RGBAFormat);canopy.minFilter=canopy.magFilter=LinearFilter;canopy.needsUpdate=true;
+  const trails=new DataTexture(baked.trails,TRAIL_MAP_SIZE,TRAIL_MAP_SIZE,RGBAFormat);trails.minFilter=trails.magFilter=LinearFilter;trails.needsUpdate=true;
   const material=new MeshStandardMaterial({map,normalMap,normalScale:new Vector2(.8,.8),roughness:1,envMapIntensity:.15});
+  material.userData.preloadTextures=[map,normalMap,grassMap,grassNormal,rockMap,rockNormal,canopy,trails];
   material.userData.disposeGroundTextures=()=>{canopy.dispose();trails.dispose();for(const t of [map,normalMap,grassMap,grassNormal,rockMap,rockNormal])t.dispose();};
   material.onBeforeCompile=shader=>{
     shader.uniforms.canopyMap={value:canopy};shader.uniforms.trailMap={value:trails};
