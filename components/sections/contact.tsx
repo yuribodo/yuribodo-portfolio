@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, forwardRef } from "react";
+import { useVisibleVideo } from "@/hooks/use-visible-video";
+
+import { useRef, forwardRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -30,10 +32,8 @@ export function Contact() {
   const yugiRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (squirtleRef.current) squirtleRef.current.playbackRate = 0.8;
-    if (yugiRef.current) yugiRef.current.playbackRate = 0.8;
-  }, []);
+  useVisibleVideo(squirtleRef, 0.8);
+  useVisibleVideo(yugiRef, 0.8);
 
   useGSAP(
     () => {
@@ -67,11 +67,10 @@ export function Contact() {
       className="fixed inset-x-0 bottom-0 z-[1] h-screen overflow-hidden bg-background"
     >
       {/* Squirtle silhouette — left side */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         ref={squirtleRef}
         src="/squirtle.mp4"
-        autoPlay
+        preload="none"
         loop
         muted
         playsInline
@@ -86,11 +85,10 @@ export function Contact() {
       />
 
       {/* Yugi silhouette — right side */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         ref={yugiRef}
         src="/yugi.mp4"
-        autoPlay
+        preload="none"
         loop
         muted
         playsInline
