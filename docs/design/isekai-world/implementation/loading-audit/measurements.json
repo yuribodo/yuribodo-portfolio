@@ -1,0 +1,898 @@
+{
+  "sourceCommit": "01ff9463483ace62034cb3112ea611ab914b61af",
+  "build": "Next 16.1.2 production, Turbopack, localhost:3004",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1
+  },
+  "method": "Sequential headless native GPU Chromium contexts. Repeat reuses the first context cache on a new page. CDP 20 Mbps/40 ms and 4x CPU where named. No V8 sampling in these runs. WebGL wrappers add CPU timing overhead.",
+  "caveats": [
+    "Idle marks desk readiness, not complete world readiness or exact first presentation.",
+    "World-held cases delay /lobby/world/ requests until idle; scenery is incomplete at that point.",
+    "Reported transfers include only requests observed in the window ending roughly 6 s after idle; world-held at 20 Mbps is incomplete.",
+    "Cold means empty HTTP browser context; OS and GPU driver caches can be warm. Other desktop applications may be active.",
+    "WebGL timings measure CPU wall time including synchronous waits, not GPU timer-query durations.",
+    "Nine diagnostic runs are not population p75/p95 measurements. CPU throttling is not a physical low-end GPU."
+  ],
+  "runs": [
+    {
+      "name": "cold",
+      "capturedAt": "2026-09-16T02:15:17.392Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 104.89999997615814,
+        "sceneMounted": 1201.2999999821186,
+        "idle": 9160.09999999404
+      },
+      "ttfbMs": 84,
+      "fcpMs": 632,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 7551,
+      "longestTaskBeforeIdle": 1239,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 268,
+          "totalMs": 0.09999999403953552,
+          "maxMs": 0.09999999403953552
+        },
+        "linkProgram": {
+          "count": 134,
+          "totalMs": 1.7000000178813934,
+          "maxMs": 0.7000000178813934
+        },
+        "getProgramParameter": {
+          "count": 400,
+          "totalMs": 40.199999779462814,
+          "maxMs": 3.2999999821186066
+        },
+        "bufferData": {
+          "count": 1842,
+          "totalMs": 75.49999988079071,
+          "maxMs": 10.299999982118607
+        },
+        "texImage2D": {
+          "count": 12,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texSubImage2D": {
+          "count": 147,
+          "totalMs": 1465.7999999821186,
+          "maxMs": 148.90000000596046
+        },
+        "generateMipmap": {
+          "count": 134,
+          "totalMs": 0.5999999642372131,
+          "maxMs": 0.09999999403953552
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 1.5999999940395355,
+          "maxMs": 0.5
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 938.3999999761581,
+          "lastObservedResponseMs": 992.3999999761581
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 1465.8999999761581,
+          "lastObservedResponseMs": 7918.399999976158
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 1048.699999988079,
+          "lastObservedResponseMs": 1056.199999988079
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 90.59999999403954,
+          "lastObservedResponseMs": 866.0999999940395
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "cold-2",
+      "capturedAt": "2026-09-16T02:15:49.013Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 33.099999994039536,
+        "sceneMounted": 730.8000000119209,
+        "idle": 8345.90000000596
+      },
+      "ttfbMs": 16.19999998807907,
+      "fcpMs": 84,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 6808,
+      "longestTaskBeforeIdle": 1390,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 258,
+          "totalMs": 0.5000000298023224,
+          "maxMs": 0.10000002384185791
+        },
+        "linkProgram": {
+          "count": 129,
+          "totalMs": 2.5,
+          "maxMs": 1
+        },
+        "getProgramParameter": {
+          "count": 385,
+          "totalMs": 51.699999898672104,
+          "maxMs": 5.200000017881393
+        },
+        "bufferData": {
+          "count": 1811,
+          "totalMs": 74.49999988079071,
+          "maxMs": 12.900000005960464
+        },
+        "texImage2D": {
+          "count": 12,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texSubImage2D": {
+          "count": 147,
+          "totalMs": 1544.4999999701977,
+          "maxMs": 162.80000001192093
+        },
+        "generateMipmap": {
+          "count": 134,
+          "totalMs": 0.29999998211860657,
+          "maxMs": 0.09999999403953552
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 1.5999999940395355,
+          "maxMs": 0.5999999940395355
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 470,
+          "lastObservedResponseMs": 553.1999999880791
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 885.3000000119209,
+          "lastObservedResponseMs": 6961.0999999940395
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 595.0999999940395,
+          "lastObservedResponseMs": 602
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 21.80000001192093,
+          "lastObservedResponseMs": 394.59999999403954
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "cold-3",
+      "capturedAt": "2026-09-16T02:18:31.003Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 26.099999994039536,
+        "sceneMounted": 1451,
+        "idle": 9453
+      },
+      "ttfbMs": 10.799999982118607,
+      "fcpMs": 912,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 8005,
+      "longestTaskBeforeIdle": 1330,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 268,
+          "totalMs": 0.7000000178813934,
+          "maxMs": 0.10000002384185791
+        },
+        "linkProgram": {
+          "count": 134,
+          "totalMs": 2.0000000596046448,
+          "maxMs": 0.800000011920929
+        },
+        "getProgramParameter": {
+          "count": 400,
+          "totalMs": 50.79999998211861,
+          "maxMs": 3.7000000178813934
+        },
+        "bufferData": {
+          "count": 1842,
+          "totalMs": 79.50000008940697,
+          "maxMs": 16.899999976158142
+        },
+        "texImage2D": {
+          "count": 12,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0.10000002384185791,
+          "maxMs": 0.10000002384185791
+        },
+        "getProgramInfoLog": {
+          "count": 133,
+          "totalMs": 1462.8000000715256,
+          "maxMs": 79.10000002384186
+        },
+        "getShaderInfoLog": {
+          "count": 266,
+          "totalMs": 492.2999999523163,
+          "maxMs": 20.5
+        },
+        "texSubImage2D": {
+          "count": 147,
+          "totalMs": 1517.800000101328,
+          "maxMs": 155.2000000178814
+        },
+        "generateMipmap": {
+          "count": 134,
+          "totalMs": 0.6000000238418579,
+          "maxMs": 0.10000002384185791
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 1.5,
+          "maxMs": 0.5999999940395355
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 1186.699999988079,
+          "lastObservedResponseMs": 1238.699999988079
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 1731,
+          "lastObservedResponseMs": 8116.0999999940395
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 1283.199999988079,
+          "lastObservedResponseMs": 1289.699999988079
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 15.5,
+          "lastObservedResponseMs": 1112.5999999940395
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "repeat",
+      "capturedAt": "2026-09-16T02:15:32.914Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 39.099999994039536,
+        "sceneMounted": 2079.9000000059605,
+        "idle": 8868.700000017881
+      },
+      "ttfbMs": 17.80000001192093,
+      "fcpMs": 956,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 7181,
+      "longestTaskBeforeIdle": 929,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 268,
+          "totalMs": 0.3999999761581421,
+          "maxMs": 0.09999999403953552
+        },
+        "linkProgram": {
+          "count": 134,
+          "totalMs": 2.6000001430511475,
+          "maxMs": 0.6000000238418579
+        },
+        "getProgramParameter": {
+          "count": 400,
+          "totalMs": 27.599999845027924,
+          "maxMs": 3.4000000059604645
+        },
+        "bufferData": {
+          "count": 1842,
+          "totalMs": 88.20000004768372,
+          "maxMs": 9.400000005960464
+        },
+        "texImage2D": {
+          "count": 12,
+          "totalMs": 0.20000001788139343,
+          "maxMs": 0.10000002384185791
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texSubImage2D": {
+          "count": 147,
+          "totalMs": 1525.7999998033047,
+          "maxMs": 156.69999998807907
+        },
+        "generateMipmap": {
+          "count": 134,
+          "totalMs": 0.6000000238418579,
+          "maxMs": 0.10000002384185791
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 1.699999988079071,
+          "maxMs": 0.5999999940395355
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 1806.7000000178814,
+          "lastObservedResponseMs": 1834
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 2231.2000000178814,
+          "lastObservedResponseMs": 8233.200000017881
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 1872.5999999940395,
+          "lastObservedResponseMs": 1876.2000000178814
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 23.80000001192093,
+          "lastObservedResponseMs": 1721.9000000059605
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 36793,
+      "errors": []
+    },
+    {
+      "name": "world-held",
+      "capturedAt": "2026-09-16T02:15:58.836Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 120.90000000596046,
+        "sceneMounted": 676.5999999940395,
+        "idle": 2653.5
+      },
+      "ttfbMs": 78,
+      "fcpMs": 196,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 1803,
+      "longestTaskBeforeIdle": 621,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 94,
+          "totalMs": 0.4000000059604645,
+          "maxMs": 0.10000002384185791
+        },
+        "linkProgram": {
+          "count": 47,
+          "totalMs": 1,
+          "maxMs": 0.5999999940395355
+        },
+        "getProgramParameter": {
+          "count": 139,
+          "totalMs": 9.599999964237213,
+          "maxMs": 1.5999999940395355
+        },
+        "bufferData": {
+          "count": 646,
+          "totalMs": 6.200000017881393,
+          "maxMs": 0.5999999940395355
+        },
+        "texImage2D": {
+          "count": 8,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0.09999999403953552,
+          "maxMs": 0.09999999403953552
+        },
+        "texSubImage2D": {
+          "count": 67,
+          "totalMs": 150.99999997019768,
+          "maxMs": 11.099999994039536
+        },
+        "generateMipmap": {
+          "count": 65,
+          "totalMs": 0.09999999403953552,
+          "maxMs": 0.09999999403953552
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 417.69999998807907,
+          "lastObservedResponseMs": 481.19999998807907
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 811.1999999880791,
+          "lastObservedResponseMs": 6940
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 541.1999999880791,
+          "lastObservedResponseMs": 553.1999999880791
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 109.90000000596046,
+          "lastObservedResponseMs": 342.19999998807907
+        }
+      },
+      "heldRequests": 29,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "world-held-2",
+      "capturedAt": "2026-09-16T02:18:40.813Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 107.7000000178814,
+        "sceneMounted": 840.9000000059605,
+        "idle": 2828
+      },
+      "ttfbMs": 47.70000001788139,
+      "fcpMs": 172,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 1954,
+      "longestTaskBeforeIdle": 622,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 94,
+          "totalMs": 0.30000004172325134,
+          "maxMs": 0.10000002384185791
+        },
+        "linkProgram": {
+          "count": 47,
+          "totalMs": 0.8999999761581421,
+          "maxMs": 0.5
+        },
+        "getProgramParameter": {
+          "count": 139,
+          "totalMs": 10.400000035762787,
+          "maxMs": 1.7000000178813934
+        },
+        "bufferData": {
+          "count": 646,
+          "totalMs": 4.89999994635582,
+          "maxMs": 0.800000011920929
+        },
+        "texImage2D": {
+          "count": 8,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "getProgramInfoLog": {
+          "count": 46,
+          "totalMs": 278.00000008940697,
+          "maxMs": 63
+        },
+        "getShaderInfoLog": {
+          "count": 92,
+          "totalMs": 41.09999993443489,
+          "maxMs": 8.899999976158142
+        },
+        "texSubImage2D": {
+          "count": 67,
+          "totalMs": 133.6999998986721,
+          "maxMs": 8.699999988079071
+        },
+        "generateMipmap": {
+          "count": 65,
+          "totalMs": 0.19999998807907104,
+          "maxMs": 0.09999999403953552
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 564.4000000059605,
+          "lastObservedResponseMs": 639.7000000178814
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 966.9000000059605,
+          "lastObservedResponseMs": 8704.600000023842
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 683,
+          "lastObservedResponseMs": 693.5
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 97.60000002384186,
+          "lastObservedResponseMs": 487.7000000178814
+        }
+      },
+      "heldRequests": 29,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "network-20",
+      "capturedAt": "2026-09-16T02:16:16.936Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 113.19999998807907,
+        "sceneMounted": 1007.4000000059605,
+        "idle": 11111.5
+      },
+      "ttfbMs": 25,
+      "fcpMs": 256,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 2521,
+      "longestTaskBeforeIdle": 633,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 176,
+          "totalMs": 0.29999998211860657,
+          "maxMs": 0.09999999403953552
+        },
+        "linkProgram": {
+          "count": 88,
+          "totalMs": 1.2000000178813934,
+          "maxMs": 0.5
+        },
+        "getProgramParameter": {
+          "count": 262,
+          "totalMs": 19.600000262260437,
+          "maxMs": 2.199999988079071
+        },
+        "bufferData": {
+          "count": 1718,
+          "totalMs": 12.100000143051147,
+          "maxMs": 0.5999999940395355
+        },
+        "texImage2D": {
+          "count": 11,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texSubImage2D": {
+          "count": 2389,
+          "totalMs": 376.40000000596046,
+          "maxMs": 27.100000023841858
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 8.100000023841858,
+          "maxMs": 3.699999988079071
+        },
+        "generateMipmap": {
+          "count": 107,
+          "totalMs": 0.8000000715255737,
+          "maxMs": 0.10000002384185791
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 946.9000000059605,
+          "lastObservedResponseMs": 3500.0999999940395
+        },
+        "world": {
+          "count": 33,
+          "encodedBodyBytes": 24050707,
+          "decodedBodyBytes": 29577315,
+          "firstRequestMs": 1112.699999988079,
+          "lastObservedResponseMs": 12405.90000000596
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 2064.199999988079,
+          "lastObservedResponseMs": 6218.9000000059605
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 102,
+          "lastObservedResponseMs": 871.8000000119209
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 28571762,
+      "errors": []
+    },
+    {
+      "name": "network-20-world-held",
+      "capturedAt": "2026-09-16T02:16:27.749Z",
+      "outcome": "ready",
+      "marks": {
+        "loader": 60.79999998211861,
+        "sceneMounted": 782.0999999940395,
+        "idle": 3386.7999999821186
+      },
+      "ttfbMs": 30.19999998807907,
+      "fcpMs": 204,
+      "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)",
+      "parallelShaderCompile": true,
+      "longTaskMsBeforeIdle": 2108,
+      "longestTaskBeforeIdle": 624,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 94,
+          "totalMs": 0.29999998211860657,
+          "maxMs": 0.09999999403953552
+        },
+        "linkProgram": {
+          "count": 47,
+          "totalMs": 1.100000023841858,
+          "maxMs": 0.7000000178813934
+        },
+        "getProgramParameter": {
+          "count": 139,
+          "totalMs": 17.600000023841858,
+          "maxMs": 2.800000011920929
+        },
+        "bufferData": {
+          "count": 646,
+          "totalMs": 6.4999998807907104,
+          "maxMs": 0.5999999940395355
+        },
+        "texImage2D": {
+          "count": 8,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "texSubImage2D": {
+          "count": 67,
+          "totalMs": 146.70000010728836,
+          "maxMs": 8.800000011920929
+        },
+        "generateMipmap": {
+          "count": 65,
+          "totalMs": 0.5,
+          "maxMs": 0.10000002384185791
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 721.5,
+          "lastObservedResponseMs": 2276.199999988079
+        },
+        "world": {
+          "count": 22,
+          "encodedBodyBytes": 10534240,
+          "decodedBodyBytes": 13935766,
+          "firstRequestMs": 886.7999999821186,
+          "lastObservedResponseMs": 9563.799999982119
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 1824.7999999821186,
+          "lastObservedResponseMs": 2000.0999999940395
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 51,
+          "lastObservedResponseMs": 648.0999999940395
+        }
+      },
+      "heldRequests": 30,
+      "httpEncodedBytesObserved": 15047169,
+      "errors": []
+    },
+    {
+      "name": "cpu-4",
+      "capturedAt": "2026-09-16T02:19:22.892Z",
+      "outcome": "not ready: locator.waitFor: Timeout 35000ms exceeded.",
+      "marks": {
+        "loader": 153.5,
+        "sceneMounted": 1547.699999988079
+      },
+      "ttfbMs": 16.900000005960464,
+      "fcpMs": 220,
+      "renderer": null,
+      "parallelShaderCompile": false,
+      "longTaskMsBeforeIdle": null,
+      "longestTaskBeforeIdle": null,
+      "glCPUWallTimesBeforeIdle": {
+        "compileShader": {
+          "count": 186,
+          "totalMs": 1.0999999642372131,
+          "maxMs": 0.5
+        },
+        "linkProgram": {
+          "count": 93,
+          "totalMs": 5.200000137090683,
+          "maxMs": 2.600000023841858
+        },
+        "getProgramParameter": {
+          "count": 277,
+          "totalMs": 49.999999940395355,
+          "maxMs": 1.600000023841858
+        },
+        "bufferData": {
+          "count": 989,
+          "totalMs": 102.8999999165535,
+          "maxMs": 12.300000011920929
+        },
+        "texImage2D": {
+          "count": 12,
+          "totalMs": 0.19999998807907104,
+          "maxMs": 0.09999999403953552
+        },
+        "texImage3D": {
+          "count": 2,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "getProgramInfoLog": {
+          "count": 92,
+          "totalMs": 637.1999999880791,
+          "maxMs": 122.90000000596046
+        },
+        "getShaderInfoLog": {
+          "count": 184,
+          "totalMs": 241.09999999403954,
+          "maxMs": 22
+        },
+        "texSubImage2D": {
+          "count": 114,
+          "totalMs": 4769.800000011921,
+          "maxMs": 523.8000000119209
+        },
+        "generateMipmap": {
+          "count": 71,
+          "totalMs": 1.199999988079071,
+          "maxMs": 0.4000000059604645
+        },
+        "texSubImage3D": {
+          "count": 4,
+          "totalMs": 5.4000000059604645,
+          "maxMs": 1.600000023841858
+        }
+      },
+      "groups": {
+        "deskModels": {
+          "count": 11,
+          "encodedBodyBytes": 3425225,
+          "decodedBodyBytes": 4834172,
+          "firstRequestMs": 1331.800000011921,
+          "lastObservedResponseMs": 1394.300000011921
+        },
+        "world": {
+          "count": 32,
+          "encodedBodyBytes": 23987828,
+          "decodedBodyBytes": 29514436,
+          "firstRequestMs": 2207.699999988079,
+          "lastObservedResponseMs": 17997.80000001192
+        },
+        "draco": {
+          "count": 2,
+          "encodedBodyBytes": 75849,
+          "decodedBodyBytes": 250876,
+          "firstRequestMs": 1755.9000000059605,
+          "lastObservedResponseMs": 1762.699999988079
+        },
+        "app": {
+          "count": 16,
+          "encodedBodyBytes": 591308,
+          "decodedBodyBytes": 1880985,
+          "firstRequestMs": 106.80000001192093,
+          "lastObservedResponseMs": 1027.4000000059605
+        }
+      },
+      "heldRequests": 0,
+      "httpEncodedBytesObserved": 28511257,
+      "errors": []
+    }
+  ]
+}
