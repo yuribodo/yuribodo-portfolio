@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { lobbyBlockReasonFor, type DeviceSignals } from './gpu-detect';
+import { hasRecentLowFps, lobbyBlockReasonFor, LOW_FPS_TTL_MS, type DeviceSignals } from './gpu-detect';
 
 const capableDesktop: DeviceSignals = {
   userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36',
@@ -11,6 +11,13 @@ const capableDesktop: DeviceSignals = {
 test('a capable desktop gets the desk; Firefox/Safari without Chromium-only signals too', () => {
   assert.equal(lobbyBlockReasonFor(capableDesktop), null);
   assert.equal(lobbyBlockReasonFor({ ...capableDesktop, effectiveType: undefined, deviceMemory: undefined }), null);
+});
+
+test('a low-fps record expires after the TTL and ignores garbage', () => {
+  const now = 1_800_000_000_000;
+  assert.equal(hasRecentLowFps(String(now - 60_000), now), true);
+  assert.equal(hasRecentLowFps(String(now - LOW_FPS_TTL_MS - 1), now), false);
+  for (const stale of [null, '', 'true', 'NaN', '0']) assert.equal(hasRecentLowFps(stale, now), false, String(stale));
 });
 
 test('each weak-device signal lands on the portfolio directly', () => {

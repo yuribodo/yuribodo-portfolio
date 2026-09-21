@@ -94,16 +94,26 @@ export function lobbyBlockReasonFor(signals: DeviceSignals): LobbyBlockReason | 
 }
 
 const LOW_FPS_KEY = "lobbyLowFps";
+/** A battery-saver or busy session shouldn't lock the desk out for good; retry daily. */
+export const LOW_FPS_TTL_MS = 24 * 60 * 60 * 1000;
 
 /** Remember an unwatchable run so the next visit lands on the portfolio directly. */
-// ponytail: persistent flag; a battery-saver session locks the device out until
-// storage is cleared. Add an expiry if that ever bites.
-export function markLobbyLowFps() {
-  try { localStorage.setItem(LOW_FPS_KEY, String(Date.now())); } catch { /* storage disabled */ }
+export function markLobbyLowFps(now = Date.now()) {
+  try { localStorage.setItem(LOW_FPS_KEY, String(now)); } catch { /* storage disabled */ }
+}
+
+/** True while a recorded low-fps run is fresher than the TTL. Exported for tests. */
+export function hasRecentLowFps(stored: string | null, now = Date.now()): boolean {
+  const at = Number(stored);
+  return Number.isFinite(at) && at > 0 && now - at < LOW_FPS_TTL_MS;
 }
 
 function readLowFps(): boolean {
-  try { return localStorage.getItem(LOW_FPS_KEY) !== null; } catch { return false; }
+  try {
+    const stored = localStorage.getItem(LOW_FPS_KEY);
+    if (stored !== null && !hasRecentLowFps(stored)) localStorage.removeItem(LOW_FPS_KEY);
+    return hasRecentLowFps(stored);
+  } catch { return false; }
 }
 
 export function getLobbyBlockReason(): LobbyBlockReason | null {
