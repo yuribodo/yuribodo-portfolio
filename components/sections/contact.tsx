@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { REVEAL_SPACER_SELECTOR } from "@/lib/observe-page-animation";
 import { LiquidBackground } from "./contact-liquid-bg";
 import { LiquidText } from "./contact-liquid-text";
 
@@ -32,8 +33,10 @@ export function Contact() {
   const yugiRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
 
-  useVisibleVideo(squirtleRef, 0.8);
-  useVisibleVideo(yugiRef, 0.8);
+  // The section is fixed behind the page, so it always "intersects" the
+  // viewport; the spacer is what actually scrolls it into view.
+  useVisibleVideo(squirtleRef, 0.8, REVEAL_SPACER_SELECTOR);
+  useVisibleVideo(yugiRef, 0.8, REVEAL_SPACER_SELECTOR);
 
   useGSAP(
     () => {
@@ -41,7 +44,7 @@ export function Contact() {
 
       gsap.set(contentRef.current, { opacity: 0, y: 30 });
 
-      const spacer = document.querySelector("[data-reveal-spacer]");
+      const spacer = document.querySelector(REVEAL_SPACER_SELECTOR);
       if (spacer) {
         ScrollTrigger.create({
           trigger: spacer,

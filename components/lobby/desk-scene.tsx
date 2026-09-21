@@ -7,6 +7,7 @@ import type { Dispatch } from "react";
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
 import { useLobbyAudio } from "@/hooks/use-lobby-audio";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { markLobbyLowFps } from "@/lib/lobby/gpu-detect";
 import { playLobbyToSiteTransition } from "@/lib/lobby/transition";
 import CameraRig, { type CameraRigHandle } from "./camera-rig";
 import Desk from "./desk";
@@ -33,7 +34,7 @@ import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
 import { PreparedGroup } from "./world/prepared-group";
 import { WorldBoundary } from "./world/world-boundary";
-import { DeskInteraction, SceneReady, SceneVisibility } from "./world/scene-ready";
+import { DeskInteraction, FrameWatchdog, SceneReady, SceneVisibility } from "./world/scene-ready";
 
 interface DeskSceneProps {
   state: LobbyState;
@@ -57,6 +58,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
   const [floorY, setFloorY] = useState(-1.5);
   const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
   const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
+  const bailLowFps = useCallback(() => { markLobbyLowFps(); dispatch({ type: "SKIP" }); }, [dispatch]);
   const prefersReducedMotion = useReducedMotion();
   // Destructure to capture the stable useCallback identities. Re-using
   // `audio` as a whole would invalidate every dep array on each mute flip
@@ -194,8 +196,15 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       }}
       className="fixed inset-0 z-[60] bg-background"
     >
-      <Canvas dpr={[1, 1.5]} shadows="soft" scene={{ environmentIntensity: 0.35 }}>
+      <Canvas
+        dpr={[1, 1.5]}
+        shadows="soft"
+        scene={{ environmentIntensity: 0.35 }}
+        // Dual-GPU laptops default to the integrated chip; ask for the discrete one.
+        gl={{ powerPreference: "high-performance" }}
+      >
         <SceneVisibility />
+        <FrameWatchdog active={state === "idle" || state === "exploring"} onLowFps={bailLowFps} />
         <CameraRig ref={cameraRigRef} state={state} />
         <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
         <DeskEnvironment ref={environmentRef} />

@@ -185,6 +185,11 @@ html.lenis, html.lenis body {
   font-family: var(--font-jetbrains), monospace; font-size: 12px;
 }
 
+/* Touch-only devices never get the desk; don't flash its loader before hydration. */
+@media (hover: none) and (pointer: coarse) {
+  [data-lobby-loading] { display: none; }
+}
+
 /* Indeterminate progress: this never claims completion before the scene renders. */
 @keyframes lobby-loading-sweep {
   from { transform: translateX(-100%); }

@@ -1,6 +1,6 @@
 "use client";
 
-import { observePageAnimation } from "@/lib/observe-page-animation";
+import { observePageAnimation, REVEAL_SPACER_SELECTOR } from "@/lib/observe-page-animation";
 import { useEffect, useRef, useCallback } from "react";
 
 const VERTEX_SHADER = `
@@ -214,6 +214,7 @@ export function LiquidBackground({ reducedMotion }: { reducedMotion: boolean }) 
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("resize", handleResize);
+    // Fixed canvas always intersects the viewport; the spacer says when it's uncovered.
     const stopObserving = observePageAnimation(canvasRef.current!, visible => {
       active = visible;
       cancelAnimationFrame(animFrameRef.current);
@@ -221,7 +222,7 @@ export function LiquidBackground({ reducedMotion }: { reducedMotion: boolean }) 
         if (!resourcesRef.current || needsResize) { initGL(); needsResize = false; }
         animFrameRef.current = requestAnimationFrame(render);
       }
-    });
+    }, document.querySelector(REVEAL_SPACER_SELECTOR) ?? canvasRef.current!);
 
     return () => {
       stopObserving();

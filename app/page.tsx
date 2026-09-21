@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { Hero } from "@/components/sections/hero";
 import { About } from "@/components/sections/about";
 import { Contact } from "@/components/sections/contact";
@@ -8,15 +7,13 @@ import { AsciiNoise } from "@/components/ui/ascii-noise";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { KonamiCode } from "@/components/easter-eggs/konami-code";
 import { LobbyGate } from "@/components/lobby/lobby-gate";
-import { isMobileUserAgent } from "@/lib/lobby/is-mobile";
 
-export default async function Home() {
-  const headersList = await headers();
-  const isMobile = isMobileUserAgent(headersList.get("user-agent"));
-
+// Static HTML (no request headers): device gating happens client-side in
+// LobbyGate, so the page can be CDN-cached and served instantly everywhere.
+export default function Home() {
   return (
     <>
-      {!isMobile && <LobbyGate isMobile={false} />}
+      <LobbyGate />
       <CustomCursor />
       <AsciiNoise />
       <Header />
