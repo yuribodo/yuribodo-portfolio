@@ -170,7 +170,7 @@ test("missing authored world assets do not block desk entry", async ({ page }) =
   await page.route("**/lobby/baked/terrain-*.bin.gz*", route => route.abort());
   await page.route("**/lobby/world/cloud-volume-*.bin.gz*", route => route.abort());
   await page.route(/\/lobby\/world\/canopy-[^/]+\.webp/, route => route.abort());
-  await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|academy-sanctuary|geological-island|ruins-kit|nature-kit|valley-nature|valley-village|organic-[a-z0-9_]+|dragon-flying|wildlife-(?:deer|stag|dragon)|living-mill|natural-vegetation|meadow-flowers|coastal-cliff)\.glb/, (route) => route.abort());
+  await page.route(/\/lobby\/world\/(sky-citadel(?:-v2)?|chess-monuments|academy-sanctuary|geological-island|ruins-kit|nature-kit|valley-nature|valley-village|organic-[a-z0-9_]+|dragon-flying|wildlife-(?:deer|stag|dragon)|living-mill|natural-vegetation|meadow-flowers|coastal-cliff|reference-houses)\.glb/, (route) => route.abort());
   await page.route(/\/lobby\/world\/(limestone|foliage|earth-[a-z]+|soil-[a-z]+|meadow-[a-z]+|rock-face-(?:color|detail|normal)|paving-[a-z]+)\.webp/, (route) => route.abort());
   await openDesk(page);
   await page.getByRole("button", { name: "Enter portfolio", exact: true }).click();

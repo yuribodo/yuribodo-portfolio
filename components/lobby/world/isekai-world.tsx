@@ -38,6 +38,7 @@ import { worldHeight } from "@/lib/lobby/world-geography";
 import { OutdoorLighting, applyOutdoorLight, useOutdoorLight } from "./outdoor-lighting";
 import { Atmosphere } from "./atmosphere";
 import { ValleyVillage } from "./valley-village";
+import { ReferenceHouses } from "./reference-houses";
 import { TerraceGarden } from "./terrace-garden";
 import { TerraceArchitecture } from "./terrace-architecture";
 
@@ -177,6 +178,7 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       <WorldBoundary><VistaStreams floorY={floorY} /></WorldBoundary>
       <WorldBoundary><RiverLandings floorY={floorY}/></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyVillage floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ReferenceHouses floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <CoreWorld id="valley"><LivingValley floorY={floorY} active={active} /></CoreWorld>
       <CoreWorld id="canopies"><DistantCanopies floorY={floorY} /></CoreWorld>
       {/* Always-available ground makes missing optional assets graceful. */}

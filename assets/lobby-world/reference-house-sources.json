@@ -1,0 +1,139 @@
+{
+  "note": "Unofficial fan models of franchise buildings, downloaded by the site owner from Sketchfab in the autoconverted glTF format. Listing attribution credits the uploader, not the franchise owner. Rebuild: node scripts/build-reference-houses.mjs <download-directory>. Sizes are in village model units (the front vista multiplies them by 2.1 at runtime).",
+  "houses": [
+    {
+      "id": "anime-house",
+      "slug": "free-anime-house",
+      "title": "(FREE) Anime House",
+      "uploader": "lowPolyBoy",
+      "url": "https://sketchfab.com/3d-models/free-anime-house-d4740edd01a1436bbc3e2e4ec91f153e",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "Original anime-style timber house; used as the main village frontage.",
+      "size": 6.6,
+      "sizeAxis": "y",
+      "triangleBudget": 7000,
+      "aliases": [
+        "free_anime_house"
+      ],
+      "dropNodes": [
+        "^Object_13$",
+        "^Object_17$",
+        "^Object_19$"
+      ],
+      "simplifyError": 0.05,
+      "tint": {
+        "Roof": [
+          1.75,
+          0.95,
+          1.15
+        ]
+      }
+    },
+    {
+      "id": "kame-house",
+      "slug": "kame-house",
+      "title": "Kame House",
+      "uploader": "davidescalante",
+      "url": "https://sketchfab.com/3d-models/kame-house-71eacaeff9934c3489d7c5a9d0830a3c",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "Dragon Ball — Master Roshi's island house.",
+      "size": 13,
+      "sizeAxis": "y",
+      "triangleBudget": 6000,
+      "aliases": [
+        "kame_house"
+      ],
+      "dropNodes": [
+        "ocean",
+        "^ISLAND \\(2\\)",
+        "^PLANTA \\(14\\)",
+        "white_0$",
+        "PIEDRAS"
+      ],
+      "simplifyError": 0.03,
+      "mound": {
+        "radius": 6,
+        "height": 0.32,
+        "depth": 1.4,
+        "color": [
+          0.84,
+          0.75,
+          0.53
+        ]
+      }
+    },
+    {
+      "id": "ichiraku-ramen",
+      "slug": "ichiraku-ramen-naruto",
+      "title": "Ichiraku Ramen - Naruto",
+      "uploader": "benjaminshaw",
+      "url": "https://sketchfab.com/3d-models/ichiraku-ramen-naruto-8a5953bdd4b64b089ef0e08ad15ce368",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "Naruto — Ichiraku Ramen shop.",
+      "size": 5.4,
+      "sizeAxis": "y",
+      "triangleBudget": 6000,
+      "aliases": [
+        "ichiraku_ramen_-_naruto"
+      ],
+      "simplifyError": 0.03
+    },
+    {
+      "id": "pokemon-center",
+      "slug": "pokemon-center",
+      "title": "Pokemon center",
+      "uploader": "chrisevilla13",
+      "url": "https://sketchfab.com/3d-models/pokemon-center-1fbdfdb11eca4ded9ba63ed90a3f1e70",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "Pokémon — Pokémon Center.",
+      "size": 5.6,
+      "sizeAxis": "y",
+      "triangleBudget": 4000,
+      "aliases": [
+        "pokemon_center"
+      ],
+      "simplifyError": 0.03
+    },
+    {
+      "id": "hobbit-house",
+      "slug": "hobbit-house",
+      "title": "Hobbit House",
+      "uploader": "burhitto",
+      "url": "https://sketchfab.com/3d-models/hobbit-house-2565e4027dfb4c9ca40aba148d0b207b",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "The Lord of the Rings — hobbit hole in a hillside.",
+      "size": 3.8,
+      "sizeAxis": "y",
+      "triangleBudget": 5000,
+      "aliases": [
+        "hobbit_house"
+      ],
+      "simplifyError": 0.03
+    },
+    {
+      "id": "pineapple-house",
+      "slug": "spongebobs-pineapple-house",
+      "title": "Spongebob's Pineapple House",
+      "uploader": "DundeeA",
+      "url": "https://sketchfab.com/3d-models/spongebobs-pineapple-house-07d2dccb7ef14734868b2cab090e13e4",
+      "listedLicense": "CC Attribution",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "reference": "SpongeBob SquarePants — pineapple house.",
+      "size": 6.2,
+      "sizeAxis": "y",
+      "triangleBudget": 6000,
+      "aliases": [
+        "spongebobs_pineapple_house"
+      ],
+      "dropNodes": [
+        "^Path_"
+      ],
+      "simplifyError": 0.03
+    }
+  ]
+}

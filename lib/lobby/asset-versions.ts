@@ -67,6 +67,7 @@ export const ASSET_VERSIONS: Record<string, string> = {
   "/lobby/world/paving-normal.webp": "85d4dcf443752c05",
   "/lobby/world/paving-roughness.webp": "3f92cd957f89c013",
   "/lobby/world/rear-landscape.webp": "ae255c48983a3f45",
+  "/lobby/world/reference-houses.glb": "ef9e5eb3560cca94",
   "/lobby/world/rock-face-color.webp": "9472534cf52afa7c",
   "/lobby/world/rock-face-detail.webp": "ee34852d426ae159",
   "/lobby/world/rock-face-normal.webp": "b322eb2151146e4c",

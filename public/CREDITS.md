@@ -139,6 +139,29 @@ Fishstick character work is credited to **Karina Bastos / Airborn Studios** on
 [the studio's project page](https://airbornstudios.artstation.com/projects/L2JNqw).
 The Sketchfab uploads are acquisition sources, not claims of original character authorship.
 
+## Reference houses in the valley village — September 2026
+
+Unofficial fan models of well-known buildings replace part of the generic
+village. Uploader attribution does not imply ownership of the underlying
+franchise. Exact source URLs, listed licenses and normalization settings:
+`assets/lobby-world/reference-house-sources.json`; runtime file
+`lobby/world/reference-houses.glb`; rebuild with `scripts/build-reference-houses.mjs`.
+
+| Building | Uploader | License listed with the download | Reference |
+| --- | --- | --- | --- |
+| [(FREE) Anime House](https://sketchfab.com/3d-models/free-anime-house-d4740edd01a1436bbc3e2e4ec91f153e) | lowPolyBoy | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Original anime-style timber house (village frontage) |
+| [Kame House](https://sketchfab.com/3d-models/kame-house-71eacaeff9934c3489d7c5a9d0830a3c) | davidescalante | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | *Dragon Ball* |
+| [Ichiraku Ramen - Naruto](https://sketchfab.com/3d-models/ichiraku-ramen-naruto-8a5953bdd4b64b089ef0e08ad15ce368) | benjaminshaw | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | *Naruto* |
+| [Pokemon center](https://sketchfab.com/3d-models/pokemon-center-1fbdfdb11eca4ded9ba63ed90a3f1e70) | chrisevilla13 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | *Pokémon* |
+| [Hobbit House](https://sketchfab.com/3d-models/hobbit-house-2565e4027dfb4c9ca40aba148d0b207b) | burhitto | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | *The Lord of the Rings* |
+| [Spongebob's Pineapple House](https://sketchfab.com/3d-models/spongebobs-pineapple-house-07d2dccb7ef14734868b2cab090e13e4) | DundeeA | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | *SpongeBob SquarePants* |
+
+Adaptations: normalized pivots and scale, baked node transforms, meshopt
+simplification to a web budget, metallic removed and roughness raised for the
+painted-valley look, textures resized to at most 1K WebP, Draco compression,
+terrain-aware plinths and scene lighting. The franchises belong to their
+respective rights holders; no affiliation or endorsement is implied.
+
 The royal overlook, throne, stairs, columns, gold inlays and balustrades are
 original project geometry. Its stone texture reuses **Rock Face 03**, by
 **Dario Barresi / Rico Cilliers**, [Poly Haven, CC0](https://polyhaven.com/a/rock_face_03),
