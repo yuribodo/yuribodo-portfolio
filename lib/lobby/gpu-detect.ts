@@ -1,8 +1,8 @@
 // Cheap one-shot probes to decide whether the visitor's device is likely to
 // download (~30 MB) and render the desk scene at a watchable framerate. When
 // any signal says no, the gate shows the portfolio directly — no 3D desk.
-// The GPU blocklist is intentionally conservative; the runtime FPS watchdog
-// in scene-ready.tsx is the safety net for borderline hardware.
+// The GPU blocklist is intentionally conservative — we only refuse hardware
+// we've actually seen hitch; when in doubt, give the benefit of the doubt.
 //
 // Returning `true` from a SSR context lets the gate render its loading
 // state without flashing; the client effect re-runs detection before the
@@ -62,7 +62,6 @@ export type LobbyBlockReason =
   | "slow-network"
   | "low-memory"
   | "low-cpu"
-  | "previous-low-fps"
   | "gpu";
 
 export interface DeviceSignals {
@@ -76,8 +75,6 @@ export interface DeviceSignals {
   /** GiB, Chromium only, capped at 8. */
   deviceMemory?: number;
   hardwareConcurrency?: number;
-  /** Set by the FPS watchdog after a previous visit ran unwatchably slow. */
-  hadLowFps: boolean;
 }
 
 /** Pure ordering of the cheap signals; the WebGL probe runs last (it costs a context). */
@@ -89,31 +86,7 @@ export function lobbyBlockReasonFor(signals: DeviceSignals): LobbyBlockReason | 
   if (signals.effectiveType && signals.effectiveType !== "4g") return "slow-network";
   if (signals.deviceMemory !== undefined && signals.deviceMemory < 4) return "low-memory";
   if (signals.hardwareConcurrency !== undefined && signals.hardwareConcurrency < 4) return "low-cpu";
-  if (signals.hadLowFps) return "previous-low-fps";
   return null;
-}
-
-const LOW_FPS_KEY = "lobbyLowFps";
-/** A battery-saver or busy session shouldn't lock the desk out for good; retry daily. */
-export const LOW_FPS_TTL_MS = 24 * 60 * 60 * 1000;
-
-/** Remember an unwatchable run so the next visit lands on the portfolio directly. */
-export function markLobbyLowFps(now = Date.now()) {
-  try { localStorage.setItem(LOW_FPS_KEY, String(now)); } catch { /* storage disabled */ }
-}
-
-/** True while a recorded low-fps run is fresher than the TTL. Exported for tests. */
-export function hasRecentLowFps(stored: string | null, now = Date.now()): boolean {
-  const at = Number(stored);
-  return Number.isFinite(at) && at > 0 && now - at < LOW_FPS_TTL_MS;
-}
-
-function readLowFps(): boolean {
-  try {
-    const stored = localStorage.getItem(LOW_FPS_KEY);
-    if (stored !== null && !hasRecentLowFps(stored)) localStorage.removeItem(LOW_FPS_KEY);
-    return hasRecentLowFps(stored);
-  } catch { return false; }
 }
 
 export function getLobbyBlockReason(): LobbyBlockReason | null {
@@ -130,7 +103,6 @@ export function getLobbyBlockReason(): LobbyBlockReason | null {
     effectiveType: nav.connection?.effectiveType,
     deviceMemory: nav.deviceMemory,
     hardwareConcurrency: nav.hardwareConcurrency,
-    hadLowFps: readLowFps(),
   });
   if (reason) return reason;
   return isGpuCapable() ? null : "gpu";

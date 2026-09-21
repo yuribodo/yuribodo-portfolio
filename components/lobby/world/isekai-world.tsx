@@ -177,8 +177,6 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       <CoreWorld id="sky"><Atmosphere active={active} /></CoreWorld>
       <WorldBoundary><VistaStreams floorY={floorY} /></WorldBoundary>
       <WorldBoundary><RiverLandings floorY={floorY}/></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyVillage floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ReferenceHouses floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <CoreWorld id="valley"><LivingValley floorY={floorY} active={active} /></CoreWorld>
       <CoreWorld id="canopies"><DistantCanopies floorY={floorY} /></CoreWorld>
       {/* Always-available ground makes missing optional assets graceful. */}
@@ -188,7 +186,14 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
       </mesh>
       <CoreWorld id="near-ground"><TerraceTerrain floorY={floorY} active={active} /></CoreWorld>
       <CoreWorld id="terrace"><TerraceArchitecture floorY={floorY} /></CoreWorld>
+      {/* Everything below is scenery, not entry criteria. Requesting it only
+          after the desk is ready keeps ~6 MB of GLBs from sharing bandwidth
+          with the core landscape on the way to the first interactive frame. */}
+      <WorldDetails enabled={active}>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCliffs floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><TerraceGarden floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyVillage floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ReferenceHouses floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><ChessMonuments /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup>
@@ -196,9 +201,7 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
         <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
       </PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><TerraceGarden floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
-      <WorldDetails enabled={active}>
       <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCreatures /></PreparedGroup></Suspense></WorldBoundary>
       <WorldCharacters floorY={floorY} active={active} />
