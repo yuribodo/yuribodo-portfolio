@@ -161,6 +161,16 @@ html.lenis, html.lenis body {
 [data-lobby-active="true"] .world-button { cursor: pointer !important; }
 [data-lobby-active="true"] .world-button:disabled { cursor: wait !important; }
 
+/* The world chrome settles into place once, instead of popping in with the frame. */
+.world-chrome-enter {
+  opacity: 1; transform: translateY(0);
+  transition: opacity 480ms cubic-bezier(0.23, 1, 0.32, 1), transform 480ms cubic-bezier(0.23, 1, 0.32, 1);
+  @starting-style { opacity: 0; transform: translateY(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-chrome-enter { transform: none; @starting-style { transform: none; } }
+}
+
 /* A keyboard user sees the action currently focused, without a second HUD. */
 .lobby-keyboard-actions { position: absolute; bottom: 5.5rem; left: 1.5rem; z-index: 30; }
 .lobby-keyboard-actions button {
