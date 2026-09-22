@@ -4,9 +4,9 @@
 // The GPU blocklist is intentionally conservative — we only refuse hardware
 // we've actually seen hitch; when in doubt, give the benefit of the doubt.
 //
-// Returning `true` from a SSR context lets the gate render its loading
-// state without flashing; the client effect re-runs detection before the
-// lobby mounts.
+// SSR returns no block so the gate can render its loader without flashing.
+// The client effect re-runs detection before the lobby mounts. Integrated
+// GPUs still get the valley; they render it at a lower shadow map and pixel cap.
 
 import { isMobileUserAgent } from "./is-mobile";
 
@@ -28,28 +28,37 @@ const RENDERER_BLOCKLIST: readonly string[] = [
   "microsoft basic render",
 ];
 
-export function isGpuCapable(): boolean {
-  if (typeof window === "undefined") return true;
+export interface LobbyScale {
+  maxDpr: number;
+  shadow: number;
+}
 
+const HIGH_SCALE: LobbyScale = { maxDpr: 1.5, shadow: 2048 };
+const LOW_SCALE: LobbyScale = { maxDpr: 1, shadow: 1024 };
+
+/** Same world either way. iGPUs spend the budget on fewer shadow texels and a lower pixel cap. */
+export function lobbyScaleForRenderer(renderer: string): LobbyScale {
+  const value = renderer.toLowerCase();
+  if (/nvidia|geforce|quadro|apple/.test(value)) return HIGH_SCALE;
+  if (/radeon/.test(value) && /rx|pro/.test(value)) return HIGH_SCALE;
+  if (/intel|iris|uhd|hd graphics|adreno|mali|powervr|radeon/.test(value)) return LOW_SCALE;
+  return HIGH_SCALE;
+}
+
+function readRenderer(): { ok: boolean; renderer: string | null } {
+  if (typeof window === "undefined") return { ok: true, renderer: null };
   let gl: WebGL2RenderingContext | null = null;
   try {
-    // three r163+ dropped WebGL1: without WebGL2 the renderer throws on mount.
-    gl = document.createElement("canvas").getContext("webgl2");
-    if (!gl) return false;
-
+    // Match the lobby canvas so a dual-GPU laptop reports the discrete chip.
+    gl = document.createElement("canvas").getContext("webgl2", { powerPreference: "high-performance" });
+    if (!gl) return { ok: false, renderer: null };
     const ext = gl.getExtension("WEBGL_debug_renderer_info");
-    if (!ext) return true;
-
+    if (!ext) return { ok: true, renderer: null };
     const renderer = String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) ?? "").toLowerCase();
-    if (!renderer) return true;
-    return !RENDERER_BLOCKLIST.some((entry) => renderer.includes(entry));
+    return { ok: true, renderer: renderer || null };
   } catch {
-    // Any failure (security policy, missing context) → assume capable so
-    // we don't lock out users whose browsers don't expose the renderer.
-    return true;
+    return { ok: true, renderer: null };
   } finally {
-    // Free the context immediately. WebGL contexts are a scarce resource;
-    // some browsers throttle once a tab has > 16 live contexts.
     gl?.getExtension("WEBGL_lose_context")?.loseContext();
   }
 }
@@ -89,13 +98,13 @@ export function lobbyBlockReasonFor(signals: DeviceSignals): LobbyBlockReason | 
   return null;
 }
 
-export function getLobbyBlockReason(): LobbyBlockReason | null {
-  if (typeof window === "undefined") return null;
+export function getLobbyAdmission(): { block: LobbyBlockReason | null; scale: LobbyScale } {
+  if (typeof window === "undefined") return { block: null, scale: HIGH_SCALE };
   const nav = navigator as Navigator & {
     deviceMemory?: number;
     connection?: { saveData?: boolean; effectiveType?: string };
   };
-  const reason = lobbyBlockReasonFor({
+  const block = lobbyBlockReasonFor({
     userAgent: nav.userAgent,
     touchOnly: matchMedia("(hover: none) and (pointer: coarse)").matches,
     reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -104,6 +113,11 @@ export function getLobbyBlockReason(): LobbyBlockReason | null {
     deviceMemory: nav.deviceMemory,
     hardwareConcurrency: nav.hardwareConcurrency,
   });
-  if (reason) return reason;
-  return isGpuCapable() ? null : "gpu";
+  if (block) return { block, scale: LOW_SCALE };
+  const gpu = readRenderer();
+  if (!gpu.ok) return { block: "gpu", scale: LOW_SCALE };
+  if (gpu.renderer && RENDERER_BLOCKLIST.some((entry) => gpu.renderer!.includes(entry))) {
+    return { block: "gpu", scale: LOW_SCALE };
+  }
+  return { block: null, scale: gpu.renderer ? lobbyScaleForRenderer(gpu.renderer) : HIGH_SCALE };
 }

@@ -109,9 +109,19 @@ body:has([data-lobby-active="true"]) {
   color: inherit;
 }
 
-.canvas-pixelated {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.hero-wash {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(250, 75, 18, 0.15), transparent 60%),
+    linear-gradient(165deg, #1a1a1a 0%, #45272f 30%, #2e2024 50%, #9f5454 70%, #1a1a1a 100%);
+  background-size: 160% 160%, 100% 100%;
+  animation: hero-wash 18s ease-in-out infinite alternate;
+}
+@keyframes hero-wash {
+  from { background-position: 30% 20%, 0 0; }
+  to { background-position: 70% 80%, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash { animation: none; }
 }
 
 /* Lenis smooth scroll */

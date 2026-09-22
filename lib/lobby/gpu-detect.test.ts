@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { lobbyBlockReasonFor, type DeviceSignals } from './gpu-detect';
+import { lobbyBlockReasonFor, lobbyScaleForRenderer, type DeviceSignals } from './gpu-detect';
 
 const capableDesktop: DeviceSignals = {
   userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36',
@@ -11,6 +11,16 @@ const capableDesktop: DeviceSignals = {
 test('a capable desktop gets the desk; Firefox/Safari without Chromium-only signals too', () => {
   assert.equal(lobbyBlockReasonFor(capableDesktop), null);
   assert.equal(lobbyBlockReasonFor({ ...capableDesktop, effectiveType: undefined, deviceMemory: undefined }), null);
+});
+
+test('integrated gpus keep the world and spend less on pixels and shadows', () => {
+  assert.deepEqual(lobbyScaleForRenderer('angle (nvidia, nvidia geforce rtx 3050 laptop gpu direct3d11 vs_5_0 ps_5_0, d3d11)'), { maxDpr: 1.5, shadow: 2048 });
+  assert.deepEqual(lobbyScaleForRenderer('angle (amd, amd radeon rx 6700 xt direct3d11 vs_5_0 ps_5_0, d3d11)'), { maxDpr: 1.5, shadow: 2048 });
+  assert.deepEqual(lobbyScaleForRenderer('apple gpu'), { maxDpr: 1.5, shadow: 2048 });
+  assert.deepEqual(lobbyScaleForRenderer('browser integration test'), { maxDpr: 1.5, shadow: 2048 });
+  assert.deepEqual(lobbyScaleForRenderer('angle (intel, intel(r) iris(r) xe graphics direct3d11 vs_5_0 ps_5_0, d3d11)'), { maxDpr: 1, shadow: 1024 });
+  assert.deepEqual(lobbyScaleForRenderer('angle (intel, intel(r) uhd graphics 620 direct3d11 vs_5_0 ps_5_0, d3d11)'), { maxDpr: 1, shadow: 1024 });
+  assert.deepEqual(lobbyScaleForRenderer('angle (amd, amd radeon(tm) graphics direct3d11 vs_5_0 ps_5_0, d3d11)'), { maxDpr: 1, shadow: 1024 });
 });
 
 test('each weak-device signal lands on the portfolio directly', () => {

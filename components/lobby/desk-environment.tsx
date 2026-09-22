@@ -15,7 +15,7 @@ const SKY_FILL = 0.55;
 const DESK_FILL = 0.18;
 const FOG_COLOR = new Color("#afcadf");
 
-const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(function DeskEnvironment(_, ref) {
+const DeskEnvironment = forwardRef<DeskEnvironmentHandle, { shadowMap: number }>(function DeskEnvironment({ shadowMap }, ref) {
   const scene = useThree((s) => s.scene);
   const sun = useRef<DirectionalLight>(null);
   const fill = useRef<DirectionalLight>(null);
@@ -45,8 +45,8 @@ const DeskEnvironment = forwardRef<DeskEnvironmentHandle>(function DeskEnvironme
       <hemisphereLight ref={sky} args={["#c0e3ef", "#9a8c67", SKY_FILL]} />
       <directionalLight
         ref={sun} position={SUN_POSITION} color="#ffe4b5" intensity={SUN} castShadow
-        shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={160}
-        shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20}
+        shadow-mapSize={[shadowMap, shadowMap]} shadow-camera-near={1} shadow-camera-far={240}
+        shadow-camera-left={-56} shadow-camera-right={56} shadow-camera-top={56} shadow-camera-bottom={-56}
         shadow-normalBias={0.015} shadow-bias={-0.0002}
       />
       <directionalLight ref={fill} position={[4, 3, -6]} color="#b5d6eb" intensity={DESK_FILL} />

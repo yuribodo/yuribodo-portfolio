@@ -28,6 +28,8 @@ import AnimeFigures, {
   type AnimeFiguresHandle,
 } from "./objects/anime-figures";
 import Beyblade, { type BeybladeHandle } from "./objects/beyblade";
+import type { LobbyScale } from "@/lib/lobby/gpu-detect";
+import { RenderScale } from "./render-scale";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
 import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
@@ -38,9 +40,11 @@ import { DeskInteraction, SceneReady, SceneVisibility } from "./world/scene-read
 interface DeskSceneProps {
   state: LobbyState;
   dispatch: Dispatch<LobbyAction>;
+  scale: LobbyScale;
+  firstVisit: boolean;
 }
 
-export default function DeskScene({ state, dispatch }: DeskSceneProps) {
+export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSceneProps) {
   const cameraRigRef = useRef<CameraRigHandle>(null);
   const monitorRef = useRef<MonitorHandle>(null);
   const environmentRef = useRef<DeskEnvironmentHandle>(null);
@@ -194,17 +198,20 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
       className="fixed inset-0 z-[60] bg-background"
     >
       <Canvas
-        dpr={[1, 1.5]}
+        dpr={scale.maxDpr}
         shadows="soft"
         scene={{ environmentIntensity: 0.35 }}
         // Dual-GPU laptops default to the integrated chip; ask for the discrete one.
         gl={{ powerPreference: "high-performance" }}
       >
+        <RenderScale max={scale.maxDpr} />
         <SceneVisibility />
         <CameraRig ref={cameraRigRef} state={state} />
         <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
-        <DeskEnvironment ref={environmentRef} />
-        <IsekaiWorld floorY={floorY} active={state !== "booting" && state !== "loading"} />
+        <DeskEnvironment ref={environmentRef} shadowMap={scale.shadow} />
+        {state !== "loading" && (
+          <IsekaiWorld floorY={floorY} active={state !== "booting"} />
+        )}
         <WorldBoundary onError={skipScene}>
         <Suspense fallback={null}><PreparedGroup priority={0}>
           <Desk onFloorReady={setFloorY} />
@@ -296,7 +303,7 @@ export default function DeskScene({ state, dispatch }: DeskSceneProps) {
           Spin Pegasus beyblade
         </button>
       </div>
-      <WorldControls loading={state === "loading"} busy={state === "booting"} onEnter={handleEnter} onSkip={handleSkip}/>
+      <WorldControls loading={state === "loading"} busy={state === "booting"} firstVisit={firstVisit} onEnter={handleEnter} onSkip={handleSkip}/>
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

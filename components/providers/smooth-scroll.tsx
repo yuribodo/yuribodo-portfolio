@@ -9,6 +9,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Touch already has a compositor scroll. Lenis only pays off with a mouse wheel.
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
     const lenis = new Lenis({
       autoRaf: false,
     });

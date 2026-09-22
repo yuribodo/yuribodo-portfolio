@@ -1,4 +1,4 @@
-export function LobbyLoading({ contained = false }: { contained?: boolean }) {
+export function LobbyLoading({ contained = false, onSkip }: { contained?: boolean; onSkip?: () => void }) {
   return (
     <div
       role="status"
@@ -15,6 +15,15 @@ export function LobbyLoading({ contained = false }: { contained?: boolean }) {
       <p className="mt-4 font-mono text-[10px] uppercase tracking-[3px] text-foreground/50">
         Preparing your world…
       </p>
+      {onSkip && (
+        <button
+          type="button"
+          onClick={onSkip}
+          className="mt-8 min-h-11 px-4 font-mono text-[10px] uppercase tracking-[3px] text-foreground/70 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          Skip to portfolio
+        </button>
+      )}
     </div>
   );
 }

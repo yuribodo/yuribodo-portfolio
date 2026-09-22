@@ -177,23 +177,16 @@ test("missing authored world assets do not block desk entry", async ({ page }) =
   await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
 });
 
-test("the loading cover waits for terrain instead of revealing floating scenery", async ({ page }) => {
+test("the desk is revealed while terrain is still downloading", async ({ page }) => {
   await allowSoftwareRenderer(page);
   let release!: () => void;
-  let requested!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
-  const terrainRequested = new Promise<void>(resolve => { requested = resolve; });
   await page.route('**/lobby/baked/terrain-*.bin.gz*', async route => {
-    requested(); await held; await route.continue();
+    await held; await route.continue();
   });
   try {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await terrainRequested;
-    await page.waitForTimeout(3500);
-    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'loading');
-    await expect(page.locator('[data-lobby-loading]')).toBeVisible();
-    release();
-    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle');
+    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle', { timeout: 20000 });
     await expect(page.locator('[data-lobby-loading]')).toHaveCount(0);
   } finally { release(); }
 });
