@@ -1,0 +1,26 @@
+[
+  {
+    "asset": "organic-rock_moss_set_01.glb",
+    "geometryAndColorUnchanged": true,
+    "oldBytes": 1566808,
+    "newBytes": 1052516
+  },
+  {
+    "asset": "organic-shrub_02.glb",
+    "geometryAndColorUnchanged": true,
+    "oldBytes": 813508,
+    "newBytes": 650664
+  },
+  {
+    "asset": "organic-fern_02.glb",
+    "geometryAndColorUnchanged": true,
+    "oldBytes": 674912,
+    "newBytes": 427872
+  },
+  {
+    "asset": "organic-tree_small_02.glb",
+    "geometryAndColorUnchanged": true,
+    "oldBytes": 9832308,
+    "newBytes": 7879308
+  }
+]

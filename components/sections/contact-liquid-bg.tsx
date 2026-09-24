@@ -1,5 +1,6 @@
 "use client";
 
+import { observePageAnimation, REVEAL_SPACER_SELECTOR } from "@/lib/observe-page-animation";
 import { useEffect, useRef, useCallback } from "react";
 
 const VERTEX_SHADER = `
@@ -173,7 +174,8 @@ export function LiquidBackground({ reducedMotion }: { reducedMotion: boolean }) 
 
   useEffect(() => {
     if (reducedMotion) return;
-    initGL();
+    let active = false;
+    let needsResize = true;
 
     let resizeTimer: ReturnType<typeof setTimeout>;
 
@@ -182,8 +184,11 @@ export function LiquidBackground({ reducedMotion }: { reducedMotion: boolean }) 
     };
 
     const handleResize = () => {
+      needsResize = true;
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(initGL, 150);
+      resizeTimer = setTimeout(() => {
+        if (active) { initGL(); needsResize = false; }
+      }, 150);
     };
 
     const render = () => {
@@ -209,9 +214,18 @@ export function LiquidBackground({ reducedMotion }: { reducedMotion: boolean }) 
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("resize", handleResize);
-    animFrameRef.current = requestAnimationFrame(render);
+    // Fixed canvas always intersects the viewport; the spacer says when it's uncovered.
+    const stopObserving = observePageAnimation(canvasRef.current!, visible => {
+      active = visible;
+      cancelAnimationFrame(animFrameRef.current);
+      if (visible) {
+        if (!resourcesRef.current || needsResize) { initGL(); needsResize = false; }
+        animFrameRef.current = requestAnimationFrame(render);
+      }
+    }, document.querySelector(REVEAL_SPACER_SELECTOR) ?? canvasRef.current!);
 
     return () => {
+      stopObserving();
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);

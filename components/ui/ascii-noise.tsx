@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { observePageAnimation } from "@/lib/observe-page-animation";
 
 const ASCII_CHARS = ".:+*#@%&=~-";
 
@@ -44,9 +45,14 @@ export function AsciiNoise() {
     }
 
     draw();
-    const interval = setInterval(draw, 3000);
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const stopObserving = observePageAnimation(canvas, active => {
+      clearInterval(interval);
+      if (active) { draw(); interval = setInterval(draw, 3000); }
+    });
 
     return () => {
+      stopObserving();
       clearInterval(interval);
       window.removeEventListener("resize", resize);
     };

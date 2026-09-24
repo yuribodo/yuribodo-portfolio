@@ -25,6 +25,18 @@ export function unregisterPulseTarget(id: string): void {
   registry.delete(id);
 }
 
+const ARRIVAL_PULSE_IDS = ["nintendo-ds", "beyblade-pegasus", "minato", "seismitoad", "drago"] as const;
+
+/** One desk object per beat, in that order, while the valley is still arriving. */
+export function pulseArrival(index: number): void {
+  for (let step = 0; step < ARRIVAL_PULSE_IDS.length; step += 1) {
+    const pulse = registry.get(ARRIVAL_PULSE_IDS[(index + step) % ARRIVAL_PULSE_IDS.length]);
+    if (!pulse) continue;
+    pulse();
+    return;
+  }
+}
+
 /** Picks up to `max` random callbacks (at least `min` if available). Returns
  *  the selected callbacks in shuffled order — the caller staggers them. */
 export function pickRandomPulseTargets(min: number, max: number): PulseFn[] {

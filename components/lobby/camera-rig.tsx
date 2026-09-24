@@ -1,120 +1,36 @@
 "use client";
+import {PerspectiveCamera} from '@react-three/drei';
+import {useFrame} from '@react-three/fiber';
+import {forwardRef,useEffect,useImperativeHandle,useRef} from 'react';
+import {Vector3,type PerspectiveCamera as Camera} from 'three';
+import {useReducedMotion} from '@/hooks/use-reduced-motion';
+import {DESK_CAMERA,DESK_TARGET} from '@/lib/lobby/world-view';
+import type {LobbyState} from './use-lobby-state';
 
-import { PerspectiveCamera } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import type { PerspectiveCamera as PerspectiveCameraImpl } from "three";
-
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
-
-import type { LobbyState } from "./use-lobby-state";
-
-export interface CameraRigHandle {
-  /** Live camera for the §6 dive transition (#10). The transition timeline
-   *  owns the dolly / FOV tweens directly — simpler than wrapping each as
-   *  an imperative method. */
-  getCamera: () => PerspectiveCameraImpl | null;
-}
-
-interface CameraRigProps {
-  state: LobbyState;
-  fov?: number;
-}
-
-// First-person "sitting at the desk" POV — head height of a seated adult,
-// gaze tilted ~35° down toward the keyboard area:
-//   - eyes ~60cm above the writing surface (desk top is at y=0)
-//   - ~40cm forward of the desk's front edge (front edge at z=0.4)
-//   - look-at sits below the desk surface line → ~35° downward gaze, the angle
-//     you naturally hit when looking at the keyboard while seated
-const BASE_POSITION = { x: 0, y: 0.4, z: 1.9 } as const;
-const LOOKAT_TARGET = { x: 0, y: -0.05, z: -0.2 } as const;
-// Drift drops 10x — at this close range, 0.3 felt like a head-jerk
-const DRIFT_AMPLITUDE = 0.06;
-const LERP_FACTOR = 0.1;
-
-const CameraRig = forwardRef<CameraRigHandle, CameraRigProps>(function CameraRig(
-  { state, fov = 50 },
-  ref,
-) {
-  const cameraRef = useRef<PerspectiveCameraImpl>(null);
-  const mouseTargetRef = useRef({ x: 0, y: 0 });
-  const prefersReducedMotion = useReducedMotion();
-
-  const isDriftEnabled =
-    !prefersReducedMotion && state !== "booting" && state !== "loading";
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      getCamera: () => cameraRef.current,
-    }),
-    [],
-  );
-
-  useEffect(() => {
-    if (!isDriftEnabled) {
-      mouseTargetRef.current = { x: 0, y: 0 };
-      return;
-    }
-
-    function handleMouseMove(event: MouseEvent) {
-      const nx = (event.clientX / window.innerWidth) * 2 - 1;
-      const ny = (event.clientY / window.innerHeight) * 2 - 1;
-      mouseTargetRef.current = { x: nx, y: -ny };
-    }
-
-    function handleMouseLeave() {
-      mouseTargetRef.current = { x: 0, y: 0 };
-    }
-
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("blur", handleMouseLeave);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("blur", handleMouseLeave);
-    };
-  }, [isDriftEnabled]);
-
-  useEffect(() => {
-    cameraRef.current?.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
-  }, []);
-
-  useFrame((_, delta) => {
-    // Dive transition (#10) owns position + lookAt while booting. Returning
-    // here keeps the drift lerp from fighting the GSAP tween.
-    if (state === "booting") return;
-
-    const camera = cameraRef.current;
-    if (!camera) return;
-
-    const targetX = BASE_POSITION.x + mouseTargetRef.current.x * DRIFT_AMPLITUDE;
-    const targetY = BASE_POSITION.y + mouseTargetRef.current.y * DRIFT_AMPLITUDE;
-
-    // Frame-rate independent lerp: same perceived speed at 60Hz and 120Hz.
-    const t = 1 - Math.pow(1 - LERP_FACTOR, delta * 60);
-
-    camera.position.x += (targetX - camera.position.x) * t;
-    camera.position.y += (targetY - camera.position.y) * t;
-    camera.lookAt(LOOKAT_TARGET.x, LOOKAT_TARGET.y, LOOKAT_TARGET.z);
-  });
-
-  return (
-    <PerspectiveCamera
-      ref={cameraRef}
-      makeDefault
-      position={[BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z]}
-      fov={fov}
-    />
-  );
+export interface CameraRigHandle {getCamera:()=>Camera|null}
+interface CameraRigProps {state:LobbyState;fov?:number}
+const base=new Vector3(DESK_CAMERA.x,DESK_CAMERA.y,DESK_CAMERA.z);
+const target=new Vector3(DESK_TARGET.x,DESK_TARGET.y,DESK_TARGET.z);
+/** The first release stays seated and forward-facing. The existing subtle
+ * pointer parallax remains; the monitor transition owns the camera on entry. */
+const CameraRig=forwardRef<CameraRigHandle,CameraRigProps>(function CameraRig({state,fov=50},ref){
+ const cameraRef=useRef<Camera>(null),drift=useRef({x:0,y:0}),reducedMotion=useReducedMotion();
+ useImperativeHandle(ref,()=>({getCamera:()=>cameraRef.current}),[]);
+ useEffect(()=>{cameraRef.current?.lookAt(target);},[]);
+ useEffect(()=>{
+  if(state==='booting'||state==='loading'||reducedMotion)return;
+  const move=(event:MouseEvent)=>{drift.current={x:event.clientX/window.innerWidth*2-1,y:1-event.clientY/window.innerHeight*2};};
+  const reset=()=>{drift.current={x:0,y:0};};
+  window.addEventListener('mousemove',move);window.addEventListener('blur',reset);document.addEventListener('mouseleave',reset);
+  return ()=>{window.removeEventListener('mousemove',move);window.removeEventListener('blur',reset);document.removeEventListener('mouseleave',reset);};
+ },[state,reducedMotion]);
+ useFrame((_,delta)=>{
+  const camera=cameraRef.current;if(!camera||state==='booting')return;
+  const t=1-Math.exp(-6.3*Math.min(delta,.1));
+  camera.position.x+=(base.x+drift.current.x*.06-camera.position.x)*t;
+  camera.position.y+=(base.y+drift.current.y*.06-camera.position.y)*t;
+  camera.lookAt(target);
+ });
+ return <PerspectiveCamera ref={cameraRef} makeDefault position={base} fov={fov} near={.05} far={3200}/>;
 });
-
 export default CameraRig;

@@ -1,0 +1,20 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Skybound — fauna e vegetação</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5f2;color:#223844;font:16px/1.6 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:28px 20px}h1{font-size:32px;line-height:1.2}h2{font-size:22px;margin-top:32px}p{max-width:85ch}a{color:#17668b}.comparison{position:relative;aspect-ratio:8/5;background:#183444;overflow:hidden}.comparison img{position:absolute;width:100%;height:100%;object-fit:contain}.after{clip-path:inset(0 50% 0 0)}.divider{position:absolute;left:50%;height:100%;border-left:2px solid white;pointer-events:none}.tag{position:absolute;top:12px;padding:5px 12px;background:#183444ed;color:white;border-radius:4px}.old{right:12px}.new{left:12px}input{width:100%;accent-color:#17668b}video,.reference{width:100%;display:block;background:#183444}.note{font-size:14px;color:#4c606b}li{margin-block:6px}label{display:block;margin-top:12px}
+</style>
+<main><h1>Fauna, clareiras e materiais orgânicos</h1>
+<p>Mais bandos cruzam o vale, cervos pastam em pequenos grupos e dois dragões voam em distâncias diferentes. A revisão também troca os modelos simples de vegetação por árvores, samambaias, arbustos e rochas com materiais detalhados.</p>
+<div class="comparison"><img src="../implementation/before-living-world.png" alt="Paisagem anterior à revisão de fauna e vegetação"><img class="after" src="../implementation/fantasy-life/before.png" alt="Paisagem com fauna, vegetação texturizada e rochas nas clareiras"><div class="divider"></div><span class="tag new">Atual</span><span class="tag old">Anterior</span></div>
+<label for="reveal">Arraste para comparar: <output id="percentage">50</output>% da versão atual</label><input id="reveal" type="range" min="0" max="100" value="50">
+<p class="note">Capturas reais em 1440×900. Mesa, colecionáveis, piso e câmera inicial preservados. Luz, nuvens e animais aparecem em instantes diferentes.</p>
+<p><a href="../implementation/fantasy-life/before.png">Abrir print completo</a> · <a href="http://localhost:3000">Abrir o site local · porta 3000</a></p>
+<h2>Em movimento</h2><video controls playsinline preload="metadata" poster="../implementation/fantasy-life/before.png"><source src="../implementation/living-world.mp4" type="video/mp4"></video>
+<p class="note">Captura da produção local. O vídeo permite avaliar os voos, a vegetação e as mudanças de vista.</p>
+<h2>Os modelos de fauna</h2><img class="reference" src="../implementation/wildlife-details.png" alt="Inspeção isolada dos modelos reais de cervos e dragão usados na cena">
+<p>Os cervos usam arquivos Blender de CDmir/TinyWorlds, com pelagem, normal maps do macho e animações de pasto e observação. O dragão é um modelo de na3ee1, refinado no Blender e animado pelo esqueleto. Esta imagem mostra os mesmos arquivos GLB do site, em iluminação de inspeção.</p>
+<h2>Base do cenário</h2><p>As plantas e as rochas desta revisão vêm do Poly Haven. As árvores próximas preservam o volume e as folhas do modelo original. As distantes usam vistas individuais das copas, pré-renderizadas em oito direções, mantendo posição no terreno, oclusão, vento e neblina. Isso evita destruir a folhagem durante a otimização.</p>
+<p>A revisão não conclui o acabamento do mundo: o relevo amplo, as margens e a arquitetura ainda precisam de mais trabalho autoral para chegar à referência. A troca de biblioteca é parte da melhoria, junto com composição, materiais e comportamento.</p>
+<p><a href="living-world.md">Mudanças, fontes, testes e desempenho</a> · <a href="../../../../public/CREDITS.md">Créditos completos</a></p>
+</main><script>
+const range=document.querySelector('#reveal');
+range.addEventListener('input',()=>{document.querySelector('.after').style.clipPath=`inset(0 ${100-range.value}% 0 0)`;document.querySelector('.divider').style.left=range.value+'%';document.querySelector('#percentage').value=range.value;});
+</script></html>
