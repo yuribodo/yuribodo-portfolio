@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import type { Dispatch } from "react";
 
+import { useArrivalPulse } from "@/hooks/use-arrival-pulse";
 import { useFirstPointermoveSweep } from "@/hooks/use-first-pointermove-sweep";
 import { useLobbyAudio } from "@/hooks/use-lobby-audio";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -83,6 +84,7 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
   // Discovery affordance (issue #14): fires once per session on the user's
   // first mouse move, pulsing 3–4 registered objects to signal interactivity.
   useFirstPointermoveSweep({ enabled: state === "idle" || state === "exploring" });
+  useArrivalPulse(state === "idle" || state === "exploring");
 
   // Ambient bed (issue #15) — boots on the user's first gesture so browser
   // autoplay policy doesn't block the AudioContext. Listens for any input
