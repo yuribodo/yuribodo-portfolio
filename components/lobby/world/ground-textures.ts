@@ -3,11 +3,17 @@ import { useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useState } from 'react';
 import { RepeatWrapping, SRGBColorSpace, TextureLoader, type Texture } from 'three';
+import { installBitmapTextureLoader } from '@/lib/lobby/bitmap-texture-loader';
 import { GROUND_PREVIEW_TEXTURES } from '@/lib/lobby/ground-preview-manifest';
 import { uploadTextures } from '@/lib/lobby/texture-upload-queue';
 
 export const GROUND_TEXTURES=['/lobby/world/soil-color.webp','/lobby/world/soil-normal.webp','/lobby/world/meadow-color.webp','/lobby/world/meadow-normal.webp','/lobby/world/rock-face-detail.webp','/lobby/world/rock-face-normal.webp'];
+installBitmapTextureLoader();
 let fullResolution: Promise<Texture[]> | undefined;
+/** Drops the page-lifetime full-res sources once the lobby is gone; a replay reloads them. */
+export function releaseGroundTextures() {
+  fullResolution = undefined;
+}
 function ownedMaps(source: Texture[]) {
   return source.map((texture, i) => {
     const map = texture.clone();

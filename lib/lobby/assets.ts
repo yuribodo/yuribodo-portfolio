@@ -11,6 +11,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 // browser has already kicked off the fetches in parallel.
 
 import { LOBBY_MODELS } from "./asset-manifest";
+import { CARD_TEXTURE_PAIRS, isLobbyReleased } from "./release-assets";
 export { LOBBY_MODELS } from "./asset-manifest";
 
 DefaultLoadingManager.setURLModifier(lobbyAssetUrl);
@@ -18,10 +19,15 @@ DefaultLoadingManager.setURLModifier(lobbyAssetUrl);
 // Keep Draco decoding on our origin: no external CDN round trip or dependency.
 useGLTF.setDecoderPath("/lobby/draco/");
 
-for (const path of Object.values(LOBBY_MODELS)) {
-  useGLTF.preload(path);
-}
+// The gate can skip before this chunk evaluates; preloading then would park
+// ~3 MB in a cache nothing will read or release.
+if (!isLobbyReleased()) {
+  for (const path of Object.values(LOBBY_MODELS)) {
+    useGLTF.preload(path);
+  }
 
-for (const file of ["pokemon-front-charizard", "pokemon-back", "yugioh-front-mago-negro", "yugioh-back"]) {
-  useTexture.preload(`/lobby/textures/${file}.webp`);
+  // Same array keys as the useTexture calls in the card decks, so these are the entries that get read.
+  for (const pair of CARD_TEXTURE_PAIRS) {
+    useTexture.preload([...pair]);
+  }
 }

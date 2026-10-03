@@ -11,6 +11,7 @@ export interface CameraRigHandle {getCamera:()=>Camera|null}
 interface CameraRigProps {state:LobbyState;fov?:number}
 const base=new Vector3(DESK_CAMERA.x,DESK_CAMERA.y,DESK_CAMERA.z);
 const target=new Vector3(DESK_TARGET.x,DESK_TARGET.y,DESK_TARGET.z);
+const SETTLE_DISTANCE=1e-4;
 /** The first release stays seated and forward-facing. The existing subtle
  * pointer parallax remains; the monitor transition owns the camera on entry. */
 const CameraRig=forwardRef<CameraRigHandle,CameraRigProps>(function CameraRig({state,fov=50},ref){
@@ -27,8 +28,11 @@ const CameraRig=forwardRef<CameraRigHandle,CameraRigProps>(function CameraRig({s
  useFrame((_,delta)=>{
   const camera=cameraRef.current;if(!camera||state==='booting')return;
   const t=1-Math.exp(-6.3*Math.min(delta,.1));
-  camera.position.x+=(base.x+drift.current.x*.06-camera.position.x)*t;
-  camera.position.y+=(base.y+drift.current.y*.06-camera.position.y)*t;
+  const goalX=base.x+drift.current.x*.06,goalY=base.y+drift.current.y*.06;
+  const dx=goalX-camera.position.x,dy=goalY-camera.position.y;
+  // The ease never lands, so downstream matrix caches would keep seeing a changing pose for minutes; land it.
+  if(Math.abs(dx)+Math.abs(dy)<SETTLE_DISTANCE){camera.position.x=goalX;camera.position.y=goalY;}
+  else{camera.position.x+=dx*t;camera.position.y+=dy*t;}
   camera.lookAt(target);
  });
  return <PerspectiveCamera ref={cameraRef} makeDefault position={base} fov={fov} near={.05} far={3200}/>;

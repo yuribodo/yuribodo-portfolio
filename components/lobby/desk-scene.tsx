@@ -30,8 +30,9 @@ import AnimeFigures, {
 } from "./objects/anime-figures";
 import Beyblade, { type BeybladeHandle } from "./objects/beyblade";
 import type { LobbyScale } from "@/lib/lobby/gpu-detect";
-import { RenderScale } from "./render-scale";
+import { ContextLossGuard, RenderScale, useNativeCeiling } from "./render-scale";
 import type { LobbyAction, LobbyState } from "./use-lobby-state";
+import { PlaceholderEnvironment } from "./placeholder-environment";
 import IsekaiWorld from "./world/isekai-world";
 import { WorldControls } from "./world/world-controls";
 import { PreparedGroup } from "./world/prepared-group";
@@ -61,7 +62,10 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
   const beybladeRef = useRef<BeybladeHandle>(null);
   const [floorY, setFloorY] = useState(-1.5);
   const assetsReady = useCallback(() => dispatch({ type: "ASSETS_READY" }), [dispatch]);
-  const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);  const prefersReducedMotion = useReducedMotion();
+  const skipScene = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
+  // Canvas and RenderScale share one ceiling: native pixels up to the tier cap, no supersampling of DPR-1 displays.
+  const maxDpr = useNativeCeiling(scale.maxDpr);
+  const prefersReducedMotion = useReducedMotion();
   // Destructure to capture the stable useCallback identities. Re-using
   // `audio` as a whole would invalidate every dep array on each mute flip
   // (the wrapper object's identity is per-render).
@@ -200,17 +204,20 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
       className="fixed inset-0 z-[60] bg-background"
     >
       <Canvas
-        dpr={scale.maxDpr}
-        shadows="soft"
+        dpr={maxDpr}
+        // three r183 dropped PCFSoftShadowMap; "soft" silently fell back to this.
+        shadows="percentage"
         scene={{ environmentIntensity: 0.35 }}
         // Dual-GPU laptops default to the integrated chip; ask for the discrete one.
         gl={{ powerPreference: "high-performance" }}
       >
-        <RenderScale max={scale.maxDpr} />
+        <RenderScale max={maxDpr} state={state} />
+        <ContextLossGuard onLost={skipScene} />
         <SceneVisibility />
         <CameraRig ref={cameraRigRef} state={state} />
         <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
         <DeskEnvironment ref={environmentRef} shadowMap={scale.shadow} />
+        <PlaceholderEnvironment />
         {state !== "loading" && (
           <IsekaiWorld floorY={floorY} active={state !== "booting"} />
         )}

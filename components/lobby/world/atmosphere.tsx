@@ -4,11 +4,13 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree, useLoader } from "@react-three/fiber";
 import {
   BackSide, BoxGeometry, Color, Mesh,
-  PMREMGenerator, Scene, ShaderMaterial, SphereGeometry, Vector3, Matrix4, type WebGLRenderer,
+  PMREMGenerator, Scene, ShaderMaterial, SphereGeometry, Matrix4, type WebGLRenderer,
   HalfFloatType, PlaneGeometry, WebGLRenderTarget, type Camera,
 } from "three";
 import { SUN_GLSL } from "./outdoor-lighting";
 import { CloudVolumeLoader, CLOUD_VOLUMES } from "@/lib/lobby/cloud-volume-loader";
+import { releasePlaceholderEnvironment, renderEnvironment } from "@/lib/lobby/placeholder-environment";
+import { quantizeSkyRatio, skyPoseChanged, SKY_IDLE_REFRESH_S, SKY_RT_SCALE } from "@/lib/lobby/sky-backdrop";
 
 const skyVertex = `varying vec3 vDirection;
 void main() { vDirection = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
@@ -100,9 +102,11 @@ const banks: {p:number[];s:number[];yaw:number;wisp?:boolean}[] = [
 // Three's scene is an imperative external renderer resource, not React state.
 function installSkyLighting(gl: WebGLRenderer, scene: Scene, backdrop: Scene, setDimmer: (ratio: number) => void) {
   setDimmer(1);
-  const previous = scene.environment, generator = new PMREMGenerator(gl);
-  const target = generator.fromScene(backdrop, .04, .1, 1200, { position: new Vector3() });
+  const adopted = scene.environment, generator = new PMREMGenerator(gl);
+  const target = renderEnvironment(generator, backdrop);
   scene.environment = target.texture; setDimmer(scene.userData.worldDimmer ?? 1);
+  // The desk's black stand-in is not ours to restore: it goes as soon as the sky replaces it.
+  const previous = releasePlaceholderEnvironment(adopted) ? null : adopted;
   generator.dispose();
   return () => { if (scene.environment === target.texture) scene.environment = previous; target.dispose(); };
 }
@@ -111,6 +115,8 @@ function renderSkyBackdrop(renderer: WebGLRenderer, scene: Scene, camera: Camera
   const previousTarget = renderer.getRenderTarget(), previousClear = renderer.autoClear;
   try {
     renderer.autoClear = true; renderer.setRenderTarget(target); renderer.render(scene,camera);
+    // Profiler hook: sky renders so far, diff it per rAF.
+    renderer.domElement.dataset.skyDraws = String(Number(renderer.domElement.dataset.skyDraws ?? 0) + 1);
   } finally { renderer.setRenderTarget(previousTarget); renderer.autoClear = previousClear; }
 }
 
@@ -118,7 +124,6 @@ export function Atmosphere({ active }: { active: boolean }) {
   const gl = useThree(s => s.gl);
   const scene = useThree(s => s.scene);
   const size = useThree(s => s.size);
-  const dpr = useThree(s => s.viewport.dpr);
   const elapsed = useRef(0);
   const fields = useLoader(CloudVolumeLoader, CLOUD_VOLUMES);
   const { dome, sky, cloud, cloudVariant, wisps, volume, field, fieldVariant, wispField, setDimmer, backdrop, target, screen, composite, updateClouds } = useMemo(() => {
@@ -143,7 +148,8 @@ export function Atmosphere({ active }: { active: boolean }) {
       const mesh=new Mesh(volume,wisp?wisps:i%2?cloudVariant:cloud);mesh.position.fromArray(p);mesh.scale.fromArray(s);mesh.rotation.y=yaw;
       backdrop.add(mesh);return mesh;
     });
-    // Three-quarter resolution preserves the small sculpted cloud edges.
+    // Three-quarter resolution preserves the small sculpted cloud edges; the
+    // useFrame below sizes it from the live pixel ratio.
     // This contains only distant atmosphere; opaque scenery still renders at
     // native canvas resolution over it. Near landmark clouds retain real depth.
     const target = new WebGLRenderTarget(1,1,{type:HalfFloatType,depthBuffer:false});
@@ -160,25 +166,30 @@ export function Atmosphere({ active }: { active: boolean }) {
       updateClouds:(time:number)=>distantClouds.forEach((mesh,i)=>{mesh.position.x=banks[i+NEAR_CLOUD_COUNT].p[0]+Math.sin(time*.008+i+2)*7;})};
   }, [fields]);
   useEffect(() => installSkyLighting(gl, scene, backdrop, setDimmer), [gl, scene, backdrop, setDimmer]);
-  useEffect(() => { target.setSize(Math.max(1,Math.ceil(size.width*dpr*.75)),Math.max(1,Math.ceil(size.height*dpr*.75))); }, [target,size.width,size.height,dpr]);
   const cloudRefs = useRef<(Mesh | null)[]>([]);
-  const skyCache=useRef({world:new Matrix4(),projection:new Matrix4(),width:0,height:0,age:Infinity,dimmer:NaN});
-  const matrixChanged=(a:Matrix4,b:Matrix4)=>a.elements.some((value,i)=>Math.abs(value-b.elements[i])>1e-7);
+  const skyCache=useRef({world:new Matrix4(),projection:new Matrix4(),width:0,height:0,age:Infinity,dimmer:NaN,ratio:0});
+  const projectionChanged=(a:Matrix4,b:Matrix4)=>a.elements.some((value,i)=>Math.abs(value-b.elements[i])>1e-7);
   useFrame(({camera},delta) => {
     if (active) {
       elapsed.current += Math.min(delta,.1); updateClouds(elapsed.current);
       cloudRefs.current.forEach((mesh,i) => { if (mesh) mesh.position.x = banks[i].p[0] + Math.sin(elapsed.current*.008+i)*1.2; });
     }
-    // Cloud drift is subpixel over several frames at this distance. Reuse the
-    // rendered atmosphere while seated; every camera/projection/size/dimmer
-    // change renders immediately. Near volumes always retain full-rate depth.
-    camera.updateMatrixWorld();
+    // The target follows the governor's live pixel ratio, snapped to a few
+    // levels so a governor step does not reallocate it every time.
     const cache=skyCache.current;
+    cache.ratio=quantizeSkyRatio(gl.getPixelRatio(),cache.ratio);
+    const width=Math.max(1,Math.ceil(size.width*cache.ratio*SKY_RT_SCALE)),height=Math.max(1,Math.ceil(size.height*cache.ratio*SKY_RT_SCALE));
+    if(target.width!==width||target.height!==height)target.setSize(width,height);
+    // Cloud drift is subpixel for seconds at this distance. Reuse the rendered
+    // atmosphere until the camera has turned or travelled a sub-pixel amount;
+    // every projection/size/dimmer change renders immediately. Near volumes
+    // always retain full-rate depth.
+    camera.updateMatrixWorld();
     cache.age+=delta;
     const dimmer=scene.userData.worldDimmer??1;
-    if(matrixChanged(camera.matrixWorld,cache.world)||matrixChanged(camera.projectionMatrix,cache.projection)
+    if(skyPoseChanged(cache.world.elements,camera.matrixWorld.elements)||projectionChanged(camera.projectionMatrix,cache.projection)
       ||target.width!==cache.width||target.height!==cache.height||dimmer!==cache.dimmer
-      ||(active&&cache.age>=1/12)){
+      ||(active&&cache.age>=SKY_IDLE_REFRESH_S)){
       renderSkyBackdrop(gl,backdrop,camera,target);
       cache.world.copy(camera.matrixWorld);cache.projection.copy(camera.projectionMatrix);
       cache.width=target.width;cache.height=target.height;cache.dimmer=dimmer;cache.age=0;

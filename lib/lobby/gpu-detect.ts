@@ -26,7 +26,17 @@ const RENDERER_BLOCKLIST: readonly string[] = [
   "llvmpipe",
   "softpipe",
   "microsoft basic render",
+  "gdi generic",
+  "mesa offscreen",
+  "software rasterizer",
+  "apple software renderer",
 ];
+
+/** Software rasterizers and ancient iGPUs; the blocklist is substring-matched on the lowercased unmasked renderer. */
+export function isBlockedRenderer(renderer: string): boolean {
+  const value = renderer.toLowerCase();
+  return RENDERER_BLOCKLIST.some((entry) => value.includes(entry));
+}
 
 export interface LobbyScale {
   maxDpr: number;
@@ -98,7 +108,20 @@ export function lobbyBlockReasonFor(signals: DeviceSignals): LobbyBlockReason | 
   return null;
 }
 
-export function getLobbyAdmission(): { block: LobbyBlockReason | null; scale: LobbyScale } {
+/** `?quality=low|high` for QA: forces the pixel/shadow scale only, never bypasses a block. */
+export function lobbyScaleOverride(search: string): LobbyScale | null {
+  const quality = new URLSearchParams(search).get("quality");
+  if (quality === "low") return LOW_SCALE;
+  if (quality === "high") return HIGH_SCALE;
+  return null;
+}
+
+/**
+ * `onCheapPass` fires after the cheap signals admit the device and before the
+ * WebGL probe, which blocks the main thread for the first context init
+ * (500+ ms): the caller starts its fetches there so they overlap the probe.
+ */
+export function getLobbyAdmission(onCheapPass?: () => void): { block: LobbyBlockReason | null; scale: LobbyScale } {
   if (typeof window === "undefined") return { block: null, scale: HIGH_SCALE };
   const nav = navigator as Navigator & {
     deviceMemory?: number;
@@ -114,10 +137,12 @@ export function getLobbyAdmission(): { block: LobbyBlockReason | null; scale: Lo
     hardwareConcurrency: nav.hardwareConcurrency,
   });
   if (block) return { block, scale: LOW_SCALE };
+  onCheapPass?.();
+  performance.mark("lobby:probe-start");
   const gpu = readRenderer();
+  performance.mark("lobby:probe-end");
   if (!gpu.ok) return { block: "gpu", scale: LOW_SCALE };
-  if (gpu.renderer && RENDERER_BLOCKLIST.some((entry) => gpu.renderer!.includes(entry))) {
-    return { block: "gpu", scale: LOW_SCALE };
-  }
-  return { block: null, scale: gpu.renderer ? lobbyScaleForRenderer(gpu.renderer) : HIGH_SCALE };
+  if (gpu.renderer && isBlockedRenderer(gpu.renderer)) return { block: "gpu", scale: LOW_SCALE };
+  const detected = gpu.renderer ? lobbyScaleForRenderer(gpu.renderer) : HIGH_SCALE;
+  return { block: null, scale: lobbyScaleOverride(location.search) ?? detected };
 }

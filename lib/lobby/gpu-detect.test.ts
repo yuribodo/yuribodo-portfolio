@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { lobbyBlockReasonFor, lobbyScaleForRenderer, type DeviceSignals } from './gpu-detect';
+import { isBlockedRenderer, lobbyBlockReasonFor, lobbyScaleForRenderer, lobbyScaleOverride, type DeviceSignals } from './gpu-detect';
 
 const capableDesktop: DeviceSignals = {
   userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36',
@@ -37,4 +37,28 @@ test('each weak-device signal lands on the portfolio directly', () => {
   for (const [override, expected] of cases) {
     assert.equal(lobbyBlockReasonFor({ ...capableDesktop, ...override }), expected, JSON.stringify(override));
   }
+});
+
+test('software rasterizers are blocked, real gpus are not', () => {
+  for (const renderer of [
+    'angle (google, vulkan 1.3.0 (swiftshader device (subzero) (0x0000c0de)), swiftshader driver)',
+    'llvmpipe (llvm 15.0.7, 256 bits)',
+    'microsoft basic render driver',
+    'gdi generic',
+    'Mesa OffScreen',
+    'apple software renderer',
+    'angle (intel, intel(r) hd graphics 4000 direct3d11 vs_5_0 ps_5_0, d3d11)',
+  ]) assert.equal(isBlockedRenderer(renderer), true, renderer);
+  for (const renderer of [
+    'angle (nvidia, nvidia geforce rtx 3050 laptop gpu direct3d11 vs_5_0 ps_5_0, d3d11)',
+    'angle (intel, intel(r) uhd graphics 620 direct3d11 vs_5_0 ps_5_0, d3d11)',
+    'apple gpu',
+  ]) assert.equal(isBlockedRenderer(renderer), false, renderer);
+});
+
+test('?quality forces the scale for QA and ignores anything else', () => {
+  assert.deepEqual(lobbyScaleOverride('?quality=low'), { maxDpr: 1, shadow: 1024 });
+  assert.deepEqual(lobbyScaleOverride('?a=1&quality=high'), { maxDpr: 1.5, shadow: 2048 });
+  assert.equal(lobbyScaleOverride('?quality=ultra'), null);
+  assert.equal(lobbyScaleOverride(''), null);
 });

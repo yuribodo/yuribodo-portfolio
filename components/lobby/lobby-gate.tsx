@@ -4,14 +4,28 @@ import dynamic from "next/dynamic";
 import { lobbyAssetUrl } from "@/lib/lobby/asset-url";
 import { preload } from "react-dom";
 import { LOBBY_MODELS } from "@/lib/lobby/asset-manifest";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createReleaseScheduler } from "@/lib/lobby/release-scheduler";
 import { getLobbyAdmission, type LobbyBlockReason, type LobbyScale } from "@/lib/lobby/gpu-detect";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useLobbyVisited } from "@/hooks/use-lobby-visited";
 import { LobbyLoading } from "./lobby-loading";
 import { useLobbyState } from "./use-lobby-state";
+import { WorldBoundary } from "./world/world-boundary";
 
 let skipLobby = () => {};
+
+// R3F disposes the Canvas 500 ms after unmount; clear the loader caches after that.
+const CANVAS_TEARDOWN_MS = 1500;
+const lobbyRelease = createReleaseScheduler(() => import("@/lib/lobby/release-assets"), CANVAS_TEARDOWN_MS);
+
+/** Desk and monitor only. The valley starts after the desk is on screen. */
+function preloadDeskModels() {
+  for (const url of [LOBBY_MODELS.desk, LOBBY_MODELS.monitor]) {
+    preload(lobbyAssetUrl(url), { as: "fetch", crossOrigin: "anonymous" });
+  }
+  performance.mark("lobby:preload");
+}
 
 const DeskScene = dynamic(() => import("./desk-scene"), {
   ssr: false,
@@ -26,6 +40,7 @@ export function LobbyGate() {
   // probing. null = probing, reason = blocked (portfolio directly), false = go.
   const [blocked, setBlocked] = useState<LobbyBlockReason | false | null>(null);
   const [scale, setScale] = useState<LobbyScale>({ maxDpr: 1.5, shadow: 2048 });
+  const sceneRequested = useRef(false);
 
   const skip = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
 
@@ -39,24 +54,26 @@ export function LobbyGate() {
     // effect is appropriate here: the values live in browser APIs, not React,
     // and this single read on mount gates the heavy 3D bundle from loading.
     // A lazy useState initializer would run during SSR where `window` is undefined.
-    const admission = getLobbyAdmission();
+    // A replay must not lose its caches to the previous run's release, nor reuse scenes whose bitmaps closed.
+    lobbyRelease.cancel();
+    // The fetches start inside the probe, before its blocking first-context init.
+    const admission = getLobbyAdmission(preloadDeskModels);
     if (admission.block) {
       // Surfaced as info (not warn) so it shows in normal devtools without
       // dirtying the console for end users.
       console.info(`[lobby] skipped: ${admission.block}`);
-    } else {
-      // Desk and monitor only. The valley starts after the desk is on screen.
-      for (const url of [LOBBY_MODELS.desk, LOBBY_MODELS.monitor]) {
-        preload(lobbyAssetUrl(url), { as: "fetch", crossOrigin: "anonymous" });
-      }
     }
+    sceneRequested.current = !admission.block;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setBlocked(admission.block ?? false);
     setScale(admission.scale);
   }, []);
 
   useEffect(() => {
-    if (state === "done") markVisited();
+    if (state !== "done") return;
+    markVisited();
+    // Also covers SKIP while still loading: late arrivals lose their cache entry.
+    if (sceneRequested.current) lobbyRelease.schedule();
   }, [state, markVisited]);
 
   const blocksPage = !reducedMotion && state !== "done" && !blocked;
@@ -84,11 +101,14 @@ export function LobbyGate() {
   if (blocked || reducedMotion) return null;
 
   return (
-    <DeskScene
-      state={state}
-      dispatch={dispatch}
-      scale={scale}
-      firstVisit={!hasVisited}
-    />
+    // A failed chunk load or Canvas creation lands on the portfolio, not Next's error page.
+    <WorldBoundary onError={skip}>
+      <DeskScene
+        state={state}
+        dispatch={dispatch}
+        scale={scale}
+        firstVisit={!hasVisited}
+      />
+    </WorldBoundary>
   );
 }
