@@ -16,6 +16,13 @@ const state: AudioManagerState = {
   buffers: new Map(),
 };
 
+const muteListeners = new Set<() => void>();
+
+export function subscribeMuted(listener: () => void): () => void {
+  muteListeners.add(listener);
+  return () => { muteListeners.delete(listener); };
+}
+
 function getContext(): AudioContext {
   if (!state.audioContext) {
     state.audioContext = new AudioContext();
@@ -93,6 +100,7 @@ export function toggleMute(): boolean {
     }
   }
 
+  muteListeners.forEach((listener) => listener());
   return state.isMuted;
 }
 

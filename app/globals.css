@@ -123,6 +123,17 @@ body:has([data-lobby-active="true"]) {
 @media (prefers-reduced-motion: reduce) {
   .hero-wash { animation: none; }
 }
+/* Pause while the lobby covers the page; same covered rule as observePageAnimation.
+   Pausing keeps the position, so the wash resumes mid-drift at the reveal. The loader
+   only counts off touch devices, where it is display:none but still mounted. */
+body:has([data-lobby-active="true"]:not([data-lobby-revealing="true"])) .hero-wash {
+  animation-play-state: paused;
+}
+@media not all and (hover: none) and (pointer: coarse) {
+  body:has([data-lobby-loading]:not([data-lobby-revealing="true"])) .hero-wash {
+    animation-play-state: paused;
+  }
+}
 
 /* Lenis smooth scroll */
 html.lenis, html.lenis body {

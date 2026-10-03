@@ -208,11 +208,18 @@ export function CustomCursor() {
       setState(detectCursorState(e.relatedTarget));
     }
 
+    // The lobby hides this cursor, so skip its work there but keep the pointer position
+    // so the blob can snap under the mouse when the lobby exits.
+    let isLobbyActive = false;
+    let hasPointer = false;
+
     function handleMouseMove(e: MouseEvent) {
-      xTo(e.clientX);
-      yTo(e.clientY);
       mouseTarget.x = e.clientX;
       mouseTarget.y = e.clientY;
+      hasPointer = true;
+      if (isLobbyActive) return;
+      xTo(e.clientX);
+      yTo(e.clientY);
       lastMoveTime = Date.now();
 
       setWillChange(true);
@@ -282,9 +289,33 @@ export function CustomCursor() {
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("mouseout", handleMouseOut);
-    gsap.ticker.add(onTick);
+
+    function syncLobbyActive() {
+      const active = !!document.querySelector('[data-lobby-active="true"]');
+      if (active === isLobbyActive) return;
+      isLobbyActive = active;
+      if (active) {
+        gsap.ticker.remove(onTick);
+        return;
+      }
+      if (hasPointer && groupRef.current) {
+        gsap.set(groupRef.current, { x: mouseTarget.x, y: mouseTarget.y });
+      }
+      gsap.ticker.add(onTick);
+    }
+
+    const lobbyObserver = new MutationObserver(syncLobbyActive);
+    lobbyObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-lobby-active"],
+    });
+    isLobbyActive = !!document.querySelector('[data-lobby-active="true"]');
+    if (!isLobbyActive) gsap.ticker.add(onTick);
 
     return () => {
+      lobbyObserver.disconnect();
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseover", handleMouseOver);
       document.removeEventListener("mouseout", handleMouseOut);
