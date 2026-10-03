@@ -1,11 +1,12 @@
 "use client";
-import {distantPosition} from "@/lib/lobby/world-distance";
+import {vistaSpread} from "@/lib/lobby/world-distance";
+import {slopeAbove} from "@/lib/lobby/plant-communities";
 import { applyOutdoorLight, useOutdoorLight, type OutdoorLight } from "./outdoor-lighting";
 
 import { useEffect, useMemo } from "react";
 import { applyWorldWind } from "./world-wind";
 import { BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, InstancedMesh, MeshStandardMaterial, Object3D } from "three";
-import { roadCenter, worldHeight, worldSlope, riverLevel } from "@/lib/lobby/world-geography";
+import { roadCenter, worldHeight, riverLevel } from "@/lib/lobby/world-geography";
 
 // A sculpted blade with a curved tip; flowers have separate petals, centres,
 // leaves and bent stems. No billboards or extra texture downloads.
@@ -53,12 +54,12 @@ function meadowGeometry(flower: boolean) {
   return g;
 }
 
-function buildMeadow(floorY:number,light:OutdoorLight){
+export function buildMeadow(floorY:number,light:OutdoorLight){
   let seed=80317;
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-  type Plant={x:number;z:number;y:number;size:number;yaw:number;tint:Color};
-  const buckets=new Map<string,Plant[]>();
-  const greens=['#b1c685','#82aa6f','#a9bb6e'], petals=['#eee7bb','#b7a3dd','#e3c25c'];
+  // Flat [x,z,y,size,yaw,tint] records: no object or Color per blade.
+  const buckets=new Map<string,number[]>();
+  const tints=['#b1c685','#82aa6f','#a9bb6e','#eee7bb','#b7a3dd','#e3c25c'].map(hex=>new Color(hex));
   for(let i=0;i<56000;i++){
     const a=random()*Math.PI*2,r=i<36000?Math.sqrt(4.4**2+random()*(18**2-4.4**2)):Math.sqrt(18**2+random()*(83**2-18**2));
     const x=Math.sin(a)*r,z=Math.cos(a)*r;
@@ -66,16 +67,16 @@ function buildMeadow(floorY:number,light:OutdoorLight){
     let route=Math.abs(x-Math.sin(z*.17)*1.6);
     if(z< -7)route=Math.abs(x-roadCenter(z));
     if(z>7){const t=(z-7)/138;route=Math.abs(x-(-12*t+Math.sin(t*Math.PI)*6));}
-    if(route<1.05+random()*.35||worldSlope(x,z)>.72)continue;
-    const y=worldHeight(x,z);if(y<riverLevel(z)+1)continue;
+    if(route<1.05+random()*.35)continue;
+    const y=worldHeight(x,z);if(y<riverLevel(z)+1||slopeAbove(x,z,.72))continue;
     const growth=Math.sin(x*.35+Math.sin(z*.21)*2)+Math.cos(z*.29-x*.11);
     if(growth<-.55&&random()>.13)continue;
     const flower=i%9===0&&growth>-.1;
     // Different flower colonies follow pockets in the meadow, not a colour mix per stem.
     const variety=Math.floor((Math.sin(x*.12)+Math.cos(z*.17)+2)*1.7)%3;
     const key=`${flower?'flowers':'grass'}:${Math.floor(x/32)}:${Math.floor(z/32)}`;
-    const tint=new Color(flower?petals[variety]:greens[i%3]);
-    (buckets.get(key)??(buckets.set(key,[]),buckets.get(key)!)).push({x,z,y:floorY+y-.015,size:flower?.16+random()*.14:.13+random()*.23,yaw:random()*Math.PI*2,tint});
+    let bucket=buckets.get(key);if(!bucket)buckets.set(key,bucket=[]);
+    bucket.push(x,z,floorY+y-.015,flower?.16+random()*.14:.13+random()*.23,random()*Math.PI*2,flower?3+variety:i%3);
   }
   const group=new Group(),blade=meadowGeometry(false),flower=meadowGeometry(true);
   const material=new MeshStandardMaterial({vertexColors:true,side:DoubleSide,roughness:1,envMapIntensity:.08});
@@ -89,8 +90,12 @@ function buildMeadow(floorY:number,light:OutdoorLight){
   applyOutdoorLight(material,light,.2);
   const transform=new Object3D();
   for(const [key,plants] of buckets){
-    const mesh=new InstancedMesh(key.startsWith('flowers')?flower:blade,material,plants.length);
-    plants.forEach((p,i)=>{transform.position.set(...distantPosition([p.x,p.y,p.z]));transform.rotation.set(0,p.yaw,0);transform.scale.set(p.size*1.6,p.size,p.size);transform.updateMatrix();mesh.setMatrixAt(i,transform.matrix);mesh.setColorAt(i,p.tint);});
+    const mesh=new InstancedMesh(key.startsWith('flowers')?flower:blade,material,plants.length/6);
+    for(let i=0;i<plants.length/6;i++){
+      const at=i*6,x=plants[at],z=plants[at+1],size=plants[at+3],spread=vistaSpread(z);
+      transform.position.set(x*spread,plants[at+2],z*spread);transform.rotation.set(0,plants[at+4],0);transform.scale.set(size*1.6,size,size);transform.updateMatrix();
+      mesh.setMatrixAt(i,transform.matrix);mesh.setColorAt(i,tints[plants[at+5]]);
+    }
     mesh.computeBoundingSphere();mesh.raycast=()=>{};mesh.receiveShadow=true;group.add(mesh);
   }
   return {group,dispose:()=>{group.children.forEach(m=>(m as InstancedMesh).dispose());blade.dispose();flower.dispose();material.dispose();}};

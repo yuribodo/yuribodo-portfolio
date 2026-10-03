@@ -9,9 +9,20 @@ import { riverLevel, riverCenter, riverWidth, roadCenter, worldHeight, worldSlop
 
 export const FORECOURT_BEDS=[[-2.35,-2.7],[2.35,-2.7]] as const;
 
+/** worldSlope(x,z)/spread>limit. Each slope is four height samples, so stop after
+ * the x pair once it alone exceeds the limit (the margin keeps rounding out of it). */
+export function slopeAbove(x:number,z:number,limit:number,spread=1){
+  const dx=worldHeight(x+1,z)-worldHeight(x-1,z);
+  if(Math.abs(dx)/2/spread>limit*(1+1e-9))return true;
+  return Math.hypot(dx,worldHeight(x,z+1)-worldHeight(x,z-1))/2/spread>limit;
+}
+
 type Placement = {position:[number,number,number];scale:number;yaw:number};
 function buildPlantCommunities(floorY:number) {
   let seed=41927;
+  // Candidates and their placement ask for the same sample back to back.
+  let lastX=NaN,lastZ=NaN,lastHeight=0;
+  const height=(x:number,z:number)=>{if(x!==lastX||z!==lastZ){lastHeight=worldHeight(x,z);lastX=x;lastZ=z;}return lastHeight;};
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const regions:Record<string,Placement[]>={};
   function clear(x:number,z:number,tree=false){
@@ -30,7 +41,7 @@ function buildPlantCommunities(floorY:number) {
     return true;
   }
   function add(kind:string,x:number,z:number,scale:number,yaw=random()*Math.PI*2){
-    const y=worldHeight(x,z);if(y<riverLevel(z)+.5)return;
+    const y=height(x,z);if(y<riverLevel(z)+.5)return;
     const shadow=kind.startsWith('tree')&&Math.hypot(x,z)<16?'shadow':'plain';
     const key=`${kind}:${shadow}:${Math.floor(x/64)}:${Math.floor(z/64)}`;
     (regions[key]??=[]).push({position:[x,floorY+y-.04,z],scale,yaw});
@@ -54,8 +65,8 @@ function buildPlantCommunities(floorY:number) {
     for(let j=0;j<52;j++){
       const theta=random()*Math.PI*2,r=Math.sqrt(random())*(19+grove%4*3);
       const x=cx+Math.sin(theta)*r,z=cz+Math.cos(theta)*r;
-      if(!clear(x,z,true)||worldSlope(x,z)/vistaSpread(z)>.65)continue;
-      const distance=Math.hypot(x,z),altitude=worldHeight(x,z);
+      if(!clear(x,z,true)||slopeAbove(x,z,.65,vistaSpread(z)))continue;
+      const distance=Math.hypot(x,z),altitude=height(x,z);
       const kind=distance>170?(j%5?'pine-b':'pine-a'):altitude>0?(j%3?'pine-b':'tree-d'):j%3?'tree-d':'tree-c';
       add(kind,x,z,(.68+random()*.58)*(z< -80?2.0:1));
       if(j%5===0&&distance<120)add('bush',x+2,z+1,.7+random()*.5);
@@ -65,11 +76,16 @@ function buildPlantCommunities(floorY:number) {
   for(let i=0;i<14000;i++){
     const angle=random()*Math.PI*2,r=i<6500?4.8+Math.sqrt(random())*16:16+Math.sqrt(random())*42;
     const x=Math.sin(angle)*r,z=Math.cos(angle)*r;
-    if(!clear(x,z)||worldSlope(x,z)>1)continue;
+    if(!clear(x,z))continue;
     const growth=Math.sin(x*.19+Math.sin(z*.1))+Math.cos(z*.16);
-    if(growth<-.8&&random()>.3)continue;
     const kind=i%31===0?'fern':i%17===0?'grass-wispy':'grass';
-    if(kind==='grass'&&i%12!==0)continue;
+    // Most grass is thinned out whatever the terrain does, so only the slope test
+    // that gates the growth draw below can still change the random stream.
+    const thinned=kind==='grass'&&i%12!==0;
+    if(thinned&&!(growth<-.8))continue;
+    if(slopeAbove(x,z,1))continue;
+    if(growth<-.8&&random()>.3)continue;
+    if(thinned)continue;
     add(kind,x,z,kind==='fern'?.18+random()*.15:kind==='grass-wispy'?.2+random()*.16:.4+random()*.3);
     if(i%79===0)add('bush',x,z,.4+random()*.55);
     if(i%151===0)add(i%2?'rock-a':'rock-b',x,z,.25+random()*.5);
@@ -105,7 +121,7 @@ function buildPlantCommunities(floorY:number) {
     for(let i=0;i<66;i++){
       const angle=random()*Math.PI*2,r=Math.sqrt(random())*extent/spread;
       const x=cx+Math.cos(angle)*r,z=cz+Math.sin(angle)*r*.76;
-      if(!clear(x,z,true)||worldSlope(x,z)/spread>.65)continue;
+      if(!clear(x,z,true)||slopeAbove(x,z,.65,spread))continue;
       const kind=grove%3===0?(i%4?'tree-d':'tree-c'):(i%5?'pine-b':'tree-d');
       add(kind,x,z,1.65+random()*1.15);
       if(i%3===0){
@@ -123,7 +139,7 @@ function buildPlantCommunities(floorY:number) {
   for(const [cx,cz]of deepGroves)for(let i=0;i<95;i++){
     const a=random()*Math.PI*2,r=Math.sqrt(random())*(14+random()*12);
     const x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r*.72;
-    if(!clear(x,z,true)||worldSlope(x,z)/vistaSpread(z)>.72)continue;
+    if(!clear(x,z,true)||slopeAbove(x,z,.72,vistaSpread(z)))continue;
     add(i%4?'tree-d':'pine-b',x,z,1.5+random()*1.6);
   }
   // Low shrubs at meadow edges keep the animals' open clearings legible.
@@ -136,10 +152,10 @@ function buildPlantCommunities(floorY:number) {
   const outcrops=[[-56,-101],[-46,-113],[-39,-129],[-81,-158],[-96,-198],[-109,-239],[-77,-290],[55,-131],[64,-151],[103,-213],[118,-257]];
   for(const [cx,cz]of outcrops)for(let i=0;i<6;i++){
     const spread=vistaSpread(cz),x=cx+(random()-.5)*19/spread,z=cz+(random()-.5)*13/spread;
-    if(!clear(x,z)||FANTASY_RESIDENTS.some(a=>Math.hypot(a.x-x,a.z-z)<3)||worldHeight(x,z)<riverLevel(z)+2)continue;
+    if(!clear(x,z)||FANTASY_RESIDENTS.some(a=>Math.hypot(a.x-x,a.z-z)<3)||height(x,z)<riverLevel(z)+2)continue;
     const scale=1.5+random()*2.8,kind=i%2?'rock-a':'rock-b';
     const key=`${kind}:plain:outcrops`;
-    (regions[key]??=[]).push({position:[x,floorY+worldHeight(x,z)-scale*.28,z],scale,yaw:random()*Math.PI*2});
+    (regions[key]??=[]).push({position:[x,floorY+height(x,z)-scale*.28,z],scale,yaw:random()*Math.PI*2});
     add('bush',x+2/spread,z-1/spread,.9+random()*.7);
   }
   // A small orchard frames the slime clearing rather than leaving a vacant

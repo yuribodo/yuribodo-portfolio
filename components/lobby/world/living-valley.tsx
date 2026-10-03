@@ -1,6 +1,5 @@
 "use client";
-import {VALLEY_AXIS} from "@/lib/lobby/valley-terrain-grid";
-import {spreadLandscape} from "./landscape-distance";
+import {landGeometry,spreadLandscape} from "./landscape-distance";
 import { applyOutdoorLight, useOutdoorLight, type OutdoorLight } from "./outdoor-lighting";
 
 import { useEffect, useMemo } from "react";
@@ -17,28 +16,6 @@ import {
 } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { riverCenter, riverWidth, riverLevel, roadCenter, worldHeight } from "@/lib/lobby/world-geography";
-
-function landGeometry(heights: Float32Array) {
-  const axis=VALLEY_AXIS;
-  const positions: number[] = [], indices: number[] = [], uv: number[] = [];
-  let sample = 0;
-  for (const z of axis) for (const x of axis) {
-    const y = heights[sample++];
-    positions.push(x, y, z); uv.push((x + 85) / 170, (85 - z) / 170);
-  }
-  const n = axis.length;
-  for (let z = 0; z < n - 1; z++) for (let x = 0; x < n - 1; x++) {
-    // The original high-resolution near ground owns this exact square.
-    if (axis[x] >= -85 && axis[x + 1] <= 85 && axis[z] >= -85 && axis[z + 1] <= 85) continue;
-    const a = z * n + x, b = a + 1, c = a + n, d = c + 1;
-    indices.push(a, c, b, b, c, d);
-  }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
-  geometry.setAttribute("uv", new Float32BufferAttribute(uv, 2));
-  geometry.setIndex(indices); geometry.computeVertexNormals();
-  return spreadLandscape(geometry,true);
-}
 
 /** Continuous ground plus readable destinations, all real geometry. Repeated
  * buildings/trees are merged by material; distant scenery casts no desk shadows.

@@ -1,0 +1,26 @@
+{
+ "-0.8": {
+  "plants": {
+   "regions": 233,
+   "count": 8797,
+   "sha256": "7bcbc180733febbafecf4067baa723330cb26aab0e485a09ca25cdb8dca3f9ab"
+  },
+  "meadow": {
+   "meshes": 62,
+   "count": 32579,
+   "sha256": "116222d72ed62447014d752fadbd55395a7b5d09366dfe7bb5d965dc57c9d8bd"
+  }
+ },
+ "-1.5": {
+  "plants": {
+   "regions": 233,
+   "count": 8797,
+   "sha256": "8f296ff50b623fad8bbd1dd30639130dfcc67fc51e061389c5b25ac65201b844"
+  },
+  "meadow": {
+   "meshes": 62,
+   "count": 32579,
+   "sha256": "033e3af199e800af3b8a2da71ca9a52dcf1f20cb9e7a4c2ffec17209ee78312d"
+  }
+ }
+}
