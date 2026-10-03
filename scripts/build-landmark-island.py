@@ -35,26 +35,8 @@ for o in list(bpy.data.objects):
  if o.name not in selected:bpy.data.objects.remove(o,do_unlink=True);continue
  name,height,p,yaw=selected[o.name];apply(o);dims=center(o);o.data.transform(Matrix.Scale(height/dims.z,4));o.location=p;o.rotation_euler.z=yaw;o.name=name
  for m in o.data.materials:m.name='Chess marble'
-# Continuous geological shell assembled from an eroded cliff, not a low-poly cone.
-before=set(bpy.data.objects);bpy.ops.import_scene.gltf(filepath=str(root/'assets/lobby-world/production/coastal-cliff.glb'))
-rock=next(o for o in set(bpy.data.objects)-before if o.type=='MESH');apply(rock);center(rock)
-bpy.context.view_layer.objects.active=rock;d=rock.modifiers.new('Distant rock budget','DECIMATE');d.ratio=.14;bpy.ops.object.modifier_apply(modifier=d.name)
-rock.name='Island eroded stone'
-for m in rock.data.materials:m.name='Island rock'
-rocks=[]
-for i in range(9):
- a=i/9*math.tau;o=rock.copy();o.data=rock.data.copy();bpy.context.collection.objects.link(o);o.location=(math.cos(a)*6.8,math.sin(a)*6.8,-6.3-.5*math.sin(i*1.8));o.rotation_euler.z=a+math.pi/2;o.scale=(.25,.5,.64+.07*math.sin(i*2.1));rocks.append(o)
-# Tilted rock masses converge underneath; the silhouettes retain real erosion.
-for i in range(5):
- a=i/5*math.tau;o=rock.copy();o.data=rock.data.copy();bpy.context.collection.objects.link(o);o.location=(math.cos(a)*2.5,math.sin(a)*2.5,-11.5);o.rotation_euler=(.3*math.cos(a),.25*math.sin(a),a);o.scale=(.16,.4,.75);rocks.append(o)
-bpy.data.objects.remove(rock,do_unlink=True)
-# Irregular ground crown, partly occupied by a sunken chess court.
-soil=plain('Island moss',(.19,.29,.13));stone=plain('Ruined pale stone',(.45,.46,.40));dark=plain('Obsidian court',(.11,.13,.16),.5);ivory=plain('Ivory court',(.48,.48,.44),.65)
-vertices=[(0,0,-.02)];count=96
-for i in range(count):
- a=i/count*math.tau;r=8.9+.35*math.sin(i*.47)+.45*math.cos(i*.79);vertices.append((math.cos(a)*r,math.sin(a)*r,-.05+.14*math.sin(i*.41)))
-faces=[(0,i+1,(i+1)%count+1) for i in range(count)]
-m=bpy.data.meshes.new('Uneven ground crown');m.from_pydata(vertices,[],faces);m.materials.append(soil);o=bpy.data.objects.new('Island crown',m);bpy.context.collection.objects.link(o)
+# Court and plinth materials; the island shell, crown and trees come after the chess export so they never ship in it.
+stone=plain('Ruined pale stone',(.45,.46,.40));dark=plain('Obsidian court',(.11,.13,.16),.5);ivory=plain('Ivory court',(.48,.48,.44),.65)
 for x in range(-4,5):
  for y in range(-3,4):
   if abs(x)==4 and abs(y)==3:continue
@@ -71,6 +53,27 @@ for i in range(14):
  cube('Column footing',(x,y,.12),(.7,.7,.24),stone,.035)
  bpy.ops.mesh.primitive_cylinder_add(vertices=12,radius=.19,depth=h,location=(x,y,h/2+.24));o=bpy.context.object;o.name='Ruined column';o.data.materials.append(stone)
  cube('Column capital',(x,y,h+.3),(.55,.55,.12),stone,.025)
+export('chess-monuments.glb')
+# Continuous geological shell assembled from an eroded cliff, not a low-poly cone.
+before=set(bpy.data.objects);bpy.ops.import_scene.gltf(filepath=str(root/'assets/lobby-world/production/coastal-cliff.glb'))
+rock=next(o for o in set(bpy.data.objects)-before if o.type=='MESH');apply(rock);center(rock)
+bpy.context.view_layer.objects.active=rock;d=rock.modifiers.new('Distant rock budget','DECIMATE');d.ratio=.14;bpy.ops.object.modifier_apply(modifier=d.name)
+rock.name='Island eroded stone'
+for m in rock.data.materials:m.name='Island rock'
+rocks=[]
+for i in range(9):
+ a=i/9*math.tau;o=rock.copy();o.data=rock.data.copy();bpy.context.collection.objects.link(o);o.location=(math.cos(a)*6.8,math.sin(a)*6.8,-6.3-.5*math.sin(i*1.8));o.rotation_euler.z=a+math.pi/2;o.scale=(.25,.5,.64+.07*math.sin(i*2.1));rocks.append(o)
+# Tilted rock masses converge underneath; the silhouettes retain real erosion.
+for i in range(5):
+ a=i/5*math.tau;o=rock.copy();o.data=rock.data.copy();bpy.context.collection.objects.link(o);o.location=(math.cos(a)*2.5,math.sin(a)*2.5,-11.5);o.rotation_euler=(.3*math.cos(a),.25*math.sin(a),a);o.scale=(.16,.4,.75);rocks.append(o)
+bpy.data.objects.remove(rock,do_unlink=True)
+# Irregular ground crown under the sunken chess court.
+soil=plain('Island moss',(.19,.29,.13))
+vertices=[(0,0,-.02)];count=96
+for i in range(count):
+ a=i/count*math.tau;r=8.9+.35*math.sin(i*.47)+.45*math.cos(i*.79);vertices.append((math.cos(a)*r,math.sin(a)*r,-.05+.14*math.sin(i*.41)))
+faces=[(0,i+1,(i+1)%count+1) for i in range(count)]
+m=bpy.data.meshes.new('Uneven ground crown');m.from_pydata(vertices,[],faces);m.materials.append(soil);o=bpy.data.objects.new('Island crown',m);bpy.context.collection.objects.link(o)
 # Merge the rock shell so its source textures cost a single draw.
 bpy.ops.object.select_all(action='DESELECT')
 for o in rocks:o.select_set(True)
@@ -84,7 +87,6 @@ for i,(x,y,scale) in enumerate([(-7,2,.35),(-4,6,.42),(1,6,.35),(6,-4,.3)]):
  for template in templates:
   o=template.copy();o.data=template.data.copy();o.parent=None;bpy.context.collection.objects.link(o);o.name='Island tree '+str(i)+' '+template.name;o.location=(x,y,0);o.scale=(scale,scale,scale);o.rotation_euler.z=i*1.9
 for o in imported:bpy.data.objects.remove(o,do_unlink=True)
-export('chess-monuments.glb')
 # A reusable rock island, without monuments or court, replaces the old faceted satellites.
 for o in list(bpy.data.objects):
  if o.type!='MESH' or (o.name not in ['Eroded island shell','Island crown'] and not o.name.startswith('Island tree')):bpy.data.objects.remove(o,do_unlink=True)

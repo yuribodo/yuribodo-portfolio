@@ -4,6 +4,6 @@ export const GROUND_PREVIEW_TEXTURES = [
   "/lobby/baked/soil-normal-dad919707ff08c06.webp",
   "/lobby/baked/meadow-color-b85c872c2b677cdd.webp",
   "/lobby/baked/meadow-normal-273c45a5df6c0c17.webp",
-  "/lobby/baked/rock-face-detail-c300a5cf70d6b156.webp",
-  "/lobby/baked/rock-face-normal-b2fae7d0d6c157e8.webp"
+  "/lobby/baked/rock-face-detail-ec32c09353067cb4.webp",
+  "/lobby/baked/rock-face-normal-8d29f74b01241a05.webp"
 ];
