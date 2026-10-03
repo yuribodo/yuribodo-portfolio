@@ -1,12 +1,13 @@
 "use client";
 
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import { Children, startTransition, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Group, Mesh, type Material, type Object3D } from 'three';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { arrivalFadeMode } from '@/lib/lobby/arrival-fade';
 import { OutdoorArrival, arrivalShaded } from './outdoor-lighting';
+import { markDetailsMounted } from './world-ledger';
 
 let remaining = 0;
 const listeners = new Set<() => void>();
@@ -41,9 +42,10 @@ interface Swap { object: Mesh; original: Material | Material[]; applied: Materia
  * (and the waterfall and chimney smoke). Cloning a material would drop its
  * shader patches and uniform links, so only stock materials are cloned, once
  * per source, and swapped back when the fade ends. */
-function FadeFamily({ children }: { children: ReactNode }) {
+function FadeFamily({ fade, children }: { fade: boolean; children: ReactNode }) {
   const ref = useRef<Group>(null);
-  const started = useRef(false);
+  // Decided once: a family that mounts under the loader is simply there when the loader leaves.
+  const started = useRef(!fade);
   const [arrival] = useState(() => ({ value: 1 }));
   const reducedMotion = useReducedMotion();
   useFrame(() => {
@@ -88,26 +90,37 @@ function FadeFamily({ children }: { children: ReactNode }) {
   return <group ref={ref}><OutdoorArrival arrival={arrival}>{children}</OutdoorArrival></group>;
 }
 
-/** The skyline, ground and village are already present. Mount detail families
- * only after desk readiness, yielding to input/painting between each family.
- * Once mounted they persist throughout the monitor dive.
+/** Mounts the detail families one at a time so their downloads and GPU preparation
+ * start without one giant first render. While the loader is up they follow each
+ * other frame by frame; afterwards (a slow family past the loader's patience) they
+ * yield to input and painting and fade in. Once mounted they persist throughout the
+ * monitor dive.
  */
-export function WorldDetails({ enabled, children }: { enabled: boolean; children: ReactNode }) {
+export function WorldDetails({ loading, children }: { loading: boolean; children: ReactNode }) {
   const items = Children.toArray(children);
+  const scene = useThree(s => s.scene);
   const [count, setCount] = useState(0);
   useEffect(() => {
-    publish(enabled ? items.length - count : 0);
-  }, [enabled, count, items.length]);
+    publish(items.length - count);
+  }, [count, items.length]);
   useEffect(() => () => publish(0), []);
   useEffect(() => {
-    if (!enabled || count >= items.length) return;
+    markDetailsMounted(scene, count >= items.length);
+    return () => markDetailsMounted(scene, false);
+  }, [scene, count, items.length]);
+  useEffect(() => {
+    if (count >= items.length) return;
     const reveal = () => startTransition(() => setCount(value => value + 1));
+    if (loading) {
+      const id = requestAnimationFrame(reveal);
+      return () => cancelAnimationFrame(id);
+    }
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(reveal, { timeout: 500 });
       return () => window.cancelIdleCallback(id);
     }
     const id = requestAnimationFrame(reveal);
     return () => cancelAnimationFrame(id);
-  }, [enabled, count, items.length]);
-  return <>{items.slice(0, count).map((item, index) => <FadeFamily key={index}>{item}</FadeFamily>)}</>;
+  }, [loading, count, items.length]);
+  return <>{items.slice(0, count).map((item, index) => <FadeFamily key={index} fade={!loading}>{item}</FadeFamily>)}</>;
 }

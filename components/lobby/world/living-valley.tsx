@@ -106,7 +106,7 @@ function buildSettlement(light: OutdoorLight) {
 export function LivingValley({ floorY, active }: { floorY: number; active: boolean }) {
   const light=useOutdoorLight();
   const baked = useLoader(TerrainDataLoader, TERRAIN_DATA_URL);
-  const textures = useGroundTextures(active);
+  const textures = useGroundTextures();
   const land = useMemo(() => landGeometry(baked.far), [baked]);
   const landMaterial = useMemo(() => applyOutdoorLight(groundMaterial(textures,baked),light), [textures,light,baked]);
   const settlement = useMemo(() => buildSettlement(light), [light]);

@@ -14,7 +14,6 @@ import Desk from "./desk";
 import DeskEnvironment, {
   type DeskEnvironmentHandle,
 } from "./desk-environment";
-import { LobbyLoading } from "./lobby-loading";
 import { MuteToggle } from "./mute-toggle";
 import Monitor, { type MonitorHandle } from "./objects/monitor";
 import RazerPeripherals from "./objects/razer-peripherals";
@@ -79,9 +78,10 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
 
   useEffect(() => {
     if (state !== "loading") return;
+    // Backstop only: SceneReady stops waiting on the world well before this.
     const timer = window.setTimeout(() => {
       dispatch({ type: "SKIP" });
-    }, 20000);
+    }, 30000);
     return () => window.clearTimeout(timer);
   }, [state, dispatch]);
 
@@ -218,9 +218,8 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
         <DeskInteraction enabled={state !== "loading" && state !== "booting"} />
         <DeskEnvironment ref={environmentRef} shadowMap={scale.shadow} />
         <PlaceholderEnvironment />
-        {state !== "loading" && (
-          <IsekaiWorld floorY={floorY} active={state !== "booting"} />
-        )}
+        {/* Mounted under the loader: SceneReady holds the reveal until the whole world is prepared. */}
+        <IsekaiWorld floorY={floorY} active={state !== "loading" && state !== "booting"} loading={state === "loading"} />
         <WorldBoundary onError={skipScene}>
         <Suspense fallback={null}><PreparedGroup priority={0}>
           <Desk onFloorReady={setFloorY} />
@@ -258,9 +257,6 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
         </PreparedGroup></Suspense>
         </WorldBoundary>
       </Canvas>
-      {/* The same indicator as the bundle fallback remains until SceneReady
-          has observed real rendered frames. No timed black entrance layer. */}
-      {state === "loading" && <LobbyLoading contained />}
       {/* Keyboard equivalents call the same object handles as mesh clicks.
           The focused action becomes visible above the navigation controls. */}
       <div
@@ -312,7 +308,8 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
           Spin Pegasus beyblade
         </button>
       </div>
-      <WorldControls loading={state === "loading"} busy={state === "booting"} firstVisit={firstVisit} onEnter={handleEnter} onSkip={handleSkip}/>
+      {/* While loading, the gate's single loader owns the skip button. */}
+      {state !== "loading" && <WorldControls busy={state === "booting"} firstVisit={firstVisit} onEnter={handleEnter} onSkip={handleSkip}/>}
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

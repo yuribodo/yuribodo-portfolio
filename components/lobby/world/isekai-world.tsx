@@ -2,11 +2,11 @@
 
 import { CoreWorld } from "./core-world";
 import { WorldDetails } from "./world-details";
-import { PreparedGroup } from "./prepared-group";
+import { DetailWorld } from "./detail-world";
 import {RiverLandings} from './river-landings';
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   Color,
   DoubleSide,
@@ -44,7 +44,10 @@ import { TerraceArchitecture } from "./terrace-architecture";
 
 interface WorldProps {
   floorY: number;
+  /** Animation runs only while the visitor can see the world. */
   active: boolean;
+  /** Under the loader: details mount without fading in, since nobody sees them arrive. */
+  loading: boolean;
 }
 
 function ArchitecturalModel({ url, position, scale = 1, rotation = [0, 0, 0] }: {
@@ -174,7 +177,7 @@ export function dimWorldMaterials(group: Group, ratio: number) {
   });
 }
 
-export default function IsekaiWorld({ floorY, active }: WorldProps) {
+export default function IsekaiWorld({ floorY, active, loading }: WorldProps) {
   return (
     <OutdoorLighting active={active}><group name="isekai-world">
       <CoreWorld id="sky"><Atmosphere active={active} /></CoreWorld>
@@ -187,33 +190,32 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
         <planeGeometry args={[6, 6]} />
         <meshToonMaterial color="#849265" />
       </mesh>
-      <CoreWorld id="near-ground"><TerraceTerrain floorY={floorY} active={active} /></CoreWorld>
+      <CoreWorld id="near-ground"><TerraceTerrain floorY={floorY} /></CoreWorld>
       <CoreWorld id="terrace"><TerraceArchitecture floorY={floorY} /></CoreWorld>
-      {/* Everything below is scenery, not entry criteria. Requesting it only
-          after the desk is ready keeps ~6 MB of GLBs from sharing bandwidth
-          with the core landscape on the way to the first interactive frame. */}
-      <WorldDetails enabled={active}>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCliffs floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><TerraceGarden floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyVillage floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ReferenceHouses floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ChessMonuments /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup>
+      {/* The lobby is revealed only once every family below has been prepared
+          (SceneReady reads the ledger), so the visitor never sees scenery pop in. */}
+      <WorldDetails loading={loading}>
+      <DetailWorld><ValleyCliffs floorY={floorY} /></DetailWorld>
+      <DetailWorld><TerraceGarden floorY={floorY} /></DetailWorld>
+      <DetailWorld><ValleyVillage floorY={floorY} /></DetailWorld>
+      <DetailWorld><ReferenceHouses floorY={floorY} /></DetailWorld>
+      <DetailWorld><group position={[-282, 65, -930]} scale={4.6} rotation={[0,.12,0]}><ArchitecturalModel url={WORLD_ASSETS.aincrad} position={[0,0,0]} /><CitadelDistricts /><SkyGarden terraces /></group></DetailWorld>
+      <DetailWorld><ChessMonuments /></DetailWorld>
+      <DetailWorld>
         <group position={[150,55,-850]} scale={1.7} rotation={[0,-.5,0]}><SkyIsland /><SkyGarden /></group>
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
         <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
-      </PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><FantasyResidents floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyWildlife floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCreatures /></PreparedGroup></Suspense></WorldBoundary>
+      </DetailWorld>
+      <DetailWorld><FantasyResidents floorY={floorY}/></DetailWorld>
+      <DetailWorld><ValleyWildlife floorY={floorY} /></DetailWorld>
+      <DetailWorld><ValleyCreatures /></DetailWorld>
       <WorldCharacters floorY={floorY} active={active} />
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><AncientTrees floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><EnchantedGroves floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><NaturalVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><OrganicVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><FlowerColonies floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><Suspense fallback={null}><PreparedGroup><MeadowLife floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
+      <DetailWorld><AncientTrees floorY={floorY}/></DetailWorld>
+      <DetailWorld><EnchantedGroves floorY={floorY}/></DetailWorld>
+      <DetailWorld><NaturalVegetation floorY={floorY} /></DetailWorld>
+      <DetailWorld><OrganicVegetation floorY={floorY} /></DetailWorld>
+      <DetailWorld><FlowerColonies floorY={floorY} /></DetailWorld>
+      <DetailWorld><MeadowLife floorY={floorY} /></DetailWorld>
       </WorldDetails>
     </group></OutdoorLighting>
   );

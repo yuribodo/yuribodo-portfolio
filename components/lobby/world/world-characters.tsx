@@ -1,14 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Group, Mesh, MeshStandardMaterial } from 'three';
 import { createCharacterInstance } from '@/lib/lobby/character-instance';
 import { WORLD_CHARACTERS, type WorldCharacterAsset } from '@/lib/lobby/world-characters';
 import { applyOutdoorLight, useOutdoorLight } from './outdoor-lighting';
-import { PreparedGroup } from "./prepared-group";
-import { WorldBoundary } from './world-boundary';
+import { DetailWorld } from "./detail-world";
 
 /** A raised court and throne give the king a place in the landscape. */
 function AinzCourt() {
@@ -83,11 +82,11 @@ function Character({ asset, floorY, active }: {
   </group>;
 }
 
-/** Each resident loads independently; none participates in desk readiness. */
+/** Each resident loads independently; a missing one is dropped, not waited on forever. */
 export function WorldCharacters({ floorY, active }: { floorY: number; active: boolean }) {
   return <group name="selected-world-characters">
-    {WORLD_CHARACTERS.map(asset => <WorldBoundary key={asset.id}>
-      <Suspense fallback={null}><PreparedGroup><Character asset={asset} floorY={floorY} active={active} /></PreparedGroup></Suspense>
-    </WorldBoundary>)}
+    {WORLD_CHARACTERS.map(asset => <DetailWorld key={asset.id}>
+      <Character asset={asset} floorY={floorY} active={active} />
+    </DetailWorld>)}
   </group>;
 }

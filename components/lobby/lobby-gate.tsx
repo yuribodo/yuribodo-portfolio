@@ -13,8 +13,6 @@ import { LobbyLoading } from "./lobby-loading";
 import { useLobbyState } from "./use-lobby-state";
 import { WorldBoundary } from "./world/world-boundary";
 
-let skipLobby = () => {};
-
 // R3F disposes the Canvas 500 ms after unmount; clear the loader caches after that.
 const CANVAS_TEARDOWN_MS = 1500;
 const lobbyRelease = createReleaseScheduler(() => import("@/lib/lobby/release-assets"), CANVAS_TEARDOWN_MS);
@@ -29,7 +27,8 @@ function preloadDeskModels() {
 
 const DeskScene = dynamic(() => import("./desk-scene"), {
   ssr: false,
-  loading: () => <LobbyLoading onSkip={() => skipLobby()} />,
+  // The gate's one loader covers the chunk download too; a second copy here would restart its animation.
+  loading: () => null,
 });
 
 export function LobbyGate() {
@@ -43,11 +42,6 @@ export function LobbyGate() {
   const sceneRequested = useRef(false);
 
   const skip = useCallback(() => dispatch({ type: "SKIP" }), [dispatch]);
-
-  useEffect(() => {
-    skipLobby = skip;
-    return () => { skipLobby = () => {}; };
-  }, [skip]);
 
   useEffect(() => {
     // One-shot probe of device signals + WebGL renderer. Setting state in an
@@ -96,19 +90,27 @@ export function LobbyGate() {
   }, [state, blocked, reducedMotion, dispatch]);
 
   if (state === "done") return null;
+  const hasScene = blocked === false && !reducedMotion;
   // Keep server and hydration markup identical while browser capabilities resolve.
-  if (blocked === null) return <LobbyLoading onSkip={skip} />;
-  if (blocked || reducedMotion) return null;
+  if (!hasScene && blocked !== null) return null;
 
   return (
-    // A failed chunk load or Canvas creation lands on the portfolio, not Next's error page.
-    <WorldBoundary onError={skip}>
-      <DeskScene
-        state={state}
-        dispatch={dispatch}
-        scale={scale}
-        firstVisit={!hasVisited}
-      />
-    </WorldBoundary>
+    <>
+      {hasScene && (
+        // A failed chunk load or Canvas creation lands on the portfolio, not Next's error page.
+        <WorldBoundary onError={skip}>
+          <DeskScene
+            state={state}
+            dispatch={dispatch}
+            scale={scale}
+            firstVisit={!hasVisited}
+          />
+        </WorldBoundary>
+      )}
+      {/* One loader from first paint until the world is ready: capability probe, scene bundle, desk and
+          landscape. It stays mounted across all three, so it never restarts or swaps for a second screen.
+          Later in the DOM than the scene so it paints above it. */}
+      {state === "loading" && <LobbyLoading onSkip={skip} />}
+    </>
   );
 }

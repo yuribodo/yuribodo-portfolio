@@ -81,10 +81,10 @@ export function useBakedGeometry(scene: Group) {
 
 export { worldHeight as terrainHeight } from "@/lib/lobby/world-geography";
 
-export function TerraceTerrain({ floorY, active }: { floorY: number; active: boolean }) {
+export function TerraceTerrain({ floorY }: { floorY: number }) {
   const light=useOutdoorLight();
   const baked = useLoader(TerrainDataLoader, TERRAIN_DATA_URL);
-  const textures = useGroundTextures(active);
+  const textures = useGroundTextures();
   const geometry = useMemo(() => {
     const geometry = new PlaneGeometry(170, 170, 288, 288);
     geometry.rotateX(-Math.PI / 2);

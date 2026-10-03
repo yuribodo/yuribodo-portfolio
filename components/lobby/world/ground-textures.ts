@@ -6,6 +6,7 @@ import { RepeatWrapping, SRGBColorSpace, TextureLoader, type Texture } from 'thr
 import { installBitmapTextureLoader } from '@/lib/lobby/bitmap-texture-loader';
 import { GROUND_PREVIEW_TEXTURES } from '@/lib/lobby/ground-preview-manifest';
 import { uploadTextures } from '@/lib/lobby/texture-upload-queue';
+import { beginWorldTask } from './world-ledger';
 
 export const GROUND_TEXTURES=['/lobby/world/soil-color.webp','/lobby/world/soil-normal.webp','/lobby/world/meadow-color.webp','/lobby/world/meadow-normal.webp','/lobby/world/rock-face-detail.webp','/lobby/world/rock-face-normal.webp'];
 installBitmapTextureLoader();
@@ -25,17 +26,19 @@ function ownedMaps(source: Texture[]) {
 
 /** Keep the same shader and height field during loading. Only texel resolution
  * increases, after all replacement maps have uploaded in the shared budget.
+ * The reveal waits for the swap, so the ground never visibly sharpens afterwards.
  * Returned maps are owned/disposed by the ground material, not the loader cache.
  */
-export function useGroundTextures(upgrade: boolean) {
+export function useGroundTextures() {
   const source = useTexture(GROUND_PREVIEW_TEXTURES);
   const preview = useMemo(() => ownedMaps(source), [source]);
   const [detail, setDetail] = useState<Texture[] | null>(null);
   const gl = useThree(s => s.gl);
+  const scene = useThree(s => s.scene);
   useEffect(() => {
-    if (!upgrade) return;
     let cancelled = false, committed = false;
     let maps: Texture[] | undefined;
+    const finish = beginWorldTask(scene);
     fullResolution ??= Promise.all(GROUND_TEXTURES.map(url => new TextureLoader().loadAsync(url)));
     fullResolution.then(async source => {
       if (cancelled) return;
@@ -44,11 +47,13 @@ export function useGroundTextures(upgrade: boolean) {
       if (cancelled) return;
       committed = true;
       setDetail(maps);
-    }).catch(error => { if (!cancelled) console.warn('[lobby] Keeping terrain preview:', error); });
+    }).catch(error => { if (!cancelled) console.warn('[lobby] Keeping terrain preview:', error); })
+      .finally(finish);
     return () => {
       cancelled = true;
+      finish();
       if (!committed) maps?.forEach(map => map.dispose());
     };
-  }, [gl, upgrade]);
+  }, [gl, scene]);
   return detail ?? preview;
 }

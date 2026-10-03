@@ -2,6 +2,9 @@ import { expect, test, type Page } from "@playwright/test";
 
 /** Exercise WebGL under software rendering without weakening the real
  * production GPU gate. This verifies behavior, never hardware performance. */
+/** The reveal now waits for the whole world (or its 12 s patience cap), and software GL is slow at it. */
+const WORLD_READY_TIMEOUT = 90_000;
+
 async function allowSoftwareRenderer(page: Page) {
   if (process.env.PLAYWRIGHT_HARDWARE_GPU === "1") return;
   await page.addInitScript(() => {
@@ -17,7 +20,7 @@ async function allowSoftwareRenderer(page: Page) {
 async function openDesk(page: Page) {
   await allowSoftwareRenderer(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("[data-lobby-state]" )).toHaveAttribute("data-lobby-state", "idle");
+  await expect(page.locator("[data-lobby-state]" )).toHaveAttribute("data-lobby-state", "idle", { timeout: WORLD_READY_TIMEOUT });
   await expect(page.getByRole("button", { name: "Enter portfolio", exact: true })).toBeEnabled();
 }
 
@@ -155,7 +158,7 @@ test("loading stays visible until the rendered desk replaces it directly", async
     expect(await page.evaluate(() => document.body.style.overflow)).toBe("hidden");
     await page.screenshot({ path: test.info().outputPath("loading-models.png") });
     release();
-    await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "idle");
+    await expect(page.locator("[data-lobby-state]")).toHaveAttribute("data-lobby-state", "idle", { timeout: WORLD_READY_TIMEOUT });
     // The indicator and its opaque cover leave in the same readiness commit.
     expect(await loading.count()).toBe(0);
     await expect(page.locator("[data-lobby-active] > .bg-background")).toHaveCount(0);
@@ -177,7 +180,7 @@ test("missing authored world assets do not block desk entry", async ({ page }) =
   await expect(page.locator("[data-lobby-active]")).toHaveCount(0);
 });
 
-test("the desk is revealed while terrain is still downloading", async ({ page }) => {
+test("the loader stays until the terrain has arrived, then the world is already complete", async ({ page }) => {
   await allowSoftwareRenderer(page);
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
@@ -186,9 +189,40 @@ test("the desk is revealed while terrain is still downloading", async ({ page })
   });
   try {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle', { timeout: 20000 });
+    await expect(page.locator('[data-lobby-loading]')).toHaveCount(1);
+    await page.waitForTimeout(4000);
+    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'loading');
+    await expect(page.locator('[data-lobby-loading]')).toHaveCount(1);
+    release();
+    await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle', { timeout: WORLD_READY_TIMEOUT });
     await expect(page.locator('[data-lobby-loading]')).toHaveCount(0);
+    // Nothing is left to arrive: no scenery request starts once the visitor can see the desk. Software GL
+    // can run out of patience first and reveal a partial world, so only a real GPU asserts this.
+    if (process.env.PLAYWRIGHT_HARDWARE_GPU === "1") {
+      const late: string[] = [];
+      page.on('request', request => { if (request.url().includes('/lobby/world/')) late.push(request.url()); });
+      await page.waitForTimeout(3000);
+      expect(late).toEqual([]);
+    }
   } finally { release(); }
+});
+
+test("one loader stays mounted from first paint until the desk is ready", async ({ page }) => {
+  await allowSoftwareRenderer(page);
+  await page.addInitScript(() => {
+    const seen = new Set<Element>();
+    let gaps = 0;
+    new MutationObserver(() => {
+      const el = document.querySelector('[data-lobby-loading]');
+      if (el) seen.add(el);
+      else if (document.querySelector('[data-lobby-state="loading"]')) gaps++;
+    }).observe(document, { childList: true, subtree: true });
+    Object.assign(window, { __loaderStats: () => ({ instances: seen.size, gaps }) });
+  });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('[data-lobby-state]')).toHaveAttribute('data-lobby-state', 'idle', { timeout: WORLD_READY_TIMEOUT });
+  const stats = await page.evaluate(() => (window as unknown as { __loaderStats: () => { instances: number; gaps: number } }).__loaderStats());
+  expect(stats).toEqual({ instances: 1, gaps: 0 });
 });
 
 test("reduced motion bypasses world assets", async ({ page }) => {

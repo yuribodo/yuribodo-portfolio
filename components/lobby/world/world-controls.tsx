@@ -1,5 +1,5 @@
 "use client";
-interface Props {loading:boolean;busy:boolean;firstVisit:boolean;onEnter:()=>void;onSkip:()=>void}
+interface Props {busy:boolean;firstVisit:boolean;onEnter:()=>void;onSkip:()=>void}
 
 // One object, one line: a pale glass pill that reads like the courtyard stone,
 // with a single ink chip carrying the arrow. Press feedback and hover lift are
@@ -26,17 +26,17 @@ const chip=[
 
 const arrow=`absolute size-4 transition-transform duration-200 ${EASE} motion-reduce:transition-none`;
 
-export function WorldControls({loading,busy,firstVisit,onEnter,onSkip}:Props){
+export function WorldControls({busy,firstVisit,onEnter,onSkip}:Props){
  // The label stays put while entering; the chip alone reports progress, so the pill never reflows.
  return <>
-  {firstVisit && !loading && !busy && (
+  {firstVisit && !busy && (
     <p data-lobby-chrome className="world-chrome-enter pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/70 bg-[#f4efe2]/78 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#0e2029]">
       Click the desk. Esc skips to the site.
     </p>
   )}
   <div data-lobby-chrome className="world-chrome-enter absolute bottom-6 right-6 z-20">
-   <button className={button} disabled={busy} aria-busy={busy||undefined} onClick={(event) => loading || event.detail === 0 ? onSkip() : onEnter()}>
-    <span className="font-sans text-[14px] font-medium tracking-[-0.01em]">{loading?'Skip to portfolio':'Enter portfolio'}</span>
+   <button className={button} disabled={busy} aria-busy={busy||undefined} onClick={(event) => event.detail === 0 ? onSkip() : onEnter()}>
+    <span className="font-sans text-[14px] font-medium tracking-[-0.01em]">Enter portfolio</span>
     <span aria-hidden className={chip}>
      {busy
       ? <span className="size-3.5 rounded-full border-[1.5px] border-current border-t-transparent animate-[spin_650ms_linear_infinite] motion-reduce:animate-none motion-reduce:border-t-current motion-reduce:opacity-60"/>
@@ -47,7 +47,7 @@ export function WorldControls({loading,busy,firstVisit,onEnter,onSkip}:Props){
     </span>
    </button>
   </div>
-  <p className="sr-only" role="status" aria-live="polite">{busy?'Entering the portfolio.':loading?'Loading the desk. You can skip to the portfolio.':'At the desk. Explore its objects or enter the portfolio.'}</p>
+  <p className="sr-only" role="status" aria-live="polite">{busy?'Entering the portfolio.':'At the desk. Explore its objects or enter the portfolio.'}</p>
  </>;
 }
 

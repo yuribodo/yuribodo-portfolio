@@ -52,7 +52,7 @@ export function RenderScale({ max, state }: { max: number; state: LobbyState }) 
 
   useEffect(() => {
     stateRef.current = state;
-    // The valley mounts after loading ends; warmup is measured from there, not from Canvas mount.
+    // The loader hides the world while it is prepared; warmup is measured from the reveal, not from Canvas mount.
     if (state !== "loading") warmUntil.current = performance.now() + RENDER_SCALE_WARMUP_MS;
   }, [state]);
 
