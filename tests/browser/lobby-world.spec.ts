@@ -234,13 +234,8 @@ test("the procedural world does not load flat landscape or sky backdrops", async
 
 test('covered artwork pauses, hidden world stops rendering, and both resume', async ({ page }) => {
   await page.addInitScript(() => {
-    const stats = { heroPaints: 0, draws: 0 };
+    const stats = { draws: 0 };
     Object.assign(window, { animationStats: stats });
-    const paint = CanvasRenderingContext2D.prototype.putImageData;
-    CanvasRenderingContext2D.prototype.putImageData = function (...args: [ImageData, number, number] | [ImageData, number, number, number, number, number, number]) {
-      if (this.canvas.closest('main')) stats.heroPaints++;
-      return Reflect.apply(paint, this, args);
-    };
     const draw = WebGL2RenderingContext.prototype.drawElements;
     WebGL2RenderingContext.prototype.drawElements = function (...args: Parameters<typeof draw>) {
       stats.draws++;
@@ -249,10 +244,10 @@ test('covered artwork pauses, hidden world stops rendering, and both resume', as
   });
   await openDesk(page);
   await page.waitForTimeout(1000);
-  const stats = () => page.evaluate(() => (window as unknown as { animationStats: { heroPaints: number; draws: number } }).animationStats);
-  const before = await stats();
-  await page.waitForTimeout(600);
-  expect((await stats()).heroPaints).toBe(before.heroPaints);
+  const stats = () => page.evaluate(() => (window as unknown as { animationStats: { draws: number } }).animationStats);
+  // The Hero wash is CSS, so "paused" is its animation play state, not paint calls.
+  const washStates = () => page.evaluate(() => document.querySelector('.hero-wash')?.getAnimations().map(animation => animation.playState) ?? []);
+  expect(await washStates()).toEqual(['paused']);
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
     document.dispatchEvent(new Event('visibilitychange'));
@@ -268,5 +263,5 @@ test('covered artwork pauses, hidden world stops rendering, and both resume', as
   await expect.poll(async () => (await stats()).draws).toBeGreaterThan(hidden.draws);
   await page.getByRole('button', { name: 'Enter portfolio', exact: true }).click();
   await expect(page.locator('[data-lobby-active]')).toHaveCount(0);
-  await expect.poll(async () => (await stats()).heroPaints).toBeGreaterThan(before.heroPaints);
+  await expect.poll(washStates).toEqual(['running']);
 });

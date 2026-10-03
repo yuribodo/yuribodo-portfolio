@@ -80,11 +80,28 @@ import fs from 'node:fs/promises';
       }));
     }
     const desk = await sample();
+    // Seated visitors keep moving the pointer; parallax invalidates camera-keyed caches.
+    let pointer = null;
+    if (process.env.WORLD_PROFILE_POINTER) {
+      await page.evaluate(() => {
+        let start;
+        const sweep = (time) => {
+          start ??= time;
+          const t = (time - start) / 1000;
+          window.dispatchEvent(new MouseEvent('mousemove', { clientX: 720 + Math.sin(t * 1.7) * 600, clientY: 450 + Math.cos(t * 1.1) * 350 }));
+          window.pointerSweep = requestAnimationFrame(sweep);
+        };
+        window.pointerSweep = requestAnimationFrame(sweep);
+      });
+      await page.waitForTimeout(1000);
+      pointer = await sample();
+      await page.evaluate(() => cancelAnimationFrame(window.pointerSweep));
+    }
     const loading = await page.evaluate(() => ({...window.loadStats, heapUsedBytes: performance.memory?.usedJSHeapSize, resources: performance.getEntriesByType('resource').filter(r=>r.name.includes('/lobby/')).map(r=>({url: new URL(r.name).pathname, bytes: r.decodedBodySize, durationMs:r.duration, startMs:r.startTime, endMs:r.responseEnd}))}));
     const screenshot = process.env.WORLD_PROFILE_SCREENSHOT;
     if (screenshot) await page.screenshot({path:screenshot});
     const result = { capturedAt: new Date().toISOString(), url: page.url(), renderer, viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, networkMbps: Number(process.env.WORLD_NETWORK_MBPS) || null,
-      caveat: 'Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement or a universal FPS guarantee. Cold load uses a fresh browser context; OS and GPU-driver caches may be warm. Heap is a browser estimate. Other desktop applications may be running.', desk, loading, responses, elapsedMs: Date.now()-started, errors };
+      caveat: 'Warm requestAnimationFrame cadence in a headless browser, 180 frames/view. Includes shadow-pass submissions; not GPU timer-query timings, VRAM measurement or a universal FPS guarantee. Cold load uses a fresh browser context; OS and GPU-driver caches may be warm. Heap is a browser estimate. Other desktop applications may be running.', desk, pointer, loading, responses, elapsedMs: Date.now()-started, errors };
     await fs.writeFile(process.env.WORLD_PROFILE_OUTPUT || 'docs/design/isekai-world/implementation/frame-profile.json', JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
     if (errors.length) process.exitCode = 1;
