@@ -8,6 +8,7 @@ import { DoubleSide, Float32BufferAttribute, Mesh, MeshStandardMaterial, type Me
 import { InstanceBatch, useBakedGeometry } from "./art-directed-terrace";
 import { ORGANIC_KINDS } from "./organic-vegetation";
 import { plantCommunities } from "@/lib/lobby/plant-communities";
+import { isVisibleGrass } from "@/lib/lobby/vegetation-lod";
 
 
 export function NaturalVegetation({floorY}:{floorY:number}){
@@ -59,7 +60,28 @@ export function NaturalVegetation({floorY}:{floorY:number}){
     });
     return {materials,geometries,depths};
   },[scene,originals,light]);
-  const placements=useMemo(()=>plantCommunities(floorY),[floorY]);
+  const grassHeight=useMemo(()=>{
+    let height=0;
+    scene.getObjectByName('tall-grass')?.traverse(o=>{
+      const geometry=o instanceof Mesh?originals.get(o.name):undefined;
+      if(!geometry)return;
+      geometry.computeBoundingBox();
+      height=Math.max(height,geometry.boundingBox!.max.y-geometry.boundingBox!.min.y);
+    });
+    return height;
+  },[scene,originals]);
+  // Plain batches cull per instance, so grid cells only multiply draw calls.
+  // Shadow casters cull as a whole mesh and keep their cells.
+  const placements=useMemo(()=>{
+    const merged:ReturnType<typeof plantCommunities>={};
+    for(const [region,plants] of Object.entries(plantCommunities(floorY))){
+      const [kind,shadow]=region.split(':');
+      // Tall grass that projects to about 2 px only adds alpha-to-coverage shimmer.
+      const visible=kind==='tall-grass'&&grassHeight>0?plants.filter(p=>isVisibleGrass(p,grassHeight)):plants;
+      (merged[shadow==='shadow'?region:`${kind}:plain`]??=[]).push(...visible);
+    }
+    return merged;
+  },[floorY,grassHeight]);
   useEffect(()=>()=>{materials.forEach(m=>m.dispose());depths.forEach(m=>m.dispose());geometries.forEach(g=>g?.dispose());},[materials,geometries,depths]);
   return <group name="natural-plant-communities">{Object.entries(placements).flatMap(([region,placements])=>{
     const [kind,shadow]=region.split(':');if(ORGANIC_KINDS.has(kind))return [];

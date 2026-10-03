@@ -2,6 +2,7 @@
  * Sources and CC0 provenance: assets/lobby-world/organic-sources.json.
  * Usage: node --max-old-space-size=4096 scripts/build-organic-assets.mjs /source-directory [asset-name]
  * Trees use bake-tree-canopies.py and pack-tree-canopies.mjs instead.
+ * Then run build-vegetation-lods.mjs to add the distance LODs.
  */
 import {createRequire} from 'node:module';
 import fs from 'node:fs/promises';

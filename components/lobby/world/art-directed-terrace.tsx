@@ -23,54 +23,58 @@ import { groundMaterial } from "./terrain-pigment";
 
 // meshopt quantization may place a decode transform on each glTF node.
 // Bake it into a private geometry before supplying our own instance matrices.
+// Callers that only reshape the result once should use this directly: the hook
+// keeps the whole map alive in component state for as long as it is mounted.
+export function bakeGeometries(scene: Group) {
+  const root = scene.clone(true);
+  root.updateMatrixWorld(true);
+  const geometries = new Map<string, BufferGeometry>();
+  root.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const geometry = object.geometry.clone();
+    // Integer-normalized attributes cannot hold a baked world-space position.
+    for (const name of ["position", "normal", "tangent"]) {
+      const attribute = geometry.getAttribute(name);
+      if (!attribute || attribute.array instanceof Float32Array) continue;
+      const values = [];
+      for (let i = 0; i < attribute.count; i++) {
+        values.push(attribute.getX(i), attribute.getY(i), attribute.getZ(i));
+        if (attribute.itemSize === 4) values.push(attribute.getW(i));
+      }
+      geometry.setAttribute(name, new Float32BufferAttribute(values, attribute.itemSize));
+    }
+    geometry.applyMatrix4(object.matrixWorld);
+    if (object.name.endsWith("_leaves") || object.name.startsWith("F1_Bush")) {
+      // Smooth canopy lighting across intersecting cards; individual polygon
+      // normals otherwise produce noisy light/dark speckles at this distance.
+      geometry.computeBoundingBox();
+      const bounds = geometry.boundingBox!;
+      const cx = (bounds.min.x + bounds.max.x) / 2;
+      const cy = (bounds.min.y + bounds.max.y) / 2;
+      const cz = (bounds.min.z + bounds.max.z) / 2;
+      const position = geometry.getAttribute("position"), normals = [], colors = [];
+      const shade = new Color("#395e54"), light = new Color("#bdcb8f");
+      for (let i = 0; i < position.count; i++) {
+        const x = (position.getX(i) - cx) * 0.2;
+        const y = Math.max(0.6, (position.getY(i) - cy) * 0.2 + 1.2);
+        const z = (position.getZ(i) - cz) * 0.2;
+        const length = Math.hypot(x, y, z);
+        normals.push(x / length, y / length, z / length);
+        const height = (position.getY(i) - bounds.min.y) / Math.max(0.01, bounds.max.y - bounds.min.y);
+        const variation = 0.05 * Math.sin(position.getX(i) * 1.7 + position.getZ(i) * 1.3);
+        const pigment = shade.clone().lerp(light, Math.min(1, Math.max(0, height + variation)));
+        colors.push(pigment.r, pigment.g, pigment.b);
+      }
+      geometry.setAttribute("normal", new Float32BufferAttribute(normals, 3));
+      geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
+    }
+    geometries.set(object.name, geometry);
+  });
+  return geometries;
+}
+
 export function useBakedGeometry(scene: Group) {
-  const geometries = useMemo(() => {
-    const root = scene.clone(true);
-    root.updateMatrixWorld(true);
-    const geometries = new Map<string, BufferGeometry>();
-    root.traverse((object) => {
-      if (!(object instanceof Mesh)) return;
-      const geometry = object.geometry.clone();
-      // Integer-normalized attributes cannot hold a baked world-space position.
-      for (const name of ["position", "normal", "tangent"]) {
-        const attribute = geometry.getAttribute(name);
-        if (!attribute || attribute.array instanceof Float32Array) continue;
-        const values = [];
-        for (let i = 0; i < attribute.count; i++) {
-          values.push(attribute.getX(i), attribute.getY(i), attribute.getZ(i));
-          if (attribute.itemSize === 4) values.push(attribute.getW(i));
-        }
-        geometry.setAttribute(name, new Float32BufferAttribute(values, attribute.itemSize));
-      }
-      geometry.applyMatrix4(object.matrixWorld);
-      if (object.name.endsWith("_leaves") || object.name.startsWith("F1_Bush")) {
-        // Smooth canopy lighting across intersecting cards; individual polygon
-        // normals otherwise produce noisy light/dark speckles at this distance.
-        geometry.computeBoundingBox();
-        const bounds = geometry.boundingBox!;
-        const cx = (bounds.min.x + bounds.max.x) / 2;
-        const cy = (bounds.min.y + bounds.max.y) / 2;
-        const cz = (bounds.min.z + bounds.max.z) / 2;
-        const position = geometry.getAttribute("position"), normals = [], colors = [];
-        const shade = new Color("#395e54"), light = new Color("#bdcb8f");
-        for (let i = 0; i < position.count; i++) {
-          const x = (position.getX(i) - cx) * 0.2;
-          const y = Math.max(0.6, (position.getY(i) - cy) * 0.2 + 1.2);
-          const z = (position.getZ(i) - cz) * 0.2;
-          const length = Math.hypot(x, y, z);
-          normals.push(x / length, y / length, z / length);
-          const height = (position.getY(i) - bounds.min.y) / Math.max(0.01, bounds.max.y - bounds.min.y);
-          const variation = 0.05 * Math.sin(position.getX(i) * 1.7 + position.getZ(i) * 1.3);
-          const pigment = shade.clone().lerp(light, Math.min(1, Math.max(0, height + variation)));
-          colors.push(pigment.r, pigment.g, pigment.b);
-        }
-        geometry.setAttribute("normal", new Float32BufferAttribute(normals, 3));
-        geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-      }
-      geometries.set(object.name, geometry);
-    });
-    return geometries;
-  }, [scene]);
+  const geometries = useMemo(() => bakeGeometries(scene), [scene]);
   useEffect(() => () => { for (const geometry of geometries.values()) geometry.dispose(); }, [geometries]);
   return geometries;
 }
@@ -97,6 +101,9 @@ export function TerraceTerrain({ floorY, active }: { floorY: number; active: boo
 
 type Placement = { position: [number, number, number]; scale?: number | [number, number, number]; yaw?: number };
 
+// Hundreds of batches share one camera: derive its frustum once per frame.
+const sharedView = { frame: NaN, projection: new Matrix4(), frustum: new Frustum() };
+
 export function InstanceBatch({ geometry, material, placements, shadows = false, depthMaterial }: {
   geometry: BufferGeometry; material: MeshStandardMaterial; placements: Placement[]; shadows?: boolean; depthMaterial?: Material;
 }) {
@@ -113,7 +120,7 @@ export function InstanceBatch({ geometry, material, placements, shadows = false,
     });
     return { matrices, bounds: matrices.map(matrix => geometry.boundingSphere!.clone().applyMatrix4(matrix)) };
   }, [geometry, placements]);
-  const visibility = useRef({ frustum: new Frustum(), projection: new Matrix4(), previousProjection: new Matrix4(),
+  const visibility = useRef({ previousProjection: new Matrix4(),
       previousWorld: new Matrix4(), scratch: new Sphere(), indices: [] as number[], initialized: false });
   useLayoutEffect(() => {
     const mesh = ref.current!;
@@ -125,18 +132,22 @@ export function InstanceBatch({ geometry, material, placements, shadows = false,
     // InstancedMesh owns its instance buffers; geometry/material stay shared.
     return () => { mesh.dispose(); };
   }, [data]);
-  useFrame(({ camera }) => {
+  useFrame(({ camera, clock }) => {
     const mesh = ref.current;
     // Keep off-camera casters: they can still cast visible terrace shadows.
     if (!mesh || shadows) return;
     const cache = visibility.current;
-    camera.updateMatrixWorld();
-    mesh.updateWorldMatrix(true, false);
-    cache.projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    if (cache.initialized && cache.projection.equals(cache.previousProjection) && mesh.matrixWorld.equals(cache.previousWorld)) return;
-    cache.previousProjection.copy(cache.projection); cache.previousWorld.copy(mesh.matrixWorld);
-    cache.frustum.setFromProjectionMatrix(cache.projection);
-    const indices = visibleInstances(data.bounds, cache.frustum, mesh.matrixWorld, cache.scratch);
+    if (sharedView.frame !== clock.elapsedTime) {
+      sharedView.frame = clock.elapsedTime;
+      camera.updateMatrixWorld();
+      sharedView.projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      sharedView.frustum.setFromProjectionMatrix(sharedView.projection);
+    }
+    // Scenery is static: after placement, the last render's world matrix is current.
+    if (!cache.initialized) mesh.updateWorldMatrix(true, false);
+    if (cache.initialized && sharedView.projection.equals(cache.previousProjection) && mesh.matrixWorld.equals(cache.previousWorld)) return;
+    cache.previousProjection.copy(sharedView.projection); cache.previousWorld.copy(mesh.matrixWorld);
+    const indices = visibleInstances(data.bounds, sharedView.frustum, mesh.matrixWorld, cache.scratch);
     if (!cache.initialized || indices.length !== cache.indices.length || indices.some((index, i) => index !== cache.indices[i])) {
       indices.forEach((index, i) => mesh.setMatrixAt(i, data.matrices[index]));
       mesh.count = indices.length;
