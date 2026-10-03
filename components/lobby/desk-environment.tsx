@@ -1,10 +1,11 @@
 "use client";
 
 import { useThree } from "@react-three/fiber";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef } from "react";
 import { Color, type DirectionalLight, type HemisphereLight, type PointLight, type Group } from "three";
 import { SUN_POSITION } from "./world/outdoor-lighting";
 import { dimWorldMaterials } from "./world/isekai-world";
+import { fitSunShadow, sunShadowMapSize } from "@/lib/lobby/shadow-frustum";
 
 export interface DeskEnvironmentHandle {
   setLightingDimmer: (ratio: number) => void;
@@ -21,6 +22,17 @@ const DeskEnvironment = forwardRef<DeskEnvironmentHandle, { shadowMap: number }>
   const fill = useRef<DirectionalLight>(null);
   const sky = useRef<HemisphereLight>(null);
   const lamp = useRef<PointLight>(null);
+  // The frustum covers the casters, not the valley; the map keeps the old texel so the shadows look as before.
+  const fit = useMemo(() => fitSunShadow(SUN_POSITION, sunShadowMapSize(shadowMap)), [shadowMap]);
+  // The light's target is not in the scene graph, so its world matrix must be set by hand.
+  // userData.shadowFit is the stable read-out of the frustum, texel size and biases.
+  useLayoutEffect(() => {
+    const light = sun.current;
+    if (!light) return;
+    light.target.position.set(...fit.target);
+    light.target.updateMatrixWorld();
+    light.userData.shadowFit = fit;
+  }, [fit]);
 
   useImperativeHandle(ref, () => ({
     setLightingDimmer(ratio) {
@@ -44,10 +56,10 @@ const DeskEnvironment = forwardRef<DeskEnvironmentHandle, { shadowMap: number }>
       <fog attach="fog" args={["#afcadf", 100, 2200]} />
       <hemisphereLight ref={sky} args={["#c0e3ef", "#9a8c67", SKY_FILL]} />
       <directionalLight
-        ref={sun} position={SUN_POSITION} color="#ffe4b5" intensity={SUN} castShadow
-        shadow-mapSize={[shadowMap, shadowMap]} shadow-camera-near={1} shadow-camera-far={240}
-        shadow-camera-left={-56} shadow-camera-right={56} shadow-camera-top={56} shadow-camera-bottom={-56}
-        shadow-normalBias={0.015} shadow-bias={-0.0002}
+        ref={sun} name="sun" position={fit.position} color="#ffe4b5" intensity={SUN} castShadow
+        shadow-mapSize={[fit.mapSize, fit.mapSize]} shadow-camera-near={fit.near} shadow-camera-far={fit.far}
+        shadow-camera-left={fit.left} shadow-camera-right={fit.right} shadow-camera-top={fit.top} shadow-camera-bottom={fit.bottom}
+        shadow-normalBias={fit.normalBias} shadow-bias={fit.bias} shadow-radius={fit.radius}
       />
       <directionalLight ref={fill} position={[4, 3, -6]} color="#b5d6eb" intensity={DESK_FILL} />
       <pointLight ref={lamp} position={[1.8, 1.5, 0.5]} color="#ffcb97" intensity={4.5} distance={6} decay={2} />

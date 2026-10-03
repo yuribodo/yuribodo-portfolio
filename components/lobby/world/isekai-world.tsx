@@ -35,7 +35,7 @@ import { MeadowLife } from "./meadow-life";
 import { NaturalVegetation } from "./natural-vegetation";
 import { LivingValley } from "./living-valley";
 import { worldHeight } from "@/lib/lobby/world-geography";
-import { OutdoorLighting, applyOutdoorLight, useOutdoorLight } from "./outdoor-lighting";
+import { OutdoorLighting, applyOutdoorLight, arrivalShaded, useOutdoorLight } from "./outdoor-lighting";
 import { Atmosphere } from "./atmosphere";
 import { ValleyVillage } from "./valley-village";
 import { ReferenceHouses } from "./reference-houses";
@@ -112,6 +112,7 @@ function Waterfall({ position, width, height, active }: {
   position: [number, number, number]; width: number; height: number; active: boolean;
 }) {
   const time = useRef(0);
+  const light = useOutdoorLight();
   const { geometry, material, updateFlow } = useMemo(() => {
     const geometry = new PlaneGeometry(width, height, 8, 32);
     const vertex = geometry.attributes.position;
@@ -123,23 +124,25 @@ function Waterfall({ position, width, height, active }: {
     const flow = { value: 0 };
     const material = new MeshBasicMaterial({ color: "#b5e3eb", transparent: true, side: DoubleSide, depthWrite: false });
     material.userData.worldBaseColor = new Color("#b5e3eb");
+    arrivalShaded.add(material);
     material.onBeforeCompile = (shader) => {
       shader.uniforms.fallTime = flow;
+      shader.uniforms.fallArrival = light.arrival ?? { value: 1 };
       shader.vertexShader = "varying vec2 vFallUv;\n" + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n vFallUv = uv;");
-      shader.fragmentShader = "varying vec2 vFallUv; uniform float fallTime;\n" + shader.fragmentShader;
+      shader.fragmentShader = "varying vec2 vFallUv; uniform float fallTime, fallArrival;\n" + shader.fragmentShader;
       shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `
         #include <color_fragment>
         float strand = pow(0.5 + 0.5 * sin(vFallUv.x * 75.0 + sin(vFallUv.y * 9.0 + fallTime * 2.0)), 3.0);
         float streak = 0.5 + 0.5 * sin(vFallUv.y * 90.0 + fallTime * 10.0 + vFallUv.x * 20.0);
         float edges = smoothstep(0.0, 0.15, vFallUv.x) * smoothstep(0.0, 0.15, 1.0 - vFallUv.x);
         diffuseColor.rgb *= 0.7 + strand * 0.3;
-        diffuseColor.a = edges * smoothstep(0.0, 0.12, vFallUv.y) * (0.36 + strand * 0.42 + streak * 0.12);
+        diffuseColor.a = edges * smoothstep(0.0, 0.12, vFallUv.y) * (0.36 + strand * 0.42 + streak * 0.12) * fallArrival;
       `);
     };
-    material.customProgramCacheKey = () => "skybound-waterfall-v1";
+    material.customProgramCacheKey = () => "skybound-waterfall-v2";
     return { geometry, material, updateFlow: (time: number) => { flow.value = time; } };
-  }, [width, height]);
+  }, [width, height, light]);
   useFrame((_, delta) => { if (active) { time.current += Math.min(delta, 0.1); updateFlow(time.current); } });
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
   return <mesh geometry={geometry} material={material} position={position} raycast={() => {}} />;
@@ -201,16 +204,16 @@ export default function IsekaiWorld({ floorY, active }: WorldProps) {
         <group position={[-480,45,-1200]} scale={1.8} rotation={[0,1.8,0]}><SkyIsland /><SkyGarden /></group>
         <Waterfall position={[158,29,-835]} width={2.2} height={52} active={active}/>
       </PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><FantasyResidents floorY={floorY}/></WorldBoundary>
-      <WorldBoundary><ValleyWildlife floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><FantasyResidents floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyWildlife floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><ValleyCreatures /></PreparedGroup></Suspense></WorldBoundary>
       <WorldCharacters floorY={floorY} active={active} />
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><AncientTrees floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><EnchantedGroves floorY={floorY}/></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><EnchantedGroves floorY={floorY}/></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><NaturalVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><OrganicVegetation floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       <WorldBoundary><Suspense fallback={null}><PreparedGroup><FlowerColonies floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
-      <WorldBoundary><MeadowLife floorY={floorY} /></WorldBoundary>
+      <WorldBoundary><Suspense fallback={null}><PreparedGroup><MeadowLife floorY={floorY} /></PreparedGroup></Suspense></WorldBoundary>
       </WorldDetails>
     </group></OutdoorLighting>
   );

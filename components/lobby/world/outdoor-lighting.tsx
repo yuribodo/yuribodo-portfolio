@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
-import { ShaderChunk, type MeshStandardMaterial } from "three";
+import { ShaderChunk, type Material, type MeshStandardMaterial } from "three";
 
 export const SUN_POSITION: [number, number, number] = [-52, 64, 38];
 export const SUN_GLSL = "normalize(vec3(-52.0, 64.0, 38.0))";
-export interface OutdoorLight { time: { value: number }; advance: (delta: number) => void }
+export interface OutdoorLight { time: { value: number }; advance: (delta: number) => void; arrival?: { value: number } }
 const LightContext = createContext<OutdoorLight | null>(null);
 
 /** One clock per world, including asynchronously loaded materials. */
@@ -17,6 +17,15 @@ export function OutdoorLighting({ active, children }: { active: boolean; childre
   }, []);
   useFrame((_, delta) => { if (active) light.advance(delta); });
   return <LightContext.Provider value={light}>{children}</LightContext.Provider>;
+}
+/** Materials whose shader reads the family's `arrival` uniform: WorldDetails fades them without cloning. */
+export const arrivalShaded = new WeakSet<Material>();
+
+/** Gives one scenery family its own arrival uniform; time and materials stay shared. */
+export function OutdoorArrival({ arrival, children }: { arrival: { value: number }; children: ReactNode }) {
+  const parent = useContext(LightContext);
+  const light = useMemo(() => parent && { ...parent, arrival }, [parent, arrival]);
+  return light ? <LightContext.Provider value={light}>{children}</LightContext.Provider> : <>{children}</>;
 }
 export function useOutdoorLight() {
   const light = useContext(LightContext);
@@ -44,6 +53,14 @@ export const cloudShader = `
   }
 `;
 
+// Screen-door fade-in: opaque, no blending, same program before and after.
+const arrivalShader = `
+  uniform float outdoorArrival;
+  bool outdoorArrived() {
+    return outdoorArrival >= 1.0 || fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(.06711056, .00583715)))) < outdoorArrival;
+  }
+`;
+
 /** Compose with the material's existing wind/pigment shader. */
 export function applyOutdoorLight<T extends MeshStandardMaterial>(material: T, light: OutdoorLight, translucency = 0): T {
   const previous = material.onBeforeCompile;
@@ -64,6 +81,12 @@ export function applyOutdoorLight<T extends MeshStandardMaterial>(material: T, l
       vOutdoorPosition=(modelMatrix*outdoorPosition).xyz;
     `);
     shader.fragmentShader = cloudShader + shader.fragmentShader;
+    if (light.arrival) {
+      shader.uniforms.outdoorArrival = light.arrival;
+      shader.fragmentShader = arrivalShader + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace("#include <clipping_planes_fragment>",
+        "#include <clipping_planes_fragment>\n if (!outdoorArrived()) discard;");
+    }
     // Only the front vista was expanded. Keep the rear valley's original
     // atmospheric falloff instead of clearing its horizon with the new range.
     shader.fragmentShader=shader.fragmentShader.replace('#include <fog_fragment>',
@@ -76,7 +99,7 @@ export function applyOutdoorLight<T extends MeshStandardMaterial>(material: T, l
     sunlight = sunlight.replace("getDirectionalLightInfo( directionalLight, directLight );", `
       getDirectionalLightInfo( directionalLight, directLight );
       outdoorSun=step(.99,dot(directLight.direction,normalize(mat3(viewMatrix)*${SUN_GLSL})));
-      directLight.color*=mix(1.0,cloudVisibility(vOutdoorPosition),outdoorSun);
+      directLight.color*=outdoorSun>.5?cloudVisibility(vOutdoorPosition):1.0;
     `);
     if (translucency > 0) sunlight = sunlight.replace(
       "RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );", `
@@ -90,6 +113,7 @@ export function applyOutdoorLight<T extends MeshStandardMaterial>(material: T, l
     lighting = lighting.slice(0, start) + sunlight + lighting.slice(end);
     shader.fragmentShader = shader.fragmentShader.replace("#include <lights_fragment_begin>", lighting);
   };
-  material.customProgramCacheKey = () => `${previousKey}-outdoor-light-v2-${translucency}`;
+  material.customProgramCacheKey = () => `${previousKey}-outdoor-light-v3-${translucency}${light.arrival ? "-arrival" : ""}`;
+  if (light.arrival) arrivalShaded.add(material);
   return material;
 }

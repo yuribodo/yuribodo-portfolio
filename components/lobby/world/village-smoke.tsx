@@ -2,7 +2,7 @@
 import {useEffect,useMemo} from 'react';
 import {useFrame} from '@react-three/fiber';
 import {InstancedBufferAttribute,InstancedBufferGeometry,PlaneGeometry,ShaderMaterial,UniformsLib,UniformsUtils} from 'three';
-import {useOutdoorLight} from './outdoor-lighting';
+import {arrivalShaded,useOutdoorLight} from './outdoor-lighting';
 
 /** Sparse chimney wisps, anchored to the model's highest compact masonry cap. */
 export function VillageSmoke({chimneys}:{chimneys:[number,number,number][]}){
@@ -16,7 +16,7 @@ export function VillageSmoke({chimneys}:{chimneys:[number,number,number][]}){
   geometry.setAttribute('smokeSeed',new InstancedBufferAttribute(new Float32Array(seeds),2));geometry.instanceCount=seeds.length/2;
   const dimmer={value:1};
   const material=new ShaderMaterial({transparent:true,depthWrite:false,depthTest:true,fog:true,
-   uniforms:{...UniformsUtils.clone(UniformsLib.fog),smokeTime:light.time,smokeDimmer:dimmer},
+   uniforms:{...UniformsUtils.clone(UniformsLib.fog),smokeTime:light.time,smokeDimmer:dimmer,smokeArrival:light.arrival??{value:1}},
    vertexShader:`uniform float smokeTime;attribute vec3 smokeAnchor;attribute vec2 smokeSeed;varying vec2 vSmokeUv;varying float vSmokeAge;
     #include <fog_pars_vertex>
     void main(){
@@ -28,20 +28,20 @@ export function VillageSmoke({chimneys}:{chimneys:[number,number,number][]}){
      gl_Position=projectionMatrix*mvPosition;
      #include <fog_vertex>
     }`,
-   fragmentShader:`uniform float smokeDimmer;varying vec2 vSmokeUv;varying float vSmokeAge;
+   fragmentShader:`uniform float smokeDimmer,smokeArrival;varying vec2 vSmokeUv;varying float vSmokeAge;
     #include <fog_pars_fragment>
     void main(){
      vec2 p=vSmokeUv*2.0-1.0;
      float shape=exp(-dot(p,p)*3.8)*(1.0-smoothstep(.55,1.0,length(p)));
      float fibre=.72+.28*sin(p.x*9.0+sin(p.y*7.0)*2.0+vSmokeAge*11.0);
-     float opacity=shape*fibre*smoothstep(0.0,.12,vSmokeAge)*(1.0-smoothstep(.45,1.0,vSmokeAge))*.19*smokeDimmer;
+     float opacity=shape*fibre*smoothstep(0.0,.12,vSmokeAge)*(1.0-smoothstep(.45,1.0,vSmokeAge))*.19*smokeDimmer*smokeArrival;
      if(opacity<.002)discard;
      gl_FragColor=vec4(vec3(.63,.65,.65)*smokeDimmer,opacity);
      #include <fog_fragment>
      #include <tonemapping_fragment>
      #include <colorspace_fragment>
     }`});
-  material.userData.setWorldDimmer=(ratio:number)=>{dimmer.value=ratio;};
+  arrivalShaded.add(material);material.userData.setWorldDimmer=(ratio:number)=>{dimmer.value=ratio;};
   return {geometry,material,setDimmer:(ratio:number)=>{dimmer.value=ratio;}};
  },[chimneys,light]);
  useFrame(({scene})=>setDimmer(scene.userData.worldDimmer??1));
