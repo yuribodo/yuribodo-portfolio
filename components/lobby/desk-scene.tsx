@@ -42,10 +42,9 @@ interface DeskSceneProps {
   state: LobbyState;
   dispatch: Dispatch<LobbyAction>;
   scale: LobbyScale;
-  firstVisit: boolean;
 }
 
-export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSceneProps) {
+export default function DeskScene({ state, dispatch, scale }: DeskSceneProps) {
   const cameraRigRef = useRef<CameraRigHandle>(null);
   const monitorRef = useRef<MonitorHandle>(null);
   const environmentRef = useRef<DeskEnvironmentHandle>(null);
@@ -309,7 +308,7 @@ export default function DeskScene({ state, dispatch, scale, firstVisit }: DeskSc
         </button>
       </div>
       {/* While loading, the gate's single loader owns the skip button. */}
-      {state !== "loading" && <WorldControls busy={state === "booting"} firstVisit={firstVisit} onEnter={handleEnter} onSkip={handleSkip}/>}
+      {state !== "loading" && <WorldControls busy={state === "booting"} onEnter={handleEnter} onSkip={handleSkip}/>}
       <MuteToggle isMuted={isMuted} onToggle={toggleMuted} />
     </div>
   );

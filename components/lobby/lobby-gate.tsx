@@ -33,7 +33,7 @@ const DeskScene = dynamic(() => import("./desk-scene"), {
 
 export function LobbyGate() {
   const reducedMotion = useReducedMotion();
-  const { hasVisited, markVisited } = useLobbyVisited();
+  const { markVisited } = useLobbyVisited();
   const [state, dispatch] = useLobbyState();
   // Tri-state so we never flash the lobby for a frame on weak devices while
   // probing. null = probing, reason = blocked (portfolio directly), false = go.
@@ -103,7 +103,6 @@ export function LobbyGate() {
             state={state}
             dispatch={dispatch}
             scale={scale}
-            firstVisit={!hasVisited}
           />
         </WorldBoundary>
       )}
