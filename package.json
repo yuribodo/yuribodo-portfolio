@@ -9,7 +9,12 @@
     "lint": "eslint",
     "test": "tsx --test 'lib/**/*.test.ts'",
     "analyze": "ANALYZE=true next build --webpack",
-    "assets:compress": "tsx scripts/compress-assets.ts"
+    "assets:compress": "tsx scripts/compress-assets.ts",
+    "assets:world": "node scripts/build-lobby-world.mjs",
+    "test:browser": "playwright test",
+    "prebuild": "tsx scripts/bake-terrain.ts && node scripts/bake-ground-preview.mjs && tsx scripts/version-lobby-assets.ts",
+    "assets:terrain": "tsx scripts/bake-terrain.ts",
+    "assets:version": "tsx scripts/version-lobby-assets.ts"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4",
@@ -31,6 +36,7 @@
   "devDependencies": {
     "@gltf-transform/cli": "^4.4.1",
     "@next/bundle-analyzer": "^16.2.6",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

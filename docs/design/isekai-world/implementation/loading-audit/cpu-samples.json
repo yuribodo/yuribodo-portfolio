@@ -1,0 +1,274 @@
+{
+  "profiledIdleMs": 9912.299999982119,
+  "caveat": "Separate V8 sampled run, adds overhead. Self samples, not wall-clock phase durations. Minified symbols mapped against the matching production bundle. Raw profile can be regenerated with AUDIT_CPU_PROFILE=1.",
+  "mappedSymbols": [
+    {
+      "functionName": "T",
+      "line": 358,
+      "column": 934,
+      "meaning": "Three WebGLProgram onFirstUse: synchronous shader/program log queries and uniform/attribute discovery",
+      "selfMs": 2085.0019999999977
+    },
+    {
+      "functionName": "i",
+      "line": 430,
+      "column": 4030,
+      "meaning": "world-geography noise hash callback",
+      "selfMs": 813.9850000000015
+    },
+    {
+      "functionName": "o",
+      "line": 430,
+      "column": 5324,
+      "meaning": "world-geography worldHeight hill callback",
+      "selfMs": 400.02599999999984
+    }
+  ],
+  "topSelfSamples": [
+    {
+      "functionName": "T",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 358,
+      "column": 934,
+      "selfMs": 2085.0019999999977
+    },
+    {
+      "functionName": "Context.<computed>",
+      "chunk": "",
+      "line": 33,
+      "column": 48,
+      "selfMs": 1806.2509999999982
+    },
+    {
+      "functionName": "(program)",
+      "chunk": "",
+      "line": 0,
+      "column": 0,
+      "selfMs": 1619.8820000000019
+    },
+    {
+      "functionName": "i",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 4030,
+      "selfMs": 813.9850000000015
+    },
+    {
+      "functionName": "o",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 5324,
+      "selfMs": 400.02599999999984
+    },
+    {
+      "functionName": "(idle)",
+      "chunk": "",
+      "line": 0,
+      "column": 0,
+      "selfMs": 178.45299999999983
+    },
+    {
+      "functionName": "HTMLCanvasElement.getContext",
+      "chunk": "",
+      "line": 16,
+      "column": 57,
+      "selfMs": 125.34099999999995
+    },
+    {
+      "functionName": "(garbage collector)",
+      "chunk": "",
+      "line": 0,
+      "column": 0,
+      "selfMs": 121.20599999999997
+    },
+    {
+      "functionName": "getX",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 96074,
+      "selfMs": 105.75799999999991
+    },
+    {
+      "functionName": "pw",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 5123,
+      "selfMs": 91.98899999999995
+    },
+    {
+      "functionName": "",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 393,
+      "column": 83461,
+      "selfMs": 87.452
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 26562,
+      "selfMs": 83.59199999999994
+    },
+    {
+      "functionName": "py",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 4321,
+      "selfMs": 83.55099999999999
+    },
+    {
+      "functionName": "getY",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 96253,
+      "selfMs": 79.10799999999999
+    },
+    {
+      "functionName": "applyMatrix4",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 22289,
+      "selfMs": 76.45499999999998
+    },
+    {
+      "functionName": "copy",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 94727,
+      "selfMs": 72.85100000000001
+    },
+    {
+      "functionName": "s",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 6014,
+      "selfMs": 70.54100000000001
+    },
+    {
+      "functionName": "px",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 4599,
+      "selfMs": 69.57699999999997
+    },
+    {
+      "functionName": "f4",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 762,
+      "column": 6171,
+      "selfMs": 66.14500000000002
+    },
+    {
+      "functionName": "pg",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 3986,
+      "selfMs": 63.321000000000005
+    },
+    {
+      "functionName": "n",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 290,
+      "column": 2004,
+      "selfMs": 62.224000000000004
+    },
+    {
+      "functionName": "pv",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 4214,
+      "selfMs": 57.732000000000006
+    },
+    {
+      "functionName": "",
+      "chunk": "f5cdb999c4241940.js",
+      "line": 81,
+      "column": 20983,
+      "selfMs": 53.56600000000002
+    },
+    {
+      "functionName": "getZ",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 96436,
+      "selfMs": 52.31100000000003
+    },
+    {
+      "functionName": "r",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 4371,
+      "selfMs": 50.31400000000003
+    },
+    {
+      "functionName": "q",
+      "chunk": "turbopack-f243d0cdfab69371.js",
+      "line": 4,
+      "column": 510,
+      "selfMs": 49.260000000000005
+    },
+    {
+      "functionName": "computeVertexNormals",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 108226,
+      "selfMs": 47.960000000000015
+    },
+    {
+      "functionName": "length",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 24223,
+      "selfMs": 44.196000000000005
+    },
+    {
+      "functionName": "setXYZ",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 96939,
+      "selfMs": 42.14600000000001
+    },
+    {
+      "functionName": "pm",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 3903,
+      "selfMs": 41.79200000000001
+    },
+    {
+      "functionName": "",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 21774,
+      "selfMs": 39.91599999999998
+    },
+    {
+      "functionName": "min",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 1,
+      "column": 23157,
+      "selfMs": 38.589
+    },
+    {
+      "functionName": "uU",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 336,
+      "column": 9520,
+      "selfMs": 36.938
+    },
+    {
+      "functionName": "",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 608,
+      "column": 2919,
+      "selfMs": 36.908
+    },
+    {
+      "functionName": "",
+      "chunk": "0b663d21dc4e2d89.js",
+      "line": 430,
+      "column": 14049,
+      "selfMs": 32.071
+    }
+  ]
+}

@@ -1,0 +1,1560 @@
+{
+  "caveat": "Texture estimates assume RGBA8 plus a full mip chain per source image; not observed VRAM. Excludes procedural textures, targets, clones and geometry. Only resources observed in cold run.",
+  "glbs": [
+    {
+      "url": "/lobby/models/beyblade-pegasus.glb",
+      "bytes": 75096,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/png",
+          "width": 64,
+          "height": 4,
+          "encodedBytes": 165,
+          "rgbaMipBytes": 1365
+        },
+        {
+          "index": 1,
+          "mime": "image/png",
+          "width": 64,
+          "height": 4,
+          "encodedBytes": 136,
+          "rgbaMipBytes": 1365
+        }
+      ],
+      "textureBytes": 301,
+      "estimatedRGBAWithMips": 2730
+    },
+    {
+      "url": "/lobby/models/drago.glb",
+      "bytes": 118920,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_unlit",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 6,
+      "materials": 6,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 8416,
+          "rgbaMipBytes": 349525
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 3714,
+          "rgbaMipBytes": 349525
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 7056,
+          "rgbaMipBytes": 349525
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 1816,
+          "rgbaMipBytes": 349525
+        }
+      ],
+      "textureBytes": 21002,
+      "estimatedRGBAWithMips": 1398100
+    },
+    {
+      "url": "/lobby/models/keyboard-razer.glb",
+      "bytes": 343512,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 4400,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 71406,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 17004,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 124760,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 217570,
+      "estimatedRGBAWithMips": 22369620
+    },
+    {
+      "url": "/lobby/models/macbook_pro_closed.glb",
+      "bytes": 583020,
+      "extensions": null,
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 195956,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 91417,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/jpeg",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 12572,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 263340,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 563285,
+      "estimatedRGBAWithMips": 22369620
+    },
+    {
+      "url": "/lobby/models/minato.glb",
+      "bytes": 163804,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 4,
+      "materials": 4,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 12910,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 4448,
+          "rgbaMipBytes": 349525
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 24082,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 4074,
+          "rgbaMipBytes": 349525
+        }
+      ],
+      "textureBytes": 45514,
+      "estimatedRGBAWithMips": 3495252
+    },
+    {
+      "url": "/lobby/models/monitor.glb",
+      "bytes": 140520,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_clearcoat",
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 2,
+      "materials": 2,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 20468,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 9262,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 25906,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 8072,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 63708,
+      "estimatedRGBAWithMips": 22369620
+    },
+    {
+      "url": "/lobby/models/mouse-razer.glb",
+      "bytes": 368212,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 3,
+      "materials": 3,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 36874,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 180982,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 28388,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 25924,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 55290,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 327458,
+      "estimatedRGBAWithMips": 27962025
+    },
+    {
+      "url": "/lobby/models/nintendo-ds.glb",
+      "bytes": 1965268,
+      "extensions": null,
+      "meshes": 17,
+      "materials": 15,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 162901,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 6300,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 134671,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 23164,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 5726,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 5,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 5078,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 6,
+          "mime": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 5318,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 343158,
+      "estimatedRGBAWithMips": 39146835
+    },
+    {
+      "url": "/lobby/models/seismitoad.glb",
+      "bytes": 87472,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 2,
+      "materials": 2,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 256,
+          "height": 256,
+          "encodedBytes": 4504,
+          "rgbaMipBytes": 349525
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 128,
+          "height": 256,
+          "encodedBytes": 3294,
+          "rgbaMipBytes": 174763
+        }
+      ],
+      "textureBytes": 7798,
+      "estimatedRGBAWithMips": 524288
+    },
+    {
+      "url": "/lobby/models/wooden_desk.glb",
+      "bytes": 747208,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_specular",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 8,
+      "materials": 8,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 6940,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 19720,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 1980,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 28558,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 31380,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 5,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 64324,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 6,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 19512,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 7,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 28126,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 8,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 42562,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 9,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 24704,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 10,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 36692,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 11,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 45832,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 12,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 18142,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 13,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 42976,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 14,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 51888,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 15,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 7776,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 16,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 9246,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 17,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 14810,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 18,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 21990,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 19,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 64710,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 20,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 8994,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 21,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 22318,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 22,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 2110,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 615290,
+      "estimatedRGBAWithMips": 128625315
+    },
+    {
+      "url": "/lobby/models/xbox-controller.glb",
+      "bytes": 241140,
+      "extensions": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression",
+        "KHR_materials_emissive_strength",
+        "KHR_materials_specular"
+      ],
+      "meshes": 16,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 40946,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 20708,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 852,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 22508,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 56038,
+          "rgbaMipBytes": 1398101
+        }
+      ],
+      "textureBytes": 141052,
+      "estimatedRGBAWithMips": 6990505
+    },
+    {
+      "url": "/lobby/world/coastal-cliff.glb",
+      "bytes": 718944,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_ior",
+        "KHR_materials_specular",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 174892,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 164592,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 97242,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 436726,
+      "estimatedRGBAWithMips": 16777215
+    },
+    {
+      "url": "/lobby/world/sky-citadel-v2.glb",
+      "bytes": 1561464,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 7,
+      "materials": 7,
+      "images": [],
+      "textureBytes": 0,
+      "estimatedRGBAWithMips": 0
+    },
+    {
+      "url": "/lobby/world/chess-monuments.glb",
+      "bytes": 2158536,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_materials_ior",
+        "KHR_materials_specular",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 8,
+      "materials": 8,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 52058,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 89144,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 146226,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 174892,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 164592,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 5,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 97242,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 6,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 15446,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 7,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 35732,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 8,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 19094,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 794426,
+      "estimatedRGBAWithMips": 46137341
+    },
+    {
+      "url": "/lobby/world/valley-village.glb",
+      "bytes": 290388,
+      "extensions": [
+        "KHR_draco_mesh_compression"
+      ],
+      "meshes": 8,
+      "materials": 1,
+      "images": [],
+      "textureBytes": 0,
+      "estimatedRGBAWithMips": 0
+    },
+    {
+      "url": "/lobby/world/natural-vegetation.glb",
+      "bytes": 462328,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 12,
+      "materials": 7,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 11630,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 8706,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 36184,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 12416,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 33782,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 5,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 50968,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 6,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 1334,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 7,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 21604,
+          "rgbaMipBytes": 1398101
+        }
+      ],
+      "textureBytes": 176624,
+      "estimatedRGBAWithMips": 11184808
+    },
+    {
+      "url": "/lobby/world/meadow-flowers.glb",
+      "bytes": 172588,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 2,
+      "materials": 3,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 498,
+          "encodedBytes": 42168,
+          "rgbaMipBytes": 1359872
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 50968,
+          "rgbaMipBytes": 1398101
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 512,
+          "height": 512,
+          "encodedBytes": 36184,
+          "rgbaMipBytes": 1398101
+        }
+      ],
+      "textureBytes": 129320,
+      "estimatedRGBAWithMips": 4156074
+    },
+    {
+      "url": "/lobby/world/living-mill.glb",
+      "bytes": 50152,
+      "extensions": [
+        "KHR_draco_mesh_compression"
+      ],
+      "meshes": 2,
+      "materials": 1,
+      "images": [],
+      "textureBytes": 0,
+      "estimatedRGBAWithMips": 0
+    },
+    {
+      "url": "/lobby/world/organic-fern_02.glb",
+      "bytes": 427872,
+      "extensions": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "meshes": 4,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 140260,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 150154,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 98730,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 389144,
+      "estimatedRGBAWithMips": 33554431
+    },
+    {
+      "url": "/lobby/world/organic-shrub_02.glb",
+      "bytes": 650664,
+      "extensions": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "meshes": 4,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 192928,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 245176,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 95246,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 533350,
+      "estimatedRGBAWithMips": 33554431
+    },
+    {
+      "url": "/lobby/world/organic-rock_moss_set_01.glb",
+      "bytes": 1052516,
+      "extensions": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "meshes": 6,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 329500,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 557410,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 89078,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 975988,
+      "estimatedRGBAWithMips": 33554431
+    },
+    {
+      "url": "/lobby/world/organic-tree_small_02.glb",
+      "bytes": 7879308,
+      "extensions": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression",
+        "KHR_texture_transform"
+      ],
+      "meshes": 1,
+      "materials": 3,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 239046,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 285192,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 81612,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 271812,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 131386,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 5,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 114332,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 6,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 627500,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 7,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 1112630,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 8,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 187362,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 3050872,
+      "estimatedRGBAWithMips": 100663293
+    },
+    {
+      "url": "/lobby/world/toothless-flight.glb",
+      "bytes": 1154208,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization",
+        "KHR_texture_transform"
+      ],
+      "meshes": 5,
+      "materials": 4,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 200,
+          "height": 200,
+          "encodedBytes": 5160,
+          "rgbaMipBytes": 213333
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 210158,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 135768,
+          "rgbaMipBytes": 22369621
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 236,
+          "height": 236,
+          "encodedBytes": 2996,
+          "rgbaMipBytes": 297045
+        }
+      ],
+      "textureBytes": 354082,
+      "estimatedRGBAWithMips": 45249620
+    },
+    {
+      "url": "/lobby/world/characters/going-merry.glb",
+      "bytes": 1790720,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 2048,
+          "height": 2048,
+          "encodedBytes": 212532,
+          "rgbaMipBytes": 22369621
+        }
+      ],
+      "textureBytes": 212532,
+      "estimatedRGBAWithMips": 22369621
+    },
+    {
+      "url": "/lobby/world/characters/ainz.glb",
+      "bytes": 439536,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 17,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 2880,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 4628,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 4450,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 4202,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 6136,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 22296,
+      "estimatedRGBAWithMips": 27962025
+    },
+    {
+      "url": "/lobby/world/characters/lancelot.glb",
+      "bytes": 974568,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 2,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 124398,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 96256,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 88244,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 3,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 62618,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 4,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 94350,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 5,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 120486,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 6,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 63370,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 649722,
+      "estimatedRGBAWithMips": 39146835
+    },
+    {
+      "url": "/lobby/world/characters/snorlax.glb",
+      "bytes": 456564,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 1,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 19640,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 19640,
+      "estimatedRGBAWithMips": 5592405
+    },
+    {
+      "url": "/lobby/world/characters/fishstick.glb",
+      "bytes": 454328,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 3,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 60296,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 1,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 34274,
+          "rgbaMipBytes": 5592405
+        },
+        {
+          "index": 2,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 512,
+          "encodedBytes": 16794,
+          "rgbaMipBytes": 2796203
+        }
+      ],
+      "textureBytes": 111364,
+      "estimatedRGBAWithMips": 13981013
+    },
+    {
+      "url": "/lobby/world/characters/royal-court.glb",
+      "bytes": 911124,
+      "extensions": [
+        "EXT_meshopt_compression",
+        "EXT_texture_webp",
+        "KHR_mesh_quantization"
+      ],
+      "meshes": 1,
+      "materials": 4,
+      "images": [
+        {
+          "index": 0,
+          "mime": "image/webp",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 195592,
+          "rgbaMipBytes": 5592405
+        }
+      ],
+      "textureBytes": 195592,
+      "estimatedRGBAWithMips": 5592405
+    }
+  ],
+  "externalTextures": [
+    {
+      "url": "/lobby/world/soil-color.webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 460360,
+      "rgbaMipBytes": 5592405
+    },
+    {
+      "url": "/lobby/world/soil-normal.webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 523530,
+      "rgbaMipBytes": 5592405
+    },
+    {
+      "url": "/lobby/world/meadow-color.webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 485202,
+      "rgbaMipBytes": 5592405
+    },
+    {
+      "url": "/lobby/world/meadow-normal.webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 604416,
+      "rgbaMipBytes": 5592405
+    },
+    {
+      "url": "/lobby/world/rock-face-detail.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1430482,
+      "rgbaMipBytes": 22369621
+    },
+    {
+      "url": "/lobby/world/canopy-tree_small_02.webp",
+      "width": 4096,
+      "height": 512,
+      "bytes": 553350,
+      "rgbaMipBytes": 11184811
+    },
+    {
+      "url": "/lobby/world/rock-face-normal.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1956924,
+      "rgbaMipBytes": 22369621
+    },
+    {
+      "url": "/lobby/world/limestone.webp",
+      "width": 512,
+      "height": 512,
+      "bytes": 29984,
+      "rgbaMipBytes": 1398101
+    },
+    {
+      "url": "/lobby/world/foliage.webp",
+      "width": 1024,
+      "height": 512,
+      "bytes": 218268,
+      "rgbaMipBytes": 2796203
+    },
+    {
+      "url": "/lobby/world/rock-face-color.webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 353040,
+      "rgbaMipBytes": 5592405
+    },
+    {
+      "url": "/lobby/textures/pokemon-front-charizard.webp",
+      "width": 512,
+      "height": 704,
+      "bytes": 79590,
+      "rgbaMipBytes": 1922389
+    },
+    {
+      "url": "/lobby/textures/pokemon-back.webp",
+      "width": 512,
+      "height": 714,
+      "bytes": 46642,
+      "rgbaMipBytes": 1949696
+    },
+    {
+      "url": "/lobby/world/canopy-pine_tree_01.webp",
+      "width": 4096,
+      "height": 512,
+      "bytes": 394362,
+      "rgbaMipBytes": 11184811
+    },
+    {
+      "url": "/lobby/textures/yugioh-back.webp",
+      "width": 500,
+      "height": 717,
+      "bytes": 30870,
+      "rgbaMipBytes": 1912000
+    },
+    {
+      "url": "/lobby/textures/yugioh-front-mago-negro.webp",
+      "width": 492,
+      "height": 717,
+      "bytes": 66090,
+      "rgbaMipBytes": 1881408
+    },
+    {
+      "url": "/lobby/world/characters/ainz-circle.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 62879,
+      "rgbaMipBytes": 1398101
+    }
+  ]
+}

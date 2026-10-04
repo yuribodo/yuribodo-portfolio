@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/assets/lobby-world/production/
 
 # next.js
 /.next/

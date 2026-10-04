@@ -30,9 +30,8 @@ const MACBOOK_Y_ROTATION = (5 * Math.PI) / 180; // ~5° off-axis
 // the seated POV without crowding the keyboard or the figures group.
 const MACBOOK_TARGET_WIDTH = 0.3;
 
-// Apple-logo emissive levels. The NoXiou5 emissiveTexture is mostly black
-// with the logo as the only bright zone, so modulating emissiveIntensity
-// on the whole material is effectively a logo-only dimmer.
+// emissiveIntensity levels. The material has no emissive map and emissiveFactor is [0,0,0], so these only take
+// effect if the model gains an emissive colour.
 const EMISSIVE_IDLE = 0.15;
 const EMISSIVE_HOVER = 0.45;
 const EMISSIVE_FLASH = 2.5;

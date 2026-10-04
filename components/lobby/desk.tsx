@@ -13,7 +13,7 @@ const DESK_TARGET_WIDTH = 1.6;
 // with the front (where you'd sit) facing the camera.
 const DESK_Y_ROTATION = -Math.PI / 2;
 
-export default function Desk() {
+export default function Desk({ onFloorReady }: { onFloorReady?: (y: number) => void }) {
   const { scene } = useGLTF(LOBBY_MODELS.desk);
 
   useLayoutEffect(() => {
@@ -36,6 +36,8 @@ export default function Desk() {
     const finalCentre = new Vector3();
     finalBox.getCenter(finalCentre);
     scene.position.set(-finalCentre.x, -finalBox.max.y, -finalCentre.z);
+    // The hutch is the model's highest point. Ground at the actual feet.
+    onFloorReady?.(new Box3().setFromObject(scene).min.y);
 
     scene.traverse((obj: Object3D) => {
       const mesh = obj as Mesh;
@@ -44,7 +46,7 @@ export default function Desk() {
         mesh.receiveShadow = true;
       }
     });
-  }, [scene]);
+  }, [scene, onFloorReady]);
 
   return <primitive object={scene} />;
 }

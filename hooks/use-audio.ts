@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import {
   getIsMuted,
   resumeOnGesture,
+  subscribeMuted,
   toggleMute,
 } from "@/lib/audio-manager";
 
 export function useAudio() {
-  const [isMuted, setIsMuted] = useState(() => getIsMuted());
+  // Server snapshot stays false so a muted visitor hydrates against the SSR markup, then updates.
+  const isMuted = useSyncExternalStore(subscribeMuted, getIsMuted, () => false);
 
   useEffect(() => {
     function handleInteraction() {
@@ -27,8 +29,7 @@ export function useAudio() {
   }, []);
 
   const toggle = useCallback(() => {
-    const newMuted = toggleMute();
-    setIsMuted(newMuted);
+    toggleMute();
   }, []);
 
   return { isMuted, toggle };

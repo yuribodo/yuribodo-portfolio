@@ -1,0 +1,38 @@
+{
+  "stag": {
+    "author": "CDmir (\u010cestm\u00edr Dammer), with TinyWorlds",
+    "license": "CC0-1.0",
+    "page": "https://opengameart.org/content/old-deer-male",
+    "url": "https://opengameart.org/sites/default/files/deer1.blend",
+    "modifications": "Converted legacy Blender materials to Principled PBR; one subdivision level; retained eating, idle and looking-around animation clips. Adjusted boundary UVs into painted fur islands to prevent blue atlas-padding seams; original texture pixels preserved.",
+    "runtimeStatus": "Archived; not loaded by the current fantasy world."
+  },
+  "deer": {
+    "author": "CDmir (\u010cestm\u00edr Dammer), with TinyWorlds",
+    "license": "CC0-1.0",
+    "page": "https://opengameart.org/content/deer-female",
+    "url": "https://opengameart.org/sites/default/files/doe.blend",
+    "modifications": "Converted legacy Blender materials to Principled PBR; one subdivision level; retained eating, idle and looking-around animation clips.",
+    "runtimeStatus": "Archived; not loaded by the current fantasy world."
+  },
+  "dragon": {
+    "author": "na3ee1",
+    "license": "CC-BY-3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "page": "https://poly.pizza/m/WIOTISRjeX",
+    "url": "https://static.poly.pizza/7523af18-fbad-4f98-a1e4-e88a8dacd4ff.glb",
+    "modifications": "Welded and subdivided in Blender; material palette consolidated into vertex colors; original skeletal flap/glide cycle and runtime flight paths. Runtime now bypasses the baked clip and articulates normalized GLTFLoader bone names directly: full shoulder/elbow strokes, glide, closed jaw and delayed tail; flight-tangent heading and curvature-based bank.",
+    "runtimeStatus": "Archived; replaced by the authored Dragon flying model."
+  },
+  "dragon-flying": {
+    "author": "NORBERTO-3D",
+    "title": "Dragon flying",
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "page": "https://sketchfab.com/3d-models/dragon-flying-78f809b98bbe426e94d4024dc894b206",
+    "redistributedSource": "https://github.com/RobertTownley/gamehook/tree/0393225db7/public/resources/dragon",
+    "licenseEvidence": "Source scene.gltf asset.extras contains the original author, title, CC-BY-4.0 license and Sketchfab source URL. The distributor also credits this exact model in README.md.",
+    "modifications": "glTF Transform optimize, Draco geometry and WebP textures, 1024px cap. Authored skeletal and morph clip preserved, runtime playback at 0.68 speed. Daylight roughness and emission adapted. Pose-aware size normalization; rider retained.",
+    "sha256": "d01941a82154fc91847836355415f63573fa0b79b3d58f83efce0d9e216346a9"
+  }
+}

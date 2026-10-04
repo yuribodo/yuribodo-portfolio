@@ -1,0 +1,711 @@
+{
+  "name": "world-held",
+  "marks": {
+    "loader": 120.90000000596046,
+    "sceneMounted": 676.5999999940395,
+    "idle": 2653.5
+  },
+  "longTasks": [
+    {
+      "start": 349.2999999821186,
+      "duration": 76
+    },
+    {
+      "start": 805.5999999940395,
+      "duration": 621
+    },
+    {
+      "start": 1426.5999999940395,
+      "duration": 216
+    },
+    {
+      "start": 1761.2999999821186,
+      "duration": 244
+    },
+    {
+      "start": 2005.699999988079,
+      "duration": 595
+    },
+    {
+      "start": 2601.4000000059605,
+      "duration": 51
+    },
+    {
+      "start": 2977.699999988079,
+      "duration": 923
+    },
+    {
+      "start": 4061.5999999940395,
+      "duration": 306
+    },
+    {
+      "start": 4609.0999999940395,
+      "duration": 659
+    },
+    {
+      "start": 5300.699999988079,
+      "duration": 476
+    },
+    {
+      "start": 5776.799999982119,
+      "duration": 246
+    },
+    {
+      "start": 6335.799999982119,
+      "duration": 64
+    },
+    {
+      "start": 6400.4000000059605,
+      "duration": 266
+    },
+    {
+      "start": 6667,
+      "duration": 264
+    },
+    {
+      "start": 6962.799999982119,
+      "duration": 264
+    },
+    {
+      "start": 7245.5,
+      "duration": 166
+    },
+    {
+      "start": 7550.199999988079,
+      "duration": 54
+    }
+  ],
+  "resources": [
+    {
+      "url": "/_next/static/media/051742360c26797e-s.p.102b7f24.woff2",
+      "initiator": "link",
+      "startMs": 109.90000000596046,
+      "endMs": 123.2999999821186,
+      "encodedBodyBytes": 31340,
+      "decodedBodyBytes": 31340,
+      "transferBytes": 31640
+    },
+    {
+      "url": "/_next/static/media/75affa71d1e2f6a7-s.p.51cde8ff.woff2",
+      "initiator": "link",
+      "startMs": 110.09999999403954,
+      "endMs": 129.09999999403954,
+      "encodedBodyBytes": 34940,
+      "decodedBodyBytes": 34940,
+      "transferBytes": 35240
+    },
+    {
+      "url": "/_next/static/chunks/9ccae526a5c25f36.css",
+      "initiator": "link",
+      "startMs": 110.90000000596046,
+      "endMs": 124.40000000596046,
+      "encodedBodyBytes": 9730,
+      "decodedBodyBytes": 51868,
+      "transferBytes": 10030
+    },
+    {
+      "url": "/_next/static/chunks/65ee189f7131983a.js",
+      "initiator": "link",
+      "startMs": 111,
+      "endMs": 129.2999999821186,
+      "encodedBodyBytes": 6201,
+      "decodedBodyBytes": 17873,
+      "transferBytes": 6501
+    },
+    {
+      "url": "/_next/static/chunks/a4335763fd548921.js",
+      "initiator": "script",
+      "startMs": 111.09999999403954,
+      "endMs": 129.5,
+      "encodedBodyBytes": 8338,
+      "decodedBodyBytes": 38395,
+      "transferBytes": 8638
+    },
+    {
+      "url": "/_next/static/chunks/e9b0fc8e278c08c0.js",
+      "initiator": "script",
+      "startMs": 111.09999999403954,
+      "endMs": 130.19999998807907,
+      "encodedBodyBytes": 32496,
+      "decodedBodyBytes": 118990,
+      "transferBytes": 32796
+    },
+    {
+      "url": "/_next/static/chunks/turbopack-f243d0cdfab69371.js",
+      "initiator": "script",
+      "startMs": 111.19999998807907,
+      "endMs": 135.40000000596046,
+      "encodedBodyBytes": 4030,
+      "decodedBodyBytes": 10232,
+      "transferBytes": 4330
+    },
+    {
+      "url": "/_next/static/chunks/475a91b1743f3576.js",
+      "initiator": "script",
+      "startMs": 111.19999998807907,
+      "endMs": 139.59999999403954,
+      "encodedBodyBytes": 70914,
+      "decodedBodyBytes": 224633,
+      "transferBytes": 71214
+    },
+    {
+      "url": "/_next/static/chunks/adc41e6c597b7cd2.js",
+      "initiator": "script",
+      "startMs": 111.2999999821186,
+      "endMs": 135.7999999821186,
+      "encodedBodyBytes": 5381,
+      "decodedBodyBytes": 18316,
+      "transferBytes": 5681
+    },
+    {
+      "url": "/_next/static/chunks/86ab33b342b75f60.js",
+      "initiator": "script",
+      "startMs": 111.40000000596046,
+      "endMs": 136,
+      "encodedBodyBytes": 27274,
+      "decodedBodyBytes": 70022,
+      "transferBytes": 27574
+    },
+    {
+      "url": "/_next/static/chunks/d0e58a787c15094e.js",
+      "initiator": "script",
+      "startMs": 111.5,
+      "endMs": 138.90000000596046,
+      "encodedBodyBytes": 17520,
+      "decodedBodyBytes": 43047,
+      "transferBytes": 17820
+    },
+    {
+      "url": "/_next/static/chunks/66e1d482cda1731d.js",
+      "initiator": "script",
+      "startMs": 111.59999999403954,
+      "endMs": 138.7999999821186,
+      "encodedBodyBytes": 282,
+      "decodedBodyBytes": 282,
+      "transferBytes": 582
+    },
+    {
+      "url": "/_next/static/chunks/955c5b83263281cf.js",
+      "initiator": "script",
+      "startMs": 111.59999999403954,
+      "endMs": 143.7999999821186,
+      "encodedBodyBytes": 7446,
+      "decodedBodyBytes": 30673,
+      "transferBytes": 7746
+    },
+    {
+      "url": "/_next/static/chunks/58f96ab04b3e7d95.js",
+      "initiator": "script",
+      "startMs": 111.69999998807907,
+      "endMs": 141.40000000596046,
+      "encodedBodyBytes": 1481,
+      "decodedBodyBytes": 2957,
+      "transferBytes": 1781
+    },
+    {
+      "url": "/_next/static/chunks/f5cdb999c4241940.js",
+      "initiator": "script",
+      "startMs": 111.69999998807907,
+      "endMs": 144,
+      "encodedBodyBytes": 26933,
+      "decodedBodyBytes": 69667,
+      "transferBytes": 27233
+    },
+    {
+      "url": "/squirtle.mp4",
+      "initiator": "video",
+      "startMs": 152.2999999821186,
+      "endMs": 157.09999999403954,
+      "encodedBodyBytes": 32270,
+      "decodedBodyBytes": 32270,
+      "transferBytes": 32570
+    },
+    {
+      "url": "/yugi.mp4",
+      "initiator": "video",
+      "startMs": 154.7999999821186,
+      "endMs": 166,
+      "encodedBodyBytes": 45158,
+      "decodedBodyBytes": 45158,
+      "transferBytes": 45458
+    },
+    {
+      "url": "/mario.mp4",
+      "initiator": "video",
+      "startMs": 155.2999999821186,
+      "endMs": 166.59999999403954,
+      "encodedBodyBytes": 68107,
+      "decodedBodyBytes": 68107,
+      "transferBytes": 68407
+    },
+    {
+      "url": "/_next/static/chunks/0b663d21dc4e2d89.js",
+      "initiator": "script",
+      "startMs": 324,
+      "endMs": 342.19999998807907,
+      "encodedBodyBytes": 307002,
+      "decodedBodyBytes": 1117750,
+      "transferBytes": 307302
+    },
+    {
+      "url": "/lobby/models/wooden_desk.glb",
+      "initiator": "fetch",
+      "startMs": 417.69999998807907,
+      "endMs": 453.40000000596046,
+      "encodedBodyBytes": 691660,
+      "decodedBodyBytes": 747208,
+      "transferBytes": 691960
+    },
+    {
+      "url": "/lobby/models/monitor.glb",
+      "initiator": "fetch",
+      "startMs": 418,
+      "endMs": 432.09999999403954,
+      "encodedBodyBytes": 110889,
+      "decodedBodyBytes": 140520,
+      "transferBytes": 111189
+    },
+    {
+      "url": "/lobby/models/macbook_pro_closed.glb",
+      "initiator": "fetch",
+      "startMs": 418.2999999821186,
+      "endMs": 452,
+      "encodedBodyBytes": 557868,
+      "decodedBodyBytes": 583020,
+      "transferBytes": 558168
+    },
+    {
+      "url": "/lobby/models/keyboard-razer.glb",
+      "initiator": "fetch",
+      "startMs": 418.5,
+      "endMs": 439.40000000596046,
+      "encodedBodyBytes": 276075,
+      "decodedBodyBytes": 343512,
+      "transferBytes": 276375
+    },
+    {
+      "url": "/lobby/models/mouse-razer.glb",
+      "initiator": "fetch",
+      "startMs": 418.59999999403954,
+      "endMs": 442.5,
+      "encodedBodyBytes": 357094,
+      "decodedBodyBytes": 368212,
+      "transferBytes": 357394
+    },
+    {
+      "url": "/lobby/models/minato.glb",
+      "initiator": "fetch",
+      "startMs": 418.90000000596046,
+      "endMs": 435.40000000596046,
+      "encodedBodyBytes": 137947,
+      "decodedBodyBytes": 163804,
+      "transferBytes": 138247
+    },
+    {
+      "url": "/lobby/models/seismitoad.glb",
+      "initiator": "fetch",
+      "startMs": 419.19999998807907,
+      "endMs": 440.7999999821186,
+      "encodedBodyBytes": 74276,
+      "decodedBodyBytes": 87472,
+      "transferBytes": 74576
+    },
+    {
+      "url": "/lobby/models/drago.glb",
+      "initiator": "fetch",
+      "startMs": 419.40000000596046,
+      "endMs": 445,
+      "encodedBodyBytes": 87010,
+      "decodedBodyBytes": 118920,
+      "transferBytes": 87310
+    },
+    {
+      "url": "/lobby/models/nintendo-ds.glb",
+      "initiator": "fetch",
+      "startMs": 419.59999999403954,
+      "endMs": 481.19999998807907,
+      "encodedBodyBytes": 868723,
+      "decodedBodyBytes": 1965268,
+      "transferBytes": 869023
+    },
+    {
+      "url": "/lobby/models/xbox-controller.glb",
+      "initiator": "fetch",
+      "startMs": 419.90000000596046,
+      "endMs": 454.2999999821186,
+      "encodedBodyBytes": 206557,
+      "decodedBodyBytes": 241140,
+      "transferBytes": 206857
+    },
+    {
+      "url": "/lobby/models/beyblade-pegasus.glb",
+      "initiator": "fetch",
+      "startMs": 420.09999999403954,
+      "endMs": 452.5,
+      "encodedBodyBytes": 57126,
+      "decodedBodyBytes": 75096,
+      "transferBytes": 57426
+    },
+    {
+      "url": "/icon.svg",
+      "initiator": "other",
+      "startMs": 468.7999999821186,
+      "endMs": 478.40000000596046,
+      "encodedBodyBytes": 2325,
+      "decodedBodyBytes": 2325,
+      "transferBytes": 2625
+    },
+    {
+      "url": "/lobby/draco/draco_wasm_wrapper.js",
+      "initiator": "fetch",
+      "startMs": 541.1999999880791,
+      "endMs": 550.5,
+      "encodedBodyBytes": 11737,
+      "decodedBodyBytes": 58456,
+      "transferBytes": 12037
+    },
+    {
+      "url": "/lobby/draco/draco_decoder.wasm",
+      "initiator": "fetch",
+      "startMs": 541.4000000059605,
+      "endMs": 553.1999999880791,
+      "encodedBodyBytes": 64112,
+      "decodedBodyBytes": 192420,
+      "transferBytes": 64412
+    },
+    {
+      "url": "/lobby/world/cloud-volume-0.bin.gz",
+      "initiator": "fetch",
+      "startMs": 811.1999999880791,
+      "endMs": 2706.5999999940395,
+      "encodedBodyBytes": 205876,
+      "decodedBodyBytes": 205876,
+      "transferBytes": 206176
+    },
+    {
+      "url": "/lobby/world/cloud-volume-1.bin.gz",
+      "initiator": "fetch",
+      "startMs": 811.2999999821186,
+      "endMs": 2706.9000000059605,
+      "encodedBodyBytes": 208815,
+      "decodedBodyBytes": 208815,
+      "transferBytes": 209115
+    },
+    {
+      "url": "/lobby/world/cloud-volume-2.bin.gz",
+      "initiator": "fetch",
+      "startMs": 811.5,
+      "endMs": 2710.5,
+      "encodedBodyBytes": 484019,
+      "decodedBodyBytes": 484019,
+      "transferBytes": 484319
+    },
+    {
+      "url": "/lobby/world/toothless-flight.glb",
+      "initiator": "fetch",
+      "startMs": 817.5,
+      "endMs": 2739.699999988079,
+      "encodedBodyBytes": 848124,
+      "decodedBodyBytes": 1154208,
+      "transferBytes": 848424
+    },
+    {
+      "url": "/lobby/world/characters/going-merry.glb",
+      "initiator": "fetch",
+      "startMs": 818,
+      "endMs": 2756.2999999821186,
+      "encodedBodyBytes": 790479,
+      "decodedBodyBytes": 1790720,
+      "transferBytes": 790779
+    },
+    {
+      "url": "/lobby/world/characters/snorlax.glb",
+      "initiator": "fetch",
+      "startMs": 818.2999999821186,
+      "endMs": 2717.7999999821186,
+      "encodedBodyBytes": 365032,
+      "decodedBodyBytes": 456564,
+      "transferBytes": 365332
+    },
+    {
+      "url": "/lobby/world/characters/lancelot.glb",
+      "initiator": "fetch",
+      "startMs": 818.5,
+      "endMs": 2749.699999988079,
+      "encodedBodyBytes": 877755,
+      "decodedBodyBytes": 974568,
+      "transferBytes": 878055
+    },
+    {
+      "url": "/lobby/world/characters/ainz.glb",
+      "initiator": "fetch",
+      "startMs": 818.7999999821186,
+      "endMs": 2728.2999999821186,
+      "encodedBodyBytes": 285798,
+      "decodedBodyBytes": 439536,
+      "transferBytes": 286098
+    },
+    {
+      "url": "/lobby/world/characters/fishstick.glb",
+      "initiator": "fetch",
+      "startMs": 819.0999999940395,
+      "endMs": 2736.699999988079,
+      "encodedBodyBytes": 318517,
+      "decodedBodyBytes": 454328,
+      "transferBytes": 318817
+    },
+    {
+      "url": "/lobby/world/organic-tree_small_02.glb",
+      "initiator": "fetch",
+      "startMs": 819.5,
+      "endMs": 2910.699999988079,
+      "encodedBodyBytes": 6463847,
+      "decodedBodyBytes": 7879308,
+      "transferBytes": 6464147
+    },
+    {
+      "url": "/lobby/world/valley-village.glb",
+      "initiator": "fetch",
+      "startMs": 851.2999999821186,
+      "endMs": 2748.7999999821186,
+      "encodedBodyBytes": 271834,
+      "decodedBodyBytes": 290388,
+      "transferBytes": 272134
+    },
+    {
+      "url": "/lobby/world/natural-vegetation.glb",
+      "initiator": "fetch",
+      "startMs": 853.0999999940395,
+      "endMs": 2758.199999988079,
+      "encodedBodyBytes": 379614,
+      "decodedBodyBytes": 462328,
+      "transferBytes": 379914
+    },
+    {
+      "url": "/lobby/world/organic-shrub_02.glb",
+      "initiator": "fetch",
+      "startMs": 1117.199999988079,
+      "endMs": 2769.7999999821186,
+      "encodedBodyBytes": 636012,
+      "decodedBodyBytes": 650664,
+      "transferBytes": 636312
+    },
+    {
+      "url": "/lobby/world/organic-fern_02.glb",
+      "initiator": "fetch",
+      "startMs": 1117.4000000059605,
+      "endMs": 2770.5,
+      "encodedBodyBytes": 422772,
+      "decodedBodyBytes": 427872,
+      "transferBytes": 423072
+    },
+    {
+      "url": "/lobby/world/organic-rock_moss_set_01.glb",
+      "initiator": "fetch",
+      "startMs": 1117.5,
+      "endMs": 2794,
+      "encodedBodyBytes": 1043714,
+      "decodedBodyBytes": 1052516,
+      "transferBytes": 1044014
+    },
+    {
+      "url": "/lobby/world/meadow-flowers.glb",
+      "initiator": "fetch",
+      "startMs": 1118.199999988079,
+      "endMs": 2767.5,
+      "encodedBodyBytes": 156827,
+      "decodedBodyBytes": 172588,
+      "transferBytes": 157127
+    },
+    {
+      "url": "/lobby/world/coastal-cliff.glb",
+      "initiator": "fetch",
+      "startMs": 1418.0999999940395,
+      "endMs": 2786.4000000059605,
+      "encodedBodyBytes": 651600,
+      "decodedBodyBytes": 718944,
+      "transferBytes": 651900
+    },
+    {
+      "url": "/lobby/world/sky-citadel-v2.glb",
+      "initiator": "fetch",
+      "startMs": 1418.4000000059605,
+      "endMs": 2807.5,
+      "encodedBodyBytes": 483418,
+      "decodedBodyBytes": 1561464,
+      "transferBytes": 483718
+    },
+    {
+      "url": "/lobby/world/chess-monuments.glb",
+      "initiator": "fetch",
+      "startMs": 1418.7999999821186,
+      "endMs": 2951.5,
+      "encodedBodyBytes": 1448915,
+      "decodedBodyBytes": 2158536,
+      "transferBytes": 1449215
+    },
+    {
+      "url": "/lobby/world/soil-color.webp",
+      "initiator": "img",
+      "startMs": 1425.7999999821186,
+      "endMs": 2785.699999988079,
+      "encodedBodyBytes": 460360,
+      "decodedBodyBytes": 460360,
+      "transferBytes": 460660
+    },
+    {
+      "url": "/lobby/world/soil-normal.webp",
+      "initiator": "img",
+      "startMs": 1425.9000000059605,
+      "endMs": 2802,
+      "encodedBodyBytes": 523530,
+      "decodedBodyBytes": 523530,
+      "transferBytes": 523830
+    },
+    {
+      "url": "/lobby/world/meadow-color.webp",
+      "initiator": "img",
+      "startMs": 1426,
+      "endMs": 2801.199999988079,
+      "encodedBodyBytes": 485202,
+      "decodedBodyBytes": 485202,
+      "transferBytes": 485502
+    },
+    {
+      "url": "/lobby/world/meadow-normal.webp",
+      "initiator": "img",
+      "startMs": 1426,
+      "endMs": 2809.7999999821186,
+      "encodedBodyBytes": 604416,
+      "decodedBodyBytes": 604416,
+      "transferBytes": 604716
+    },
+    {
+      "url": "/lobby/world/rock-face-detail.webp",
+      "initiator": "img",
+      "startMs": 1426.0999999940395,
+      "endMs": 2835.0999999940395,
+      "encodedBodyBytes": 1430482,
+      "decodedBodyBytes": 1430482,
+      "transferBytes": 1430782
+    },
+    {
+      "url": "/lobby/world/canopy-tree_small_02.webp",
+      "initiator": "img",
+      "startMs": 1426.199999988079,
+      "endMs": 2824.699999988079,
+      "encodedBodyBytes": 553350,
+      "decodedBodyBytes": 553350,
+      "transferBytes": 553650
+    },
+    {
+      "url": "/lobby/world/rock-face-normal.webp",
+      "initiator": "img",
+      "startMs": 1426.199999988079,
+      "endMs": 2839.4000000059605,
+      "encodedBodyBytes": 1956924,
+      "decodedBodyBytes": 1956924,
+      "transferBytes": 1957224
+    },
+    {
+      "url": "/lobby/world/limestone.webp",
+      "initiator": "img",
+      "startMs": 1426.2999999821186,
+      "endMs": 2816.5999999940395,
+      "encodedBodyBytes": 29984,
+      "decodedBodyBytes": 29984,
+      "transferBytes": 30284
+    },
+    {
+      "url": "/lobby/world/foliage.webp",
+      "initiator": "img",
+      "startMs": 1426.2999999821186,
+      "endMs": 2825.699999988079,
+      "encodedBodyBytes": 218268,
+      "decodedBodyBytes": 218268,
+      "transferBytes": 218568
+    },
+    {
+      "url": "/lobby/textures/pokemon-front-charizard.webp",
+      "initiator": "img",
+      "startMs": 1426.4000000059605,
+      "endMs": 1440.7999999821186,
+      "encodedBodyBytes": 79590,
+      "decodedBodyBytes": 79590,
+      "transferBytes": 79890
+    },
+    {
+      "url": "/lobby/world/rock-face-color.webp",
+      "initiator": "img",
+      "startMs": 1426.4000000059605,
+      "endMs": 2835.699999988079,
+      "encodedBodyBytes": 353040,
+      "decodedBodyBytes": 353040,
+      "transferBytes": 353340
+    },
+    {
+      "url": "/lobby/textures/pokemon-back.webp",
+      "initiator": "img",
+      "startMs": 1426.5,
+      "endMs": 1439.699999988079,
+      "encodedBodyBytes": 46642,
+      "decodedBodyBytes": 46642,
+      "transferBytes": 46942
+    },
+    {
+      "url": "/lobby/textures/yugioh-front-mago-negro.webp",
+      "initiator": "img",
+      "startMs": 1680.5999999940395,
+      "endMs": 1686.0999999940395,
+      "encodedBodyBytes": 66090,
+      "decodedBodyBytes": 66090,
+      "transferBytes": 66390
+    },
+    {
+      "url": "/lobby/textures/yugioh-back.webp",
+      "initiator": "img",
+      "startMs": 1680.699999988079,
+      "endMs": 1684.7999999821186,
+      "encodedBodyBytes": 30870,
+      "decodedBodyBytes": 30870,
+      "transferBytes": 31170
+    },
+    {
+      "url": "/lobby/world/canopy-pine_tree_01.webp",
+      "initiator": "img",
+      "startMs": 2697.4000000059605,
+      "endMs": 2836.7999999821186,
+      "encodedBodyBytes": 394362,
+      "decodedBodyBytes": 394362,
+      "transferBytes": 394662
+    },
+    {
+      "url": "/lobby/world/characters/royal-court.glb",
+      "initiator": "fetch",
+      "startMs": 6077.9000000059605,
+      "endMs": 6098.299999982119,
+      "encodedBodyBytes": 587738,
+      "decodedBodyBytes": 911124,
+      "transferBytes": 588038
+    },
+    {
+      "url": "/lobby/world/living-mill.glb",
+      "initiator": "fetch",
+      "startMs": 6132.0999999940395,
+      "endMs": 6136.5,
+      "encodedBodyBytes": 47204,
+      "decodedBodyBytes": 50152,
+      "transferBytes": 47504
+    },
+    {
+      "url": "/lobby/world/characters/ainz-circle.jpg",
+      "initiator": "img",
+      "startMs": 6931,
+      "endMs": 6940,
+      "encodedBodyBytes": 62879,
+      "decodedBodyBytes": 62879,
+      "transferBytes": 63179
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-09-15T01:24:17.955342+00:00",
+  "unitTests": {
+    "passed": 30,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 8,
+    "failed": 0,
+    "nativeGpu": true,
+    "baseURL": "http://localhost:3003"
+  },
+  "typeScript": "passed",
+  "productionBuild": "passed",
+  "changedFileEslint": "passed",
+  "dragonFlight": "14 poses, 1275 channels; every adjacent pose changes",
+  "captures": {
+    "url": "http://localhost:3002",
+    "viewports": [
+      "1440x900",
+      "1280x720",
+      "1920x1080"
+    ],
+    "consoleAndRuntimeErrors": []
+  },
+  "limitations": [
+    "Local RTX 3050 Laptop results; other desktop applications may affect GPU cadence.",
+    "No pre-change throttled-network measurement.",
+    "JS heap is an estimate, not peak heap or VRAM.",
+    "Three previously documented lint diagnostics remain in untouched keyboard/mouse files."
+  ]
+}

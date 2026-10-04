@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skybound — luz e movimento</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5f2;color:#223844;font:16px/1.6 system-ui,sans-serif}main{max-width:1180px;margin:auto;padding:28px 20px}h1{font-size:32px;line-height:1.2}h2{font-size:22px;margin-top:32px}p{max-width:82ch}a{color:#17668b}label{display:block;margin-top:12px}select{font:inherit;padding:6px 12px;margin:6px 0 16px;background:white;color:inherit;border:1px solid #aabbbf;border-radius:4px}.comparison{position:relative;aspect-ratio:8/5;background:#183444;overflow:hidden}.comparison img{position:absolute;width:100%;height:100%;object-fit:contain}.after{clip-path:inset(0 50% 0 0)}.divider{position:absolute;left:50%;height:100%;border-left:2px solid white;pointer-events:none}.tag{position:absolute;top:12px;padding:5px 12px;background:#183444ed;color:white;border-radius:4px}.old{right:12px}.new{left:12px}input{width:100%;accent-color:#17668b}video{width:100%;display:block;background:#183444}.note{font-size:14px;color:#4c606b}li{margin-block:6px}
+</style>
+<main>
+<h1>Sol, sombra e movimento</h1>
+<p>A luz agora varia ao longo do vale. As áreas sob nuvens mantêm a iluminação do céu, as folhas deixam passar parte da luz do sol e o rio tem ondulações irregulares.</p>
+<label for="view">Vista</label><select id="view"><option value="rear">O vale atrás da mesa</option><option value="desktop">Sentado à mesa</option></select>
+<div class="comparison"><img class="before" src="../implementation/before-lighting-rear.png" alt="Vale antes da revisão de iluminação"><img class="after" src="../implementation/before-ambient-rear.png" alt="Vale com a iluminação revisada"><div class="divider"></div><span class="tag new">Atual</span><span class="tag old">Anterior</span></div>
+<label for="reveal">Arraste para comparar: <output id="percentage">50</output>% da versão atual</label><input id="reveal" type="range" min="0" max="100" value="50">
+<p class="note">Mesmo enquadramento e resolução por vista. Nuvens e vegetação estão em movimento; as capturas não representam o mesmo instante da animação.</p>
+<h2>Veja em movimento</h2>
+<video controls playsinline preload="metadata" poster="../implementation/before-ambient-rear.png"><source src="../implementation/lighting-motion.mp4" type="video/mp4"></video>
+<p class="note">Gravação do navegador com a versão de produção local. O vídeo não inicia automaticamente.</p>
+<h2>O que mudou</h2><ul>
+<li>Sol mais lateral e quente, com preenchimento frio nas sombras.</li>
+<li>Sombras próximas cobrindo árvores, ruínas e os arredores da mesa.</li>
+<li>Cobertura de nuvens animada e compartilhada entre os materiais do ambiente.</li>
+<li>Transmissão de luz nas folhas e pétalas, dependente da posição do sol e da câmera.</li>
+<li>Ondulações do rio sem a grade repetida de reflexos; variação por profundidade e espuma nas margens rasas.</li>
+</ul>
+<p>As sombras de nuvens e a transmissão nas folhas são aproximações leves. O relevo e as margens do rio ainda precisam de trabalho de forma; iluminação não resolve essa parte.</p>
+<p><a href="lighting-and-shaders.md">Notas técnicas e validação</a></p>
+</main>
+<script>
+const range=document.querySelector('#reveal'),view=document.querySelector('#view');
+range.addEventListener('input',()=>{document.querySelector('.after').style.clipPath=`inset(0 ${100-range.value}% 0 0)`;document.querySelector('.divider').style.left=range.value+'%';document.querySelector('#percentage').value=range.value;});
+view.addEventListener('change',()=>{const name=view.value;document.querySelector('.before').src=`../implementation/before-lighting-${name}.png`;document.querySelector('.after').src=`../implementation/before-ambient-${name}.png`;document.querySelector('.before').alt=name==='rear'?'Vale antes da revisão de iluminação':'Mesa antes da revisão de iluminação';document.querySelector('.after').alt=name==='rear'?'Vale com a iluminação revisada':'Mesa com a iluminação revisada';});
+</script></html>

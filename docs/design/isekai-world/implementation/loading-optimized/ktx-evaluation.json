@@ -1,0 +1,22 @@
+{
+  "sourceBytes": 747208,
+  "source": "wooden_desk.glb",
+  "tool": "KTX-Software 4.4.2",
+  "dimensions": "preserved",
+  "mips": "offline generated",
+  "candidates": [
+    {
+      "candidate": "desk-ktx.glb",
+      "bytes": 9238332,
+      "geometryVerifiedIdentical": true,
+      "sha256": "42e9d7c10356676570b52de56fc3f32e1eae3ece8c652123a420eae9ea06914c"
+    },
+    {
+      "candidate": "desk-etc1s.glb",
+      "bytes": 1888796,
+      "geometryVerifiedIdentical": true,
+      "sha256": "6d2f6b4fb7cedde7dc5ab97c2f795ae7ad4e06fee05b37ee77b81f5a2a91cbca"
+    }
+  ],
+  "decision": "Not integrated: UASTC increases desk bytes 12.4x, ETC1S 2.5x; would add critical download/transcoder cost. GPU/visual comparison not performed. Preserve current desk WebP for this pass."
+}

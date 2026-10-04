@@ -1,0 +1,12 @@
+{
+  "asset": "Rock Face 03",
+  "author": "Dario Barresi (photography), Rico Cilliers (processing)",
+  "source": "https://polyhaven.com/a/rock_face_03",
+  "license": "CC0",
+  "resolution": 2048,
+  "files": [
+    {"source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_face_03/rock_face_03_diff_2k.jpg", "input": "rock-face-detail.jpg", "output": "rock-face-detail.webp", "quality": 90},
+    {"source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_face_03/rock_face_03_nor_gl_2k.jpg", "input": "rock-face-normal.jpg", "output": "rock-face-normal.webp", "quality": 94}
+  ],
+  "rebuild": "Download source files under their input names; node scripts/build-rock-detail.mjs <download-directory>"
+}

@@ -16,6 +16,13 @@ const state: AudioManagerState = {
   buffers: new Map(),
 };
 
+const muteListeners = new Set<() => void>();
+
+export function subscribeMuted(listener: () => void): () => void {
+  muteListeners.add(listener);
+  return () => { muteListeners.delete(listener); };
+}
+
 function getContext(): AudioContext {
   if (!state.audioContext) {
     state.audioContext = new AudioContext();
@@ -72,7 +79,8 @@ function fadeSoundtrackTo(target: number, durationMs: number): void {
 
   function step(now: number) {
     const elapsed = now - startTime;
-    const progress = Math.min(elapsed / durationMs, 1);
+    // A callback queued during a frame can receive that frame's earlier timestamp.
+    const progress = Math.max(0, Math.min(elapsed / durationMs, 1));
     audio.volume = start + (target - start) * progress;
     if (progress < 1) requestAnimationFrame(step);
   }
@@ -92,6 +100,7 @@ export function toggleMute(): boolean {
     }
   }
 
+  muteListeners.forEach((listener) => listener());
   return state.isMuted;
 }
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useVisibleVideo } from "@/hooks/use-visible-video";
+
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -67,13 +69,7 @@ export function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Slow down video to 0.3x speed
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.playbackRate = 0.3;
-    }
-  }, []);
+  useVisibleVideo(videoRef, 0.3);
 
   useGSAP(
     () => {
@@ -184,12 +180,11 @@ export function About() {
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-background px-6 py-40">
       {/* Mario silhouette */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         ref={videoRef}
         data-about-silhouette
         src="/mario.mp4"
-        autoPlay
+        preload="none"
         loop
         muted
         playsInline
